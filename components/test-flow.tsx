@@ -166,9 +166,9 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
             </div>
           </div>
           <div className="mt-3">
-            <div className="h-1 w-full overflow-hidden rounded-full bg-slate-100">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
               <div
-                className="h-full rounded-full bg-slate-950 transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -232,18 +232,18 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
                     <motion.button
                       key={option.id}
                       onClick={() => handleSelectOption(option.id)}
-                      className={`group relative w-full rounded-lg border-2 p-4 text-left transition-all duration-150 ${
+                      className={`group relative w-full rounded-xl border-2 p-4 text-left transition-all duration-150 ${
                         isSelected
-                          ? "border-slate-950 bg-slate-950/[0.03]"
-                          : "border-slate-200 bg-white hover:border-slate-400"
+                          ? "border-indigo-600 bg-indigo-50/60"
+                          : "border-slate-200 bg-white hover:border-indigo-300 hover:bg-slate-50/50"
                       }`}
                       whileTap={{ scale: 0.995 }}
                     >
                       <div className="flex items-start gap-3.5">
                         <span
-                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-sm font-bold transition-colors ${
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold transition-colors ${
                             isSelected
-                              ? "bg-slate-950 text-white"
+                              ? "bg-gradient-to-br from-indigo-600 to-violet-600 text-white"
                               : "bg-slate-100 text-slate-600"
                           }`}
                         >
@@ -251,7 +251,7 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
                         </span>
                         <span className="pt-1 text-sm text-slate-700">{option.text[lang]}</span>
                         {isSelected && (
-                          <CheckCircle className="ml-auto mt-0.5 h-4.5 w-4.5 shrink-0 text-slate-950" />
+                          <CheckCircle className="ml-auto mt-0.5 h-4.5 w-4.5 shrink-0 text-indigo-600" />
                         )}
                       </div>
                     </motion.button>
@@ -264,7 +264,7 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
             {isPractical && (
               <div className="space-y-4">
                 <textarea
-                  className="w-full min-h-[180px] resize-y rounded-lg border-2 border-slate-200 bg-white p-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-950 focus:outline-none"
+                  className="w-full min-h-[180px] resize-y rounded-xl border-2 border-slate-200 bg-white p-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none"
                   placeholder={t(UI.test.practicalPlaceholder, lang)}
                   value={practicalTexts[question.id] || ""}
                   onChange={(e) =>
@@ -321,7 +321,7 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
           <button
             onClick={handleNext}
             disabled={!canContinue}
-            className="flex items-center gap-2 rounded-md bg-slate-950 px-8 py-2.5 text-sm font-semibold text-white transition-all hover:bg-slate-800 disabled:opacity-30"
+            className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-8 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 disabled:opacity-30 disabled:shadow-none"
           >
             {isLast ? t(UI.test.viewResults, lang) : t(UI.test.next, lang)}
             <ChevronRight className="h-4 w-4" />

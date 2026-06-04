@@ -1,8 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { dimensions, levels } from "@/lib/test-data";
 import { useLang } from "@/contexts/language-context";
 import { UI, t } from "@/lib/i18n";
@@ -12,7 +10,7 @@ import {
   Clock,
   Target,
   ChevronRight,
-  Award,
+  Star,
   BarChart3,
   ArrowRight,
   MessageSquare,
@@ -24,6 +22,7 @@ import {
   Check,
   LogIn,
   LogOut,
+  Sparkles,
 } from "lucide-react";
 
 interface LandingPageProps {
@@ -40,35 +39,21 @@ const iconMap: Record<string, React.ElementType> = {
   TrendingUp,
 };
 
-const DIM_ICON_STYLES = [
-  "bg-blue-50 text-blue-600",
-  "bg-violet-50 text-violet-600",
-  "bg-teal-50 text-teal-600",
-  "bg-amber-50 text-amber-600",
-  "bg-rose-50 text-rose-600",
-  "bg-emerald-50 text-emerald-600",
+// Coordinated cool-tone gradients (indigo / violet family)
+const DIM_GRADIENTS = [
+  "from-indigo-500 to-violet-500",
+  "from-violet-500 to-fuchsia-500",
+  "from-blue-500 to-indigo-500",
+  "from-fuchsia-500 to-pink-500",
+  "from-sky-500 to-blue-500",
+  "from-purple-500 to-indigo-500",
 ];
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function Pill({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-5 flex items-center gap-3">
-      <div className="h-px w-7 bg-amber-500" />
-      <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-amber-600">
-        {children}
-      </span>
-    </div>
-  );
-}
-
-function SectionLabelCenter({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mb-5 flex items-center justify-center gap-3">
-      <div className="h-px w-7 bg-amber-500" />
-      <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-amber-600">
-        {children}
-      </span>
-      <div className="h-px w-7 bg-amber-500" />
-    </div>
+    <span className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3.5 py-1.5 text-xs font-semibold text-indigo-700">
+      {children}
+    </span>
   );
 }
 
@@ -77,44 +62,33 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
   const { lang, setLang } = useLang();
 
   return (
-    <div className="min-h-screen bg-white">
-
-      {/* ── Navigation ─────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
-          {/* Logo */}
+    <div className="min-h-screen bg-white text-slate-900">
+      {/* ── Nav ────────────────────────────────────────────────────── */}
+      <nav className="sticky top-0 z-50 border-b border-slate-100 bg-white/85 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-950">
-              <Brain className="h-4 w-4 text-white" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-sm shadow-indigo-500/30">
+              <Brain className="h-5 w-5 text-white" />
             </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-sm font-bold tracking-tight text-slate-900">
-                {t(UI.nav.brand, lang)}
-              </span>
-              <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-slate-400">
-                Assessment
-              </span>
-            </div>
+            <span className="text-[17px] font-bold tracking-tight">{t(UI.nav.brand, lang)}</span>
           </div>
 
-          {/* Center nav */}
-          <div className="hidden items-center gap-7 md:flex">
-            <a href="#framework" className="text-sm font-medium text-slate-500 transition-colors hover:text-slate-900">
-              {lang === "zh" ? "评估框架" : "Framework"}
+          <div className="hidden items-center gap-8 md:flex">
+            <a href="#how" className="text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600">
+              {lang === "zh" ? "怎么测" : "How it works"}
             </a>
-            <a href="#levels" className="text-sm font-medium text-slate-500 transition-colors hover:text-slate-900">
-              {lang === "zh" ? "等级体系" : "Levels"}
+            <a href="#dimensions" className="text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600">
+              {lang === "zh" ? "测什么" : "What we measure"}
             </a>
-            <a href="#pricing" className="text-sm font-medium text-slate-500 transition-colors hover:text-slate-900">
+            <a href="#pricing" className="text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600">
               {t(UI.nav.pricing, lang)}
             </a>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setLang(lang === "zh" ? "en" : "zh")}
-              className="rounded border border-slate-200 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-slate-500 transition-all hover:border-slate-400 hover:text-slate-800"
+              className="rounded-full px-3 py-1.5 text-xs font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
               {lang === "zh" ? "EN" : "中文"}
             </button>
@@ -122,160 +96,241 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
             {session ? (
               <div className="flex items-center gap-2">
                 {session.user?.image && (
-                  <img src={session.user.image} alt={session.user.name ?? "User"} className="h-7 w-7 rounded-full ring-2 ring-slate-200" />
+                  <img src={session.user.image} alt={session.user.name ?? "User"} className="h-8 w-8 rounded-full ring-2 ring-indigo-100" />
                 )}
-                <span className="hidden text-sm font-medium text-slate-700 sm:block">{session.user?.name}</span>
-                <button onClick={() => signOut()} className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900">
-                  <LogOut className="h-3.5 w-3.5" />
+                <button onClick={() => signOut()} className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+                  <LogOut className="h-4 w-4" />
                 </button>
               </div>
             ) : (
-              <button onClick={() => signIn("google")} className="hidden items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 sm:flex">
-                <LogIn className="h-3.5 w-3.5" />
-                {t(UI.nav.login, lang)}
+              <button onClick={() => signIn("google")} className="hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-indigo-600 sm:flex">
+                <LogIn className="h-4 w-4" />
+                {lang === "zh" ? "登录" : "Log in"}
               </button>
             )}
 
-            <Button
+            <button
               onClick={onStartTest}
-              size="sm"
-              className="rounded-md bg-slate-950 px-5 text-sm font-semibold text-white hover:bg-slate-800"
+              className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-slate-800"
             >
               {t(UI.nav.startTest, lang)}
-            </Button>
+            </button>
           </div>
         </div>
       </nav>
 
-      {/* ── Hero ── Dark, authoritative ────────────────────────────── */}
-      <section className="relative overflow-hidden bg-slate-950 px-6 pb-28 pt-24 md:pb-36 md:pt-32">
-        {/* Grid overlay */}
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff07_1px,transparent_1px),linear-gradient(to_bottom,#ffffff07_1px,transparent_1px)] bg-[size:60px_60px]" />
-        {/* Ambient glows */}
-        <div className="pointer-events-none absolute left-1/4 top-0 h-[480px] w-[560px] -translate-y-1/2 rounded-full bg-blue-700/12 blur-[110px]" />
-        <div className="pointer-events-none absolute right-1/4 bottom-0 h-[360px] w-[440px] translate-y-1/2 rounded-full bg-violet-700/10 blur-[100px]" />
+      {/* ── Hero ───────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden">
+        {/* Soft gradient mesh */}
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -left-32 -top-32 h-[480px] w-[480px] rounded-full bg-indigo-300/30 blur-[120px]" />
+          <div className="absolute right-0 top-20 h-[420px] w-[420px] rounded-full bg-fuchsia-300/25 blur-[120px]" />
+          <div className="absolute bottom-0 left-1/3 h-[360px] w-[360px] rounded-full bg-violet-300/20 blur-[110px]" />
+        </div>
 
-        <div className="relative mx-auto max-w-4xl text-center">
-          {/* Overline */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8 flex items-center justify-center gap-3"
-          >
-            <div className="h-px w-8 bg-amber-400/70" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-400">
-              {lang === "zh" ? "专业 AI 素养认证平台" : "Professional AI Literacy Certification"}
-            </span>
-            <div className="h-px w-8 bg-amber-400/70" />
-          </motion.div>
+        <div className="mx-auto max-w-6xl px-5 pb-20 pt-16 md:pb-28 md:pt-24">
+          <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
+            {/* Left copy */}
+            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <Pill>
+                <Sparkles className="h-3.5 w-3.5" />
+                {t(UI.hero.badge, lang)}
+              </Pill>
 
-          {/* Heading */}
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="mb-6 text-5xl font-bold leading-[1.06] tracking-tight text-white md:text-6xl lg:text-7xl"
-          >
-            {lang === "zh" ? (
-              <>
-                量化你真实的
-                <br />
-                <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-violet-400 bg-clip-text text-transparent">
-                  AI 素养水平
+              <h1 className="mt-6 text-[44px] font-extrabold leading-[1.05] tracking-tight md:text-6xl">
+                {t(UI.hero.title1, lang)}{" "}
+                <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
+                  {t(UI.hero.titleHighlight, lang)}
                 </span>
-              </>
-            ) : (
-              <>
-                The Standard for
-                <br />
-                <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-violet-400 bg-clip-text text-transparent">
-                  AI Literacy
-                </span>
-              </>
-            )}
-          </motion.h1>
+                {t(UI.hero.title2, lang)}
+              </h1>
 
-          {/* Subheading */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-slate-400 md:text-xl"
-          >
-            {t(UI.hero.desc, lang)}
-          </motion.p>
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-600">
+                {t(UI.hero.desc, lang)}
+              </p>
 
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col items-center justify-center gap-4 sm:flex-row"
-          >
-            <button
-              onClick={onStartTest}
-              className="inline-flex h-12 items-center gap-2.5 rounded-md bg-white px-8 text-base font-semibold text-slate-950 shadow-lg transition-all hover:bg-slate-100 hover:shadow-xl active:scale-[0.98]"
-            >
-              {t(UI.hero.cta, lang)}
-              <ArrowRight className="h-4 w-4" />
-            </button>
-            <div className="flex items-center gap-4 text-sm text-slate-500">
-              <span className="flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5" />
-                15 {t(UI.hero.minutes, lang)}
-              </span>
-              <span className="h-1 w-1 rounded-full bg-slate-700" />
-              <span className="flex items-center gap-1.5">
-                <Target className="h-3.5 w-3.5" />
-                18 {t(UI.hero.questions, lang)}
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Stats strip */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.55 }}
-            className="mt-20 grid grid-cols-2 gap-8 border-t border-white/8 pt-12 md:grid-cols-4"
-          >
-            {[
-              { value: "50,000+", label: lang === "zh" ? "已完成测评" : "Assessments" },
-              { value: "6", label: lang === "zh" ? "核心维度" : "Dimensions" },
-              { value: "5", label: lang === "zh" ? "专业等级" : "Levels" },
-              { value: "18", label: lang === "zh" ? "道精选题目" : "Questions" },
-            ].map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-3xl font-black tabular-nums text-white">{s.value}</div>
-                <div className="mt-1 text-[11px] font-medium uppercase tracking-wider text-slate-500">{s.label}</div>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <button
+                  onClick={onStartTest}
+                  className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 transition-all hover:shadow-xl hover:shadow-indigo-500/40 active:scale-[0.98]"
+                >
+                  {t(UI.hero.cta, lang)}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </button>
+                <button
+                  onClick={onStartTest}
+                  className="inline-flex h-13 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-7 py-3.5 text-base font-semibold text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
+                >
+                  <Play className="h-4 w-4 fill-current" />
+                  {t(UI.hero.ctaSecondary, lang)}
+                </button>
               </div>
-            ))}
-          </motion.div>
+
+              {/* Trust row */}
+              <div className="mt-10 flex flex-wrap items-center gap-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-2.5">
+                    {["from-indigo-400 to-violet-500", "from-violet-400 to-fuchsia-500", "from-sky-400 to-indigo-500", "from-fuchsia-400 to-pink-500", "from-blue-400 to-indigo-500"].map((g, i) => (
+                      <div key={i} className={`flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br ${g} text-xs font-bold text-white ring-2 ring-white`}>
+                        {String.fromCharCode(65 + i)}
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1">
+                      {[0, 1, 2, 3, 4].map((i) => (
+                        <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                    <p className="mt-0.5 text-xs font-medium text-slate-500">{t(UI.hero.socialProof, lang)}</p>
+                  </div>
+                </div>
+                <div className="hidden h-8 w-px bg-slate-200 sm:block" />
+                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                  <Check className="h-4 w-4 text-emerald-500" />
+                  {t(UI.hero.noCard, lang)}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Right: result card mockup */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="relative mx-auto w-full max-w-md"
+            >
+              {/* Main report card */}
+              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-2xl shadow-indigo-500/10">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    {lang === "zh" ? "你的 AI 素养报告" : "Your AI Fluency Report"}
+                  </span>
+                  <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600">
+                    {lang === "zh" ? "已完成" : "COMPLETE"}
+                  </span>
+                </div>
+
+                <div className="mt-5 flex items-center gap-4">
+                  <div className="flex h-16 w-16 flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-500/30">
+                    <span className="text-2xl font-black leading-none">L4</span>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-slate-900">{lang === "zh" ? "AI 协作者" : "AI Collaborator"}</p>
+                    <p className="text-sm text-slate-500">{lang === "zh" ? "超过 78% 的用户" : "Top 22% of users"}</p>
+                  </div>
+                </div>
+
+                {/* Dimension bars */}
+                <div className="mt-6 space-y-3">
+                  {[
+                    { n: lang === "zh" ? "提示能力" : "Prompting", v: 88, g: "from-indigo-500 to-violet-500" },
+                    { n: lang === "zh" ? "输出评估" : "Evaluation", v: 74, g: "from-violet-500 to-fuchsia-500" },
+                    { n: lang === "zh" ? "风险意识" : "Risk Awareness", v: 62, g: "from-blue-500 to-indigo-500" },
+                  ].map((d, i) => (
+                    <div key={d.n}>
+                      <div className="mb-1 flex items-center justify-between text-xs">
+                        <span className="font-medium text-slate-600">{d.n}</span>
+                        <span className="font-bold tabular-nums text-slate-900">{d.v}%</span>
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${d.v}%` }}
+                          transition={{ duration: 1, delay: 0.5 + i * 0.15 }}
+                          className={`h-full rounded-full bg-gradient-to-r ${d.g}`}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Floating accent card */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="absolute -bottom-5 -left-5 flex items-center gap-2.5 rounded-2xl border border-slate-100 bg-white p-3 pr-4 shadow-xl shadow-indigo-500/10"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500">
+                  <TrendingUp className="h-4.5 w-4.5 text-white" />
+                </div>
+                <div className="leading-tight">
+                  <p className="text-sm font-bold text-slate-900">+2 {lang === "zh" ? "等级" : "levels"}</p>
+                  <p className="text-[11px] text-slate-500">{lang === "zh" ? "成长空间" : "growth potential"}</p>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* ── Framework ──────────────────────────────────────────────── */}
-      <section id="framework" className="px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-14"
-          >
-            <SectionLabel>
-              {lang === "zh" ? "评估框架" : "Assessment Framework"}
-            </SectionLabel>
-            <h2 className="mb-4 max-w-xl text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-              {t(UI.dimensions.sectionTitle, lang)}
-            </h2>
-            <p className="max-w-2xl text-lg text-slate-500">
-              {t(UI.dimensions.sectionDesc, lang)}
-            </p>
-          </motion.div>
+      {/* ── Stats strip ────────────────────────────────────────────── */}
+      <section className="border-y border-slate-100 bg-slate-50/60">
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 px-5 py-10 md:grid-cols-4">
+          {[
+            { v: "50K+", l: lang === "zh" ? "完成测评" : "Assessments taken" },
+            { v: "6", l: lang === "zh" ? "能力维度" : "Skill dimensions" },
+            { v: "15 min", l: lang === "zh" ? "平均用时" : "Average time" },
+            { v: "4.9★", l: lang === "zh" ? "用户评分" : "User rating" },
+          ].map((s) => (
+            <div key={s.l} className="text-center">
+              <div className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-3xl font-extrabold text-transparent">{s.v}</div>
+              <div className="mt-1 text-sm font-medium text-slate-500">{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* ── How it works ───────────────────────────────────────────── */}
+      <section id="how" className="px-5 py-24 md:py-28">
+        <div className="mx-auto max-w-5xl">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <Pill>{lang === "zh" ? "简单三步" : "Simple 3 steps"}</Pill>
+            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.howItWorks.title, lang)}</h2>
+            <p className="mt-3 text-lg text-slate-600">{t(UI.howItWorks.subtitle, lang)}</p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              { n: "1", title: t(UI.howItWorks.step1.title, lang), desc: t(UI.howItWorks.step1.desc, lang), icon: Play, g: "from-indigo-500 to-violet-500" },
+              { n: "2", title: t(UI.howItWorks.step2.title, lang), desc: t(UI.howItWorks.step2.desc, lang), icon: BarChart3, g: "from-violet-500 to-fuchsia-500" },
+              { n: "3", title: t(UI.howItWorks.step3.title, lang), desc: t(UI.howItWorks.step3.desc, lang), icon: TrendingUp, g: "from-fuchsia-500 to-pink-500" },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  key={item.n}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.12 }}
+                  className="relative rounded-3xl border border-slate-100 bg-white p-7 shadow-sm transition-all hover:shadow-lg hover:shadow-indigo-500/5"
+                >
+                  <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${item.g} shadow-md shadow-indigo-500/20`}>
+                    <Icon className="h-6 w-6 text-white" />
+                  </div>
+                  <span className="absolute right-7 top-7 text-5xl font-black text-slate-100">{item.n}</span>
+                  <h3 className="mb-2 text-xl font-bold">{item.title}</h3>
+                  <p className="leading-relaxed text-slate-600">{item.desc}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Dimensions ─────────────────────────────────────────────── */}
+      <section id="dimensions" className="bg-slate-50/60 px-5 py-24 md:py-28">
+        <div className="mx-auto max-w-6xl">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <Pill>{lang === "zh" ? "测什么" : "What we measure"}</Pill>
+            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.dimensions.sectionTitle, lang)}</h2>
+            <p className="mt-3 text-lg text-slate-600">{t(UI.dimensions.sectionDesc, lang)}</p>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {dimensions.map((dim, i) => {
               const Icon = iconMap[dim.icon] || Brain;
               return (
@@ -284,26 +339,14 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                   initial={{ opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.07 }}
+                  transition={{ duration: 0.4, delay: i * 0.06 }}
+                  className="group rounded-3xl border border-slate-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10"
                 >
-                  <Card className="group h-full border border-slate-200 bg-white shadow-none transition-all duration-200 hover:border-slate-300 hover:shadow-md">
-                    <CardContent className="p-6">
-                      <div className="mb-5 flex items-center justify-between">
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${DIM_ICON_STYLES[i]}`}>
-                          <Icon className="h-5 w-5" />
-                        </div>
-                        <span className="text-2xl font-black tabular-nums text-slate-100">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                      </div>
-                      <h3 className="mb-1.5 text-sm font-bold text-slate-900">
-                        {dim.name[lang]}
-                      </h3>
-                      <p className="text-sm leading-relaxed text-slate-500">
-                        {dim.description[lang]}
-                      </p>
-                    </CardContent>
-                  </Card>
+                  <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${DIM_GRADIENTS[i]} shadow-md shadow-indigo-500/20`}>
+                    <Icon className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="mb-2 text-lg font-bold">{dim.name[lang]}</h3>
+                  <p className="text-sm leading-relaxed text-slate-600">{dim.description[lang]}</p>
                 </motion.div>
               );
             })}
@@ -312,91 +355,30 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
       </section>
 
       {/* ── Levels ─────────────────────────────────────────────────── */}
-      <section id="levels" className="border-y border-slate-100 bg-slate-50 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-14 text-center"
-          >
-            <SectionLabelCenter>
-              {lang === "zh" ? "认证等级体系" : "Certification Levels"}
-            </SectionLabelCenter>
-            <h2 className="mb-4 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-              {t(UI.levels.sectionTitle, lang)}
-            </h2>
-            <p className="mx-auto max-w-2xl text-lg text-slate-500">
-              {t(UI.levels.sectionDesc, lang)}
-            </p>
-          </motion.div>
-
-          <div className="relative">
-            {/* Connector line */}
-            <div className="absolute left-0 right-0 top-[26px] hidden h-px bg-slate-200 md:block" />
-            <div className="grid gap-8 md:grid-cols-5">
-              {levels.map((level, i) => (
-                <motion.div
-                  key={level.level}
-                  initial={{ opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.09 }}
-                  className="relative flex flex-col items-center text-center"
-                >
-                  <div className={`relative z-10 mb-5 flex h-[52px] w-[52px] items-center justify-center rounded-full border-4 border-white shadow-md ${level.color} text-white`}>
-                    <span className="text-sm font-bold">{level.badge}</span>
-                  </div>
-                  <h4 className="mb-1 text-sm font-bold text-slate-900">{level.name[lang]}</h4>
-                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                    {level.minScore}–{level.maxScore}{t(UI.levels.points, lang)}
-                  </p>
-                  <p className="text-xs leading-relaxed text-slate-500">{level.description[lang]}</p>
-                </motion.div>
-              ))}
-            </div>
+      <section className="px-5 py-24 md:py-28">
+        <div className="mx-auto max-w-6xl">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <Pill>{lang === "zh" ? "你会拿到哪个等级" : "Where will you land"}</Pill>
+            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.levels.sectionTitle, lang)}</h2>
+            <p className="mt-3 text-lg text-slate-600">{t(UI.levels.sectionDesc, lang)}</p>
           </div>
-        </div>
-      </section>
 
-      {/* ── How it Works ───────────────────────────────────────────── */}
-      <section className="px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-5xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-16 text-center"
-          >
-            <SectionLabelCenter>
-              {lang === "zh" ? "测评流程" : "The Process"}
-            </SectionLabelCenter>
-            <h2 className="mb-4 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-              {t(UI.howItWorks.title, lang)}
-            </h2>
-            <p className="mx-auto max-w-xl text-lg text-slate-500">
-              {t(UI.howItWorks.subtitle, lang)}
-            </p>
-          </motion.div>
-
-          <div className="grid gap-12 md:grid-cols-3 md:gap-10">
-            {[
-              { step: "01", title: t(UI.howItWorks.step1.title, lang), desc: t(UI.howItWorks.step1.desc, lang), icon: Play },
-              { step: "02", title: t(UI.howItWorks.step2.title, lang), desc: t(UI.howItWorks.step2.desc, lang), icon: BarChart3 },
-              { step: "03", title: t(UI.howItWorks.step3.title, lang), desc: t(UI.howItWorks.step3.desc, lang), icon: TrendingUp },
-            ].map((item, i) => (
+          <div className="grid gap-4 md:grid-cols-5">
+            {levels.map((level, i) => (
               <motion.div
-                key={item.step}
+                key={level.level}
                 initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.14 }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                className="rounded-2xl border border-slate-100 bg-white p-5 text-center shadow-sm transition-all hover:shadow-lg hover:shadow-indigo-500/5"
               >
-                <div className="mb-5 leading-none">
-                  <span className="text-7xl font-black tabular-nums text-slate-100">{item.step}</span>
+                <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full ${level.color} text-white shadow-md`}>
+                  <span className="text-base font-black">{level.badge}</span>
                 </div>
-                <h3 className="mb-2.5 text-xl font-bold text-slate-900">{item.title}</h3>
-                <p className="leading-relaxed text-slate-500">{item.desc}</p>
+                <h4 className="mb-1 text-sm font-bold leading-tight">{level.name[lang]}</h4>
+                <p className="mb-2.5 text-[11px] font-semibold text-indigo-500">{level.minScore}–{level.maxScore}{t(UI.levels.points, lang)}</p>
+                <p className="text-xs leading-relaxed text-slate-500">{level.description[lang]}</p>
               </motion.div>
             ))}
           </div>
@@ -404,24 +386,13 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
       </section>
 
       {/* ── Pricing ────────────────────────────────────────────────── */}
-      <section id="pricing" className="border-t border-slate-100 bg-slate-50 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-16 text-center"
-          >
-            <SectionLabelCenter>
-              {lang === "zh" ? "定价方案" : "Pricing"}
-            </SectionLabelCenter>
-            <h2 className="mb-4 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-              {t(UI.pricing.title, lang)}
-            </h2>
-            <p className="mx-auto max-w-2xl text-lg text-slate-500">
-              {t(UI.pricing.subtitle, lang)}
-            </p>
-          </motion.div>
+      <section id="pricing" className="bg-slate-50/60 px-5 py-24 md:py-28">
+        <div className="mx-auto max-w-5xl">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <Pill>{lang === "zh" ? "定价" : "Pricing"}</Pill>
+            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.pricing.title, lang)}</h2>
+            <p className="mt-3 text-lg text-slate-600">{t(UI.pricing.subtitle, lang)}</p>
+          </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             {(
@@ -434,7 +405,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                   desc: t(UI.pricing.free.desc, lang),
                   features: UI.pricing.free.features[lang] as readonly string[],
                   cta: t(UI.pricing.free.cta, lang),
-                  dark: false,
+                  highlighted: false,
                   action: onStartTest,
                 },
                 {
@@ -445,7 +416,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                   desc: t(UI.pricing.pro.desc, lang),
                   features: UI.pricing.pro.features[lang] as readonly string[],
                   cta: t(UI.pricing.pro.cta, lang),
-                  dark: true,
+                  highlighted: true,
                   action: () => (session ? null : signIn("google")),
                 },
                 {
@@ -456,7 +427,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                   desc: t(UI.pricing.team.desc, lang),
                   features: UI.pricing.team.features[lang] as readonly string[],
                   cta: t(UI.pricing.team.cta, lang),
-                  dark: false,
+                  highlighted: false,
                   action: () => (session ? null : signIn("google")),
                 },
               ] as const
@@ -469,42 +440,44 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 className="relative"
               >
-                {plan.dark && (
+                {plan.highlighted && (
                   <div className="absolute -top-3.5 left-1/2 z-10 -translate-x-1/2">
-                    <span className="rounded-full bg-amber-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-slate-900">
+                    <span className="rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-md shadow-indigo-500/30">
                       {t(UI.pricing.popular, lang)}
                     </span>
                   </div>
                 )}
-                <div className={`h-full rounded-xl p-8 ${plan.dark ? "bg-slate-950 shadow-2xl" : "border border-slate-200 bg-white shadow-sm"}`}>
-                  <h3 className={`mb-1 text-base font-bold ${plan.dark ? "text-white" : "text-slate-900"}`}>
-                    {plan.name}
-                  </h3>
-                  <p className={`mb-6 text-sm ${plan.dark ? "text-slate-500" : "text-slate-500"}`}>{plan.desc}</p>
-                  <div className="mb-8 flex items-end gap-1.5">
-                    <span className={`text-5xl font-black leading-none tabular-nums ${plan.dark ? "text-white" : "text-slate-900"}`}>
-                      {plan.price}
-                    </span>
-                    <span className={`mb-1.5 text-sm ${plan.dark ? "text-slate-500" : "text-slate-400"}`}>{plan.period}</span>
+                <div
+                  className={`flex h-full flex-col rounded-3xl p-8 ${
+                    plan.highlighted
+                      ? "bg-gradient-to-b from-indigo-600 to-violet-700 shadow-2xl shadow-indigo-500/30"
+                      : "border border-slate-200 bg-white shadow-sm"
+                  }`}
+                >
+                  <h3 className={`text-lg font-bold ${plan.highlighted ? "text-white" : "text-slate-900"}`}>{plan.name}</h3>
+                  <p className={`mt-1 text-sm ${plan.highlighted ? "text-indigo-100" : "text-slate-500"}`}>{plan.desc}</p>
+                  <div className="mt-6 flex items-end gap-1">
+                    <span className={`text-5xl font-extrabold leading-none tracking-tight ${plan.highlighted ? "text-white" : "text-slate-900"}`}>{plan.price}</span>
+                    <span className={`mb-1.5 text-sm ${plan.highlighted ? "text-indigo-200" : "text-slate-400"}`}>{plan.period}</span>
                   </div>
 
-                  <ul className="mb-8 space-y-3">
+                  <ul className="mt-7 flex-1 space-y-3.5">
                     {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-3">
-                        <div className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${plan.dark ? "bg-amber-400" : "bg-slate-100"}`}>
-                          <Check className={`h-2.5 w-2.5 ${plan.dark ? "text-slate-900" : "text-slate-600"}`} />
+                      <li key={f} className="flex items-start gap-2.5">
+                        <div className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full ${plan.highlighted ? "bg-white/20" : "bg-indigo-50"}`}>
+                          <Check className={`h-3 w-3 ${plan.highlighted ? "text-white" : "text-indigo-600"}`} />
                         </div>
-                        <span className={`text-sm ${plan.dark ? "text-slate-300" : "text-slate-600"}`}>{f}</span>
+                        <span className={`text-sm ${plan.highlighted ? "text-indigo-50" : "text-slate-600"}`}>{f}</span>
                       </li>
                     ))}
                   </ul>
 
                   <button
                     onClick={plan.action}
-                    className={`w-full rounded-md py-2.5 text-sm font-bold transition-all ${
-                      plan.dark
-                        ? "bg-amber-400 text-slate-900 hover:bg-amber-300"
-                        : "bg-slate-950 text-white hover:bg-slate-800"
+                    className={`mt-8 w-full rounded-full py-3 text-sm font-semibold transition-all ${
+                      plan.highlighted
+                        ? "bg-white text-indigo-700 hover:bg-indigo-50"
+                        : "bg-slate-900 text-white hover:bg-slate-800"
                     }`}
                   >
                     {plan.cta}
@@ -517,48 +490,38 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
       </section>
 
       {/* ── CTA ────────────────────────────────────────────────────── */}
-      <section className="bg-slate-950 px-6 py-24 md:py-32">
-        <div className="mx-auto max-w-3xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <div className="mb-6 flex items-center justify-center gap-3">
-              <div className="h-px w-8 bg-amber-400/60" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-400">
-                {lang === "zh" ? "免费开始" : "Get Started Free"}
-              </span>
-              <div className="h-px w-8 bg-amber-400/60" />
-            </div>
-            <h2 className="mb-5 text-3xl font-bold text-white md:text-5xl">
-              {t(UI.cta.title, lang)}
-            </h2>
-            <p className="mb-10 text-lg text-slate-400">{t(UI.cta.subtitle, lang)}</p>
-            <button
-              onClick={onStartTest}
-              className="inline-flex h-12 items-center gap-2.5 rounded-md bg-amber-400 px-10 text-base font-bold text-slate-900 shadow-lg transition-all hover:bg-amber-300 active:scale-[0.98]"
-            >
-              {t(UI.cta.btn, lang)}
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </motion.div>
+      <section className="px-5 py-24 md:py-28">
+        <div className="mx-auto max-w-5xl">
+          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 px-6 py-16 text-center shadow-2xl shadow-indigo-500/30 md:px-16 md:py-20">
+            <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
+            <div className="pointer-events-none absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative">
+              <h2 className="mx-auto max-w-2xl text-3xl font-extrabold text-white md:text-4xl">{t(UI.cta.title, lang)}</h2>
+              <p className="mx-auto mt-4 max-w-xl text-lg text-indigo-100">{t(UI.cta.subtitle, lang)}</p>
+              <button
+                onClick={onStartTest}
+                className="mt-9 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-base font-semibold text-indigo-700 shadow-lg transition-all hover:bg-indigo-50 active:scale-[0.98]"
+              >
+                {t(UI.cta.btn, lang)}
+                <ChevronRight className="h-4 w-4" />
+              </button>
+              <p className="mt-4 text-sm text-indigo-200">{t(UI.hero.noCard, lang)} · {t(UI.hero.minutes, lang) === "minutes" ? "15 minutes" : "15 分钟"}</p>
+            </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer className="border-t border-slate-800 bg-slate-950 px-6 py-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-sm text-slate-600 md:flex-row">
+      <footer className="border-t border-slate-100 px-5 py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 md:flex-row">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded bg-slate-800">
-              <Brain className="h-3.5 w-3.5 text-white" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600">
+              <Brain className="h-4 w-4 text-white" />
             </div>
-            <span className="font-semibold text-slate-400">{t(UI.nav.brand, lang)}</span>
-            <span className="text-slate-700">·</span>
-            <span className="text-slate-700">Assessment</span>
+            <span className="font-bold">{t(UI.nav.brand, lang)}</span>
           </div>
-          <p className="text-slate-700">{t(UI.footer.tagline, lang)}</p>
-          <span className="text-slate-700">© 2025</span>
+          <p className="text-sm text-slate-500">{t(UI.footer.tagline, lang)}</p>
+          <p className="text-sm text-slate-400">© 2025 {t(UI.nav.brand, lang)}</p>
         </div>
       </footer>
     </div>
