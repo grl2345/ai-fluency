@@ -173,26 +173,27 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      {/* Hero Section — dark, authoritative */}
-      <section className="bg-slate-950 px-6 py-16 md:py-20">
+      {/* Hero Section — light, celebratory */}
+      <section className="relative overflow-hidden px-6 py-16 md:py-20">
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full bg-indigo-300/25 blur-[120px]" />
+          <div className="absolute -right-24 top-10 h-[380px] w-[380px] rounded-full bg-fuchsia-300/20 blur-[120px]" />
+        </div>
         <div className="mx-auto max-w-4xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="mb-6 flex items-center justify-center gap-3">
-              <div className="h-px w-7 bg-amber-400/70" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-amber-400">
-                {t(UI.results.badge, lang)}
-              </span>
-              <div className="h-px w-7 bg-amber-400/70" />
-            </div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3.5 py-1.5 text-xs font-semibold text-indigo-700">
+              <Sparkles className="h-3.5 w-3.5" />
+              {t(UI.results.badge, lang)}
+            </span>
 
-            <h1 className="mb-3 text-3xl font-bold tracking-tight text-white md:text-4xl">
+            <h1 className="mb-3 mt-6 text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
               {t(UI.results.title, lang)}
             </h1>
-            <p className="mx-auto mb-10 max-w-xl text-slate-400">
+            <p className="mx-auto mb-10 max-w-xl text-slate-600">
               {t(UI.results.subtitle, lang)}
             </p>
           </motion.div>
@@ -206,18 +207,18 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
           >
             <div className="inline-flex flex-col items-center">
               <div className="relative mb-5">
-                <div className="absolute inset-0 rounded-full blur-xl opacity-40 bg-white" />
+                <div className={`absolute inset-0 rounded-full blur-2xl opacity-30 ${currentLevel.color}`} />
                 <div
-                  className={`relative flex h-32 w-32 flex-col items-center justify-center rounded-full border-4 border-white/10 ${currentLevel.color} text-white shadow-2xl`}
+                  className={`relative flex h-32 w-32 flex-col items-center justify-center rounded-full border-4 border-white ${currentLevel.color} text-white shadow-2xl shadow-indigo-500/20`}
                 >
                   <span className="text-4xl font-black">{currentLevel.badge}</span>
-                  <span className="text-sm font-semibold opacity-80">
+                  <span className="text-sm font-semibold opacity-90">
                     {totalScore}{t(UI.levels.points, lang)}
                   </span>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-white">{currentLevel.name[lang]}</h2>
-              <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+              <h2 className="text-2xl font-bold text-slate-900">{currentLevel.name[lang]}</h2>
+              <p className="mt-2 max-w-sm text-sm text-slate-500">
                 {currentLevel.description[lang]}
               </p>
             </div>
@@ -229,7 +230,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35 }}
-              className="mb-8 mx-auto max-w-md rounded-2xl bg-secondary/60 px-6 py-4 text-sm text-muted-foreground"
+              className="mx-auto mb-8 max-w-md rounded-2xl border border-indigo-100 bg-indigo-50/60 px-6 py-4 text-sm text-slate-600"
             >
               {gapMessage}
             </motion.div>
@@ -242,15 +243,15 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex flex-wrap justify-center gap-3"
           >
-            <button className="flex items-center gap-2 rounded-md border border-white/20 px-5 py-2 text-sm font-medium text-slate-300 transition-all hover:border-white/40 hover:text-white">
+            <button className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg">
               <Share2 className="h-4 w-4" />
               {t(UI.results.share, lang)}
             </button>
-            <button className="flex items-center gap-2 rounded-md border border-white/20 px-5 py-2 text-sm font-medium text-slate-300 transition-all hover:border-white/40 hover:text-white">
+            <button className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50">
               <Download className="h-4 w-4" />
               {t(UI.results.download, lang)}
             </button>
-            <button onClick={onRetake} className="flex items-center gap-2 rounded-md px-5 py-2 text-sm font-medium text-slate-500 transition-all hover:text-slate-300">
+            <button onClick={onRetake} className="flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-900">
               <RefreshCw className="h-4 w-4" />
               {t(UI.results.retake, lang)}
             </button>
@@ -296,28 +297,28 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                         outerRadius="70%"
                         data={dimensionScores}
                       >
-                        <PolarGrid stroke="hsl(var(--border))" strokeOpacity={0.5} />
+                        <PolarGrid stroke="#e2e8f0" strokeOpacity={0.8} />
                         <PolarAngleAxis
                           dataKey="shortName"
                           tick={{
-                            fill: "hsl(var(--muted-foreground))",
+                            fill: "#64748b",
                             fontSize: 11,
-                            fontWeight: 500,
+                            fontWeight: 600,
                           }}
                         />
                         <PolarRadiusAxis
                           angle={30}
                           domain={[0, 100]}
-                          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+                          tick={{ fill: "#94a3b8", fontSize: 10 }}
                           axisLine={false}
                         />
                         <Radar
                           name="Score"
                           dataKey="score"
-                          stroke="hsl(var(--primary))"
-                          fill="hsl(var(--primary))"
-                          fillOpacity={0.15}
-                          strokeWidth={2}
+                          stroke="#6366f1"
+                          fill="#6366f1"
+                          fillOpacity={0.18}
+                          strokeWidth={2.5}
                         />
                       </RadarChart>
                     </ResponsiveContainer>
