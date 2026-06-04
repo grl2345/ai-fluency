@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
 import './globals.css'
+import { AuthProvider } from '@/components/auth-provider'
 
 export const metadata: Metadata = {
   title: 'AI Fluency Assessment - Discover Your AI Literacy Level',
@@ -33,8 +34,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-background font-sans antialiased">
-        {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        <AuthProvider>
+          {children}
+          {process.env.NODE_ENV === 'production' && <Analytics />}
+        </AuthProvider>
       </body>
     </html>
   )

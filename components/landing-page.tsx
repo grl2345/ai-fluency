@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { dimensions, levels } from "@/lib/test-data";
+import { signIn, signOut, useSession } from "next-auth/react";
 import {
   Brain,
   Clock,
@@ -23,6 +24,9 @@ import {
   TrendingUp,
   Zap,
   Play,
+  Check,
+  LogIn,
+  LogOut,
 } from "lucide-react";
 
 interface LandingPageProps {
@@ -39,6 +43,8 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export function LandingPage({ onStartTest }: LandingPageProps) {
+  const { data: session } = useSession();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -52,9 +58,52 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
               AI Fluency
             </span>
           </div>
-          <Button onClick={onStartTest} className="rounded-full px-6">
-            Take the Test
-          </Button>
+          <div className="hidden items-center gap-6 md:flex">
+            <a
+              href="#pricing"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              定价
+            </a>
+          </div>
+          <div className="flex items-center gap-3">
+            {session ? (
+              <div className="flex items-center gap-3">
+                {session.user?.image && (
+                  <img
+                    src={session.user.image}
+                    alt={session.user.name ?? "User"}
+                    className="h-8 w-8 rounded-full"
+                  />
+                )}
+                <span className="hidden text-sm font-medium text-foreground sm:block">
+                  {session.user?.name}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => signOut()}
+                  className="gap-2 rounded-full"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">退出</span>
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => signIn("google")}
+                className="gap-2 rounded-full"
+              >
+                <LogIn className="h-4 w-4" />
+                谷歌登录
+              </Button>
+            )}
+            <Button onClick={onStartTest} className="rounded-full px-6">
+              Take the Test
+            </Button>
+          </div>
         </div>
       </nav>
 
@@ -362,6 +411,138 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                   {item.title}
                 </h3>
                 <p className="text-muted-foreground">{item.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="border-t border-border/40 bg-secondary/30 px-6 py-20 md:py-28">
+        <div className="mx-auto max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-16 text-center"
+          >
+            <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+              简单透明的定价
+            </h2>
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+              选择适合您的方案，随时升级或降级
+            </p>
+          </motion.div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            {[
+              {
+                name: "免费版",
+                price: "¥0",
+                period: "永久免费",
+                description: "适合个人探索 AI 能力基础评估",
+                features: [
+                  "1次 AI 流利度测试",
+                  "六维能力雷达图",
+                  "基础能力报告",
+                  "5 个学习建议",
+                ],
+                cta: "免费开始",
+                highlighted: false,
+                action: onStartTest,
+              },
+              {
+                name: "专业版",
+                price: "¥29",
+                period: "每月",
+                description: "适合持续提升 AI 技能的专业人士",
+                features: [
+                  "无限次测试",
+                  "详细历史记录与趋势分析",
+                  "完整个性化学习路径",
+                  "可分享的专业证书",
+                  "优先客户支持",
+                ],
+                cta: "升级专业版",
+                highlighted: true,
+                action: () => session ? null : signIn("google"),
+              },
+              {
+                name: "团队版",
+                price: "¥199",
+                period: "每月 · 最多10人",
+                description: "适合团队管理员和企业培训负责人",
+                features: [
+                  "包含全部专业版功能",
+                  "团队整体能力看板",
+                  "成员管理与邀请",
+                  "批量导出报告 (PDF/Excel)",
+                  "专属客户成功经理",
+                ],
+                cta: "联系销售",
+                highlighted: false,
+                action: () => session ? null : signIn("google"),
+              },
+            ].map((plan, index) => (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+              >
+                <Card
+                  className={`relative h-full ${
+                    plan.highlighted
+                      ? "border-primary bg-primary/5 shadow-xl ring-2 ring-primary"
+                      : "border-border/40 bg-card/50"
+                  }`}
+                >
+                  {plan.highlighted && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                      <Badge className="rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
+                        最受欢迎
+                      </Badge>
+                    </div>
+                  )}
+                  <CardContent className="flex h-full flex-col p-8">
+                    <div className="mb-6">
+                      <h3 className="mb-1 text-xl font-bold text-foreground">
+                        {plan.name}
+                      </h3>
+                      <p className="mb-4 text-sm text-muted-foreground">
+                        {plan.description}
+                      </p>
+                      <div className="flex items-end gap-2">
+                        <span className="text-4xl font-bold text-foreground">
+                          {plan.price}
+                        </span>
+                        <span className="mb-1 text-sm text-muted-foreground">
+                          {plan.period}
+                        </span>
+                      </div>
+                    </div>
+
+                    <ul className="mb-8 flex-1 space-y-3">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="flex items-start gap-3">
+                          <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+                          <span className="text-sm text-muted-foreground">
+                            {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Button
+                      onClick={plan.action}
+                      variant={plan.highlighted ? "default" : "outline"}
+                      className="w-full rounded-full"
+                    >
+                      {plan.cta}
+                    </Button>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
           </div>
