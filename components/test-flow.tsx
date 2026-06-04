@@ -136,33 +136,42 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
   const isLast = currentQuestion === questions.length - 1;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-border/40 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto max-w-3xl px-6 py-5">
+      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur-xl">
+        <div className="mx-auto max-w-3xl px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <span className="text-sm font-medium text-muted-foreground">
-                {lang === "zh"
-                  ? `${t(UI.test.question, lang)}${currentQuestion + 1}${t(UI.test.of, lang)}${questions.length}${t(UI.test.total, lang)}`
-                  : `${t(UI.test.question, lang)}${currentQuestion + 1}${t(UI.test.of, lang)}${questions.length}`}
+              <span className="text-sm font-semibold tabular-nums text-slate-900">
+                {currentQuestion + 1}
+                <span className="font-normal text-slate-400"> / {questions.length}</span>
               </span>
-              <span className="text-sm text-muted-foreground">|</span>
-              <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+              <span className="hidden h-4 w-px bg-slate-200 sm:block" />
+              <span className="hidden items-center gap-1.5 text-sm text-slate-400 sm:inline-flex">
                 <Clock className="h-3.5 w-3.5" />
                 ~{Math.ceil((questions.length - currentQuestion) * 0.6)}{t(UI.test.minLeft, lang)}
               </span>
             </div>
-            <button
-              onClick={onBack}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              aria-label="Exit test"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-3">
+              <span className="hidden rounded bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500 sm:inline">
+                {sectionLabel}
+              </span>
+              <button
+                onClick={onBack}
+                className="flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                aria-label="Exit test"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-          <div className="mt-4">
-            <Progress value={progress} className="h-1.5" />
+          <div className="mt-3">
+            <div className="h-1 w-full overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-slate-950 transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -172,47 +181,47 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentQuestion}
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.25 }}
           >
-            {/* Section Tag */}
-            <div className="mb-6">
-              <span className="inline-flex items-center rounded-full bg-secondary px-3 py-1 text-xs font-medium text-foreground">
+            {/* Section tag (mobile only — desktop shows in header) */}
+            <div className="mb-5 sm:hidden">
+              <span className="inline-flex items-center rounded bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
                 {sectionLabel}
               </span>
             </div>
 
             {/* Profile note */}
             {isProfile && (
-              <p className="mb-6 text-sm text-muted-foreground italic">
+              <p className="mb-5 text-sm text-slate-500 italic">
                 {t(UI.test.profileNote, lang)}
               </p>
             )}
 
             {/* Practical note */}
             {isPractical && (
-              <p className="mb-6 text-sm text-muted-foreground italic">
+              <p className="mb-5 text-sm text-slate-500 italic">
                 {t(UI.test.practicalNote, lang)}
               </p>
             )}
 
             {/* Question */}
-            <h2 className="mb-8 text-2xl font-semibold leading-snug tracking-tight text-foreground md:text-3xl whitespace-pre-line">
+            <h2 className="mb-8 text-2xl font-bold leading-snug tracking-tight text-slate-900 md:text-3xl whitespace-pre-line">
               {question.question[lang]}
             </h2>
 
             {/* Multi-select hint */}
             {isMulti && (
-              <p className="mb-4 text-sm text-muted-foreground">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-400">
                 {t(UI.test.selectAll, lang)}
               </p>
             )}
 
-            {/* Options (profile, knowledge, scenario) */}
+            {/* Options */}
             {!isPractical && question.options && (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {question.options.map((option, index) => {
                   const isSelected = isMulti
                     ? currentMulti.includes(option.id)
@@ -223,27 +232,26 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
                     <motion.button
                       key={option.id}
                       onClick={() => handleSelectOption(option.id)}
-                      className={`group relative w-full rounded-xl border-2 p-5 text-left transition-all ${
+                      className={`group relative w-full rounded-lg border-2 p-4 text-left transition-all duration-150 ${
                         isSelected
-                          ? "border-foreground bg-foreground/5"
-                          : "border-border/60 bg-card hover:border-foreground/30"
+                          ? "border-slate-950 bg-slate-950/[0.03]"
+                          : "border-slate-200 bg-white hover:border-slate-400"
                       }`}
-                      whileHover={{ scale: 1.005 }}
                       whileTap={{ scale: 0.995 }}
                     >
-                      <div className="flex items-start gap-4">
+                      <div className="flex items-start gap-3.5">
                         <span
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-semibold transition-colors ${
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded text-sm font-bold transition-colors ${
                             isSelected
-                              ? "bg-foreground text-background"
-                              : "bg-secondary text-foreground"
+                              ? "bg-slate-950 text-white"
+                              : "bg-slate-100 text-slate-600"
                           }`}
                         >
                           {optionLabel}
                         </span>
-                        <span className="pt-1.5 text-foreground">{option.text[lang]}</span>
+                        <span className="pt-1 text-sm text-slate-700">{option.text[lang]}</span>
                         {isSelected && (
-                          <CheckCircle className="ml-auto h-5 w-5 shrink-0 text-foreground" />
+                          <CheckCircle className="ml-auto mt-0.5 h-4.5 w-4.5 shrink-0 text-slate-950" />
                         )}
                       </div>
                     </motion.button>
@@ -256,7 +264,7 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
             {isPractical && (
               <div className="space-y-4">
                 <textarea
-                  className="w-full min-h-[180px] rounded-xl border-2 border-border/60 bg-card p-5 text-foreground placeholder:text-muted-foreground focus:border-foreground/40 focus:outline-none resize-y"
+                  className="w-full min-h-[180px] resize-y rounded-lg border-2 border-slate-200 bg-white p-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-950 focus:outline-none"
                   placeholder={t(UI.test.practicalPlaceholder, lang)}
                   value={practicalTexts[question.id] || ""}
                   onChange={(e) =>
@@ -266,23 +274,19 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
 
                 {/* Rubric collapsible */}
                 {question.rubric && question.rubric.length > 0 && (
-                  <div className="rounded-xl border border-border/40 overflow-hidden">
+                  <div className="overflow-hidden rounded-lg border border-slate-200">
                     <button
                       onClick={() => setRubricOpen((v) => !v)}
-                      className="w-full flex items-center justify-between px-5 py-3 text-sm font-medium text-muted-foreground hover:bg-secondary/50 transition-colors"
+                      className="flex w-full items-center justify-between px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 transition-colors hover:bg-slate-50"
                     >
-                      <span>{lang === "zh" ? "评分标准提示" : "Scoring Criteria Hints"}</span>
-                      {rubricOpen ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
+                      <span>{lang === "zh" ? "评分提示" : "Scoring Hints"}</span>
+                      {rubricOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                     </button>
                     {rubricOpen && (
-                      <ul className="px-5 pb-4 space-y-2">
+                      <ul className="border-t border-slate-100 px-4 pb-4 pt-3 space-y-2.5">
                         {question.rubric.map((criterion, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium">
+                          <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-500">
+                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded bg-slate-100 text-xs font-bold text-slate-600">
                               {idx + 1}
                             </span>
                             {criterion[lang]}
@@ -295,9 +299,9 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
               </div>
             )}
 
-            {/* Note */}
+            {/* Diagnostic note */}
             {question.note && !isProfile && !isPractical && (
-              <p className="mt-6 text-sm text-muted-foreground italic border-l-2 border-border/40 pl-4">
+              <p className="mt-6 border-l-2 border-slate-200 pl-4 text-sm italic text-slate-400">
                 {question.note[lang]}
               </p>
             )}
@@ -306,24 +310,22 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
 
         {/* Navigation */}
         <div className="mt-14 flex items-center justify-between">
-          <Button
-            variant="ghost"
+          <button
             onClick={handlePrevious}
             disabled={currentQuestion === 0}
-            className="gap-2 text-muted-foreground"
+            className="flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-900 disabled:pointer-events-none disabled:opacity-30"
           >
             <ArrowLeft className="h-4 w-4" />
             {t(UI.test.previous, lang)}
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={handleNext}
             disabled={!canContinue}
-            className="gap-2 rounded-full px-8"
-            size="lg"
+            className="flex items-center gap-2 rounded-md bg-slate-950 px-8 py-2.5 text-sm font-semibold text-white transition-all hover:bg-slate-800 disabled:opacity-30"
           >
             {isLast ? t(UI.test.viewResults, lang) : t(UI.test.next, lang)}
             <ChevronRight className="h-4 w-4" />
-          </Button>
+          </button>
         </div>
       </main>
     </div>
