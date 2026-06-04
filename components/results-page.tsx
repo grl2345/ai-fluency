@@ -15,11 +15,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  sampleQuestions,
+  allQuestions,
   dimensions,
   levels,
   learningResources,
+  scorePractical,
 } from "@/lib/test-data";
+import { useLang } from "@/contexts/language-context";
+import { UI, t } from "@/lib/i18n";
 import {
   Download,
   Share2,
@@ -28,7 +31,6 @@ import {
   TrendingUp,
   Award,
   ChevronRight,
-  Wrench,
   MessageSquare,
   CheckCircle,
   GitMerge,
@@ -36,71 +38,135 @@ import {
   BarChart3,
   Sparkles,
   ArrowUpRight,
+  Brain,
+  Target,
 } from "lucide-react";
 
 interface ResultsPageProps {
   answers: Record<number, string>;
+  practicalTexts: Record<string, string>;
+  profileData: Record<string, string | string[]>;
   onRetake: () => void;
 }
 
 const iconMap: Record<string, React.ElementType> = {
-  Wrench,
+  Brain,
+  Target,
   MessageSquare,
   CheckCircle,
   GitMerge,
   Shield,
-  TrendingUp,
 };
 
-export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
-  // Calculate dimension scores
-  const dimensionScores = useMemo(() => {
-    const scores: Record<string, { total: number; max: number; count: number }> = {};
+export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: ResultsPageProps) {
+  const { lang } = useLang();
 
+  // Dimension scores from knowledge + scenario questions
+  const dimensionScores = useMemo(() => {
+    const scores: Record<string, { total: number; max: number }> = {};
     dimensions.forEach((dim) => {
-      scores[dim.id] = { total: 0, max: 0, count: 0 };
+      scores[dim.id] = { total: 0, max: 0 };
     });
 
-    sampleQuestions.forEach((q) => {
-      const answerId = answers[q.id];
-      const selectedOption = q.options.find((opt) => opt.id === answerId);
-      const maxScore = Math.max(...q.options.map((opt) => opt.score));
-
+    allQuestions.forEach((q) => {
+      if (!q.dimension || q.type === "profile" || q.type === "practical") return;
+      const answerId = answers[q.id as unknown as number];
+      if (!answerId) return;
+      const selectedOption = q.options?.find((opt) => opt.id === answerId);
+      const maxScore = q.options ? Math.max(...q.options.map((opt) => opt.score)) : 0;
       if (selectedOption) {
-        scores[q.dimension].total += selectedOption.score;
-        scores[q.dimension].max += maxScore;
-        scores[q.dimension].count += 1;
+        scores[q.dimension].total += selectedOption.score * q.weight;
+        scores[q.dimension].max += maxScore * q.weight;
       }
     });
+
+    // Add practical scores into their dimensions
+    allQuestions
+      .filter((q) => q.type === "practical" && q.dimension)
+      .forEach((q) => {
+        const text = practicalTexts[q.id] || "";
+        const prScore = scorePractical(q.id, text);
+        const maxPr = 5;
+        scores[q.dimension!].total += prScore * q.weight;
+        scores[q.dimension!].max += maxPr * q.weight;
+      });
 
     return Object.entries(scores).map(([id, data]) => {
       const dimension = dimensions.find((d) => d.id === id)!;
       const percentage = data.max > 0 ? Math.round((data.total / data.max) * 100) : 0;
+      const nameStr = dimension.name[lang];
+      const shortName = lang === "zh" ? nameStr.slice(0, 4) : nameStr.slice(0, 8);
       return {
         id,
-        name: dimension.name,
-        shortName: dimension.name.split(" ")[0],
-        score: percentage,
+        name: nameStr,
+        shortName,
+        score: Math.min(100, percentage),
         fullMark: 100,
       };
     });
+  }, [answers, practicalTexts, lang]);
+
+  // Tier calculation from scenario tierSignals
+  const behavioralTier = useMemo(() => {
+    const signals: number[] = [];
+    allQuestions
+      .filter((q) => q.type === "scenario")
+      .forEach((q) => {
+        const answerId = answers[q.id as unknown as number];
+        if (!answerId) return;
+        const opt = q.options?.find((o) => o.id === answerId);
+        if (opt?.tierSignal) signals.push(opt.tierSignal);
+      });
+    if (signals.length === 0) return 1;
+    signals.sort((a, b) => a - b);
+    const mid = Math.floor(signals.length / 2);
+    return signals.length % 2 !== 0
+      ? signals[mid]
+      : Math.round((signals[mid - 1] + signals[mid]) / 2);
   }, [answers]);
 
-  // Calculate total score and level
-  const totalScore = useMemo(() => {
-    const avg =
-      dimensionScores.reduce((sum, d) => sum + d.score, 0) / dimensionScores.length;
-    return Math.round(avg);
-  }, [dimensionScores]);
+  const practicalTier = useMemo(() => {
+    const pr1 = scorePractical("PR1", practicalTexts["PR1"] || "");
+    const pr2 = scorePractical("PR2", practicalTexts["PR2"] || "");
+    const pr3 = scorePractical("PR3", practicalTexts["PR3"] || "");
+    const total = pr1 + pr2 + pr3;
+    if (total <= 5) return 2;
+    if (total <= 10) return 3;
+    return 4;
+  }, [practicalTexts]);
+
+  const mainTier = Math.min(behavioralTier, practicalTier);
 
   const currentLevel = useMemo(() => {
-    return levels.find((l) => totalScore >= l.minScore && totalScore <= l.maxScore) || levels[0];
-  }, [totalScore]);
+    // map tier to level index
+    // tier 1→L1, 2→L2, 3→L3, 4→L4, 5-6→L5
+    const levelIdx = Math.max(0, Math.min(4, mainTier - 1));
+    return levels[levelIdx];
+  }, [mainTier]);
 
-  // Find strengths and areas for improvement
-  const sortedDimensions = useMemo(() => {
-    return [...dimensionScores].sort((a, b) => b.score - a.score);
-  }, [dimensionScores]);
+  const totalScore = currentLevel.minScore + Math.round((currentLevel.maxScore - currentLevel.minScore) * 0.5);
+
+  // Gap analysis
+  const gapMessage = useMemo(() => {
+    const p2 = profileData["P2"] as string | undefined;
+    const expectedTierMap: Record<string, number> = {
+      never: 1,
+      lt6m: 2,
+      "6m2y": 3,
+      gt2y: 4,
+    };
+    if (!p2 || !(p2 in expectedTierMap)) return null;
+    const expected = expectedTierMap[p2];
+    const gap = expected - mainTier;
+    if (gap > 0) return t(UI.results.gapPositive, lang);
+    if (gap < 0) return t(UI.results.gapNegative, lang);
+    return t(UI.results.gapNeutral, lang);
+  }, [profileData, mainTier, lang]);
+
+  const sortedDimensions = useMemo(
+    () => [...dimensionScores].sort((a, b) => b.score - a.score),
+    [dimensionScores]
+  );
 
   const strengths = sortedDimensions.slice(0, 2);
   const improvements = sortedDimensions.slice(-2).reverse();
@@ -120,15 +186,14 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
               className="mb-6 rounded-full border-border/60 px-4 py-1.5"
             >
               <Sparkles className="mr-2 h-3.5 w-3.5" />
-              Assessment Complete
+              {t(UI.results.badge, lang)}
             </Badge>
 
             <h1 className="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-              Your AI Fluency Profile
+              {t(UI.results.title, lang)}
             </h1>
             <p className="mx-auto mb-10 max-w-xl text-muted-foreground">
-              Based on your responses, here&apos;s a comprehensive analysis of your AI
-              literacy across six key dimensions.
+              {t(UI.results.subtitle, lang)}
             </p>
           </motion.div>
 
@@ -137,7 +202,7 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mb-10"
+            className="mb-6"
           >
             <div className="inline-flex flex-col items-center">
               <div className="relative mb-4">
@@ -147,16 +212,28 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
                 >
                   <span className="text-4xl font-bold">{currentLevel.badge}</span>
                   <span className="text-sm font-medium opacity-90">
-                    {totalScore} pts
+                    {totalScore}{t(UI.levels.points, lang)}
                   </span>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-foreground">{currentLevel.name}</h2>
+              <h2 className="text-2xl font-bold text-foreground">{currentLevel.name[lang]}</h2>
               <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-                {currentLevel.description}
+                {currentLevel.description[lang]}
               </p>
             </div>
           </motion.div>
+
+          {/* Gap analysis */}
+          {gapMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.35 }}
+              className="mb-8 mx-auto max-w-md rounded-2xl bg-secondary/60 px-6 py-4 text-sm text-muted-foreground"
+            >
+              {gapMessage}
+            </motion.div>
+          )}
 
           {/* Action Buttons */}
           <motion.div
@@ -167,15 +244,15 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
           >
             <Button variant="outline" className="gap-2 rounded-full">
               <Share2 className="h-4 w-4" />
-              Share Results
+              {t(UI.results.share, lang)}
             </Button>
             <Button variant="outline" className="gap-2 rounded-full">
               <Download className="h-4 w-4" />
-              Download Certificate
+              {t(UI.results.download, lang)}
             </Button>
             <Button variant="ghost" onClick={onRetake} className="gap-2 rounded-full">
               <RefreshCw className="h-4 w-4" />
-              Retake Test
+              {t(UI.results.retake, lang)}
             </Button>
           </motion.div>
         </div>
@@ -187,15 +264,15 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
           <TabsList className="mb-10 grid w-full max-w-md grid-cols-3 mx-auto rounded-full bg-secondary p-1">
             <TabsTrigger value="overview" className="gap-2 rounded-full text-sm">
               <Award className="h-4 w-4" />
-              <span className="hidden sm:inline">Overview</span>
+              <span className="hidden sm:inline">{t(UI.results.overview, lang)}</span>
             </TabsTrigger>
             <TabsTrigger value="details" className="gap-2 rounded-full text-sm">
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Breakdown</span>
+              <span className="hidden sm:inline">{t(UI.results.breakdown, lang)}</span>
             </TabsTrigger>
             <TabsTrigger value="learning" className="gap-2 rounded-full text-sm">
               <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Learn</span>
+              <span className="hidden sm:inline">{t(UI.results.learn, lang)}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -207,7 +284,7 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Award className="h-5 w-5 text-primary" />
-                    Competency Radar
+                    {t(UI.results.radar, lang)}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -254,13 +331,13 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
                   <CardHeader className="pb-4">
                     <CardTitle className="flex items-center gap-2 text-lg text-teal-600">
                       <TrendingUp className="h-5 w-5" />
-                      Your Strengths
+                      {t(UI.results.strengths, lang)}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {strengths.map((dim) => {
                       const fullDim = dimensions.find((d) => d.id === dim.id);
-                      const Icon = iconMap[fullDim?.icon || "Wrench"];
+                      const Icon = iconMap[fullDim?.icon || "Brain"];
                       return (
                         <div
                           key={dim.id}
@@ -273,7 +350,7 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
                             <div>
                               <p className="font-medium text-foreground">{dim.name}</p>
                               <p className="text-sm text-muted-foreground">
-                                {fullDim?.description}
+                                {fullDim?.description[lang]}
                               </p>
                             </div>
                           </div>
@@ -290,13 +367,13 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
                   <CardHeader className="pb-4">
                     <CardTitle className="flex items-center gap-2 text-lg text-amber-600">
                       <BookOpen className="h-5 w-5" />
-                      Areas for Growth
+                      {t(UI.results.growth, lang)}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {improvements.map((dim) => {
                       const fullDim = dimensions.find((d) => d.id === dim.id);
-                      const Icon = iconMap[fullDim?.icon || "Wrench"];
+                      const Icon = iconMap[fullDim?.icon || "Brain"];
                       return (
                         <div
                           key={dim.id}
@@ -309,7 +386,7 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
                             <div>
                               <p className="font-medium text-foreground">{dim.name}</p>
                               <p className="text-sm text-muted-foreground">
-                                {fullDim?.description}
+                                {fullDim?.description[lang]}
                               </p>
                             </div>
                           </div>
@@ -333,7 +410,7 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
             <div className="grid gap-4 md:grid-cols-2">
               {dimensionScores.map((dim, index) => {
                 const fullDim = dimensions.find((d) => d.id === dim.id);
-                const Icon = iconMap[fullDim?.icon || "Wrench"];
+                const Icon = iconMap[fullDim?.icon || "Brain"];
                 return (
                   <motion.div
                     key={dim.id}
@@ -357,7 +434,7 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
                               </span>
                             </div>
                             <p className="mt-1 text-sm text-muted-foreground">
-                              {fullDim?.description}
+                              {fullDim?.description[lang]}
                             </p>
                             <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary">
                               <motion.div
@@ -381,11 +458,10 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
           <TabsContent value="learning">
             <div className="mb-8 rounded-2xl bg-gradient-to-r from-primary/5 via-transparent to-accent/5 p-6 md:p-8">
               <h3 className="mb-2 text-xl font-semibold text-foreground">
-                Personalized Learning Path
+                {t(UI.results.learningPath, lang)}
               </h3>
               <p className="text-muted-foreground">
-                Based on your assessment, we recommend focusing on these areas to
-                advance from {currentLevel.name} to the next level.
+                {t(UI.results.learningDesc, lang)}
               </p>
             </div>
 
@@ -393,7 +469,7 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
               {improvements.map((dim) => {
                 const resources = learningResources.find((r) => r.dimension === dim.id);
                 const fullDim = dimensions.find((d) => d.id === dim.id);
-                const Icon = iconMap[fullDim?.icon || "Wrench"];
+                const Icon = iconMap[fullDim?.icon || "Brain"];
 
                 return (
                   <Card key={dim.id} className="border-border/40">
@@ -405,39 +481,42 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
                         <div>
                           <span className="text-lg">{dim.name}</span>
                           <Badge variant="outline" className="ml-3 text-xs">
-                            Priority
+                            {t(UI.results.priority, lang)}
                           </Badge>
                         </div>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      {resources?.resources.map((res, idx) => (
-                        <div
-                          key={idx}
-                          className="group flex cursor-pointer items-center justify-between rounded-xl border border-border/40 p-4 transition-all hover:border-primary/30 hover:bg-secondary/50"
-                        >
-                          <div className="flex-1">
-                            <p className="font-medium text-foreground group-hover:text-primary">
-                              {res.title}
-                            </p>
-                            <div className="mt-1.5 flex items-center gap-3 text-sm text-muted-foreground">
-                              <Badge variant="secondary" className="text-xs font-normal">
-                                {res.type === "article"
-                                  ? "Article"
-                                  : res.type === "video"
-                                  ? "Video"
-                                  : res.type === "course"
-                                  ? "Course"
-                                  : res.type === "template"
-                                  ? "Template"
-                                  : "Newsletter"}
-                              </Badge>
-                              <span>{res.duration}</span>
+                      {resources?.resources.map((res, idx) => {
+                        const resTitle = typeof res.title === "object" ? res.title[lang] : res.title;
+                        const resDuration = typeof res.duration === "object" ? res.duration[lang] : res.duration;
+                        const typeLabel =
+                          res.type === "article" ? t(UI.results.article, lang)
+                          : res.type === "video" ? t(UI.results.video, lang)
+                          : res.type === "course" ? t(UI.results.course, lang)
+                          : res.type === "template" ? t(UI.results.template, lang)
+                          : t(UI.results.newsletter, lang);
+
+                        return (
+                          <div
+                            key={idx}
+                            className="group flex cursor-pointer items-center justify-between rounded-xl border border-border/40 p-4 transition-all hover:border-primary/30 hover:bg-secondary/50"
+                          >
+                            <div className="flex-1">
+                              <p className="font-medium text-foreground group-hover:text-primary">
+                                {resTitle}
+                              </p>
+                              <div className="mt-1.5 flex items-center gap-3 text-sm text-muted-foreground">
+                                <Badge variant="secondary" className="text-xs font-normal">
+                                  {typeLabel}
+                                </Badge>
+                                <span>{resDuration}</span>
+                              </div>
                             </div>
+                            <ArrowUpRight className="h-5 w-5 text-muted-foreground transition-all group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                           </div>
-                          <ArrowUpRight className="h-5 w-5 text-muted-foreground transition-all group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                        </div>
-                      ))}
+                        );
+                      })}
                     </CardContent>
                   </Card>
                 );
@@ -447,7 +526,7 @@ export function ResultsPage({ answers, onRetake }: ResultsPageProps) {
             {/* CTA */}
             <div className="mt-10 text-center">
               <Button size="lg" className="gap-2 rounded-full px-8">
-                Explore Full Learning Catalog
+                {t(UI.results.exploreCatalog, lang)}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>

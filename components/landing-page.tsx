@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { dimensions, levels } from "@/lib/test-data";
+import { useLang } from "@/contexts/language-context";
+import { UI, t } from "@/lib/i18n";
 import { signIn, signOut, useSession } from "next-auth/react";
 import {
   Brain,
@@ -12,11 +14,9 @@ import {
   Target,
   ChevronRight,
   Award,
-  Users,
   Sparkles,
   BarChart3,
   ArrowRight,
-  Wrench,
   MessageSquare,
   CheckCircle2,
   GitMerge,
@@ -34,7 +34,8 @@ interface LandingPageProps {
 }
 
 const iconMap: Record<string, React.ElementType> = {
-  Wrench,
+  Brain,
+  Target,
   MessageSquare,
   CheckCircle: CheckCircle2,
   GitMerge,
@@ -44,6 +45,7 @@ const iconMap: Record<string, React.ElementType> = {
 
 export function LandingPage({ onStartTest }: LandingPageProps) {
   const { data: session } = useSession();
+  const { lang, setLang } = useLang();
 
   return (
     <div className="min-h-screen bg-background">
@@ -55,7 +57,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
               <Brain className="h-5 w-5 text-background" />
             </div>
             <span className="text-lg font-semibold tracking-tight text-foreground">
-              AI Fluency
+              {t(UI.nav.brand, lang)}
             </span>
           </div>
           <div className="hidden items-center gap-6 md:flex">
@@ -63,10 +65,18 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
               href="#pricing"
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
-              定价
+              {t(UI.nav.pricing, lang)}
             </a>
           </div>
           <div className="flex items-center gap-3">
+            {/* Language toggle */}
+            <button
+              onClick={() => setLang(lang === "zh" ? "en" : "zh")}
+              className="rounded-full border border-border/60 px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
+            >
+              {lang === "zh" ? "EN" : "中文"}
+            </button>
+
             {session ? (
               <div className="flex items-center gap-3">
                 {session.user?.image && (
@@ -86,7 +96,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                   className="gap-2 rounded-full"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">退出</span>
+                  <span className="hidden sm:inline">{t(UI.nav.logout, lang)}</span>
                 </Button>
               </div>
             ) : (
@@ -97,11 +107,11 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                 className="gap-2 rounded-full"
               >
                 <LogIn className="h-4 w-4" />
-                谷歌登录
+                {t(UI.nav.login, lang)}
               </Button>
             )}
             <Button onClick={onStartTest} className="rounded-full px-6">
-              Take the Test
+              {t(UI.nav.startTest, lang)}
             </Button>
           </div>
         </div>
@@ -122,19 +132,18 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                 className="mb-6 rounded-full border-border/60 px-4 py-1.5 text-muted-foreground"
               >
                 <Sparkles className="mr-2 h-3.5 w-3.5" />
-                Free Assessment
+                {t(UI.hero.badge, lang)}
               </Badge>
 
               <h1 className="mb-6 text-balance text-4xl font-bold leading-[1.1] tracking-tight text-foreground md:text-5xl lg:text-6xl">
-                Discover Your
+                {t(UI.hero.title1, lang)}
                 <br />
-                <span className="text-primary">AI Fluency</span> Level
+                <span className="text-primary">{t(UI.hero.titleHighlight, lang)}</span>{" "}
+                {t(UI.hero.title2, lang)}
               </h1>
 
               <p className="mb-8 max-w-lg text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
-                A comprehensive assessment designed to measure your AI literacy
-                across six key dimensions. Get personalized insights and a clear
-                path to improvement.
+                {t(UI.hero.desc, lang)}
               </p>
 
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -143,18 +152,18 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                   onClick={onStartTest}
                   className="h-14 gap-3 rounded-full px-8 text-base font-medium"
                 >
-                  Start Free Assessment
+                  {t(UI.hero.cta, lang)}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1.5">
                     <Clock className="h-4 w-4" />
-                    10 minutes
+                    15 {t(UI.hero.minutes, lang)}
                   </span>
                   <span className="h-1 w-1 rounded-full bg-border" />
                   <span className="flex items-center gap-1.5">
                     <Target className="h-4 w-4" />
-                    10 questions
+                    18 {t(UI.hero.questions, lang)}
                   </span>
                 </div>
               </div>
@@ -173,10 +182,10 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    50,000+ assessments completed
+                    {t(UI.hero.socialProof, lang)}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Join professionals worldwide
+                    {t(UI.hero.socialSub, lang)}
                   </p>
                 </div>
               </div>
@@ -198,7 +207,9 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-100">
                           <Zap className="h-4 w-4 text-teal-600" />
                         </div>
-                        <span className="text-sm font-medium">Prompt Skills</span>
+                        <span className="text-sm font-medium">
+                          {lang === "zh" ? "提示技能" : "Prompt Skills"}
+                        </span>
                       </div>
                       <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
                         <div className="h-full w-4/5 rounded-full bg-teal-500" />
@@ -214,10 +225,12 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100">
                           <Award className="h-4 w-4 text-amber-600" />
                         </div>
-                        <span className="text-sm font-medium">Level 4</span>
+                        <span className="text-sm font-medium">
+                          {lang === "zh" ? "等级 4" : "Level 4"}
+                        </span>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        AI Expert Status
+                        {lang === "zh" ? "AI 协作者" : "AI Collaborator"}
                       </p>
                     </CardContent>
                   </Card>
@@ -234,7 +247,6 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                         <Brain className="h-10 w-10 text-primary" />
                       </div>
                     </div>
-                    {/* Dimension dots */}
                     {[0, 60, 120, 180, 240, 300].map((angle, i) => (
                       <div
                         key={i}
@@ -264,17 +276,16 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
             className="mb-16 max-w-2xl"
           >
             <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-              Six Dimensions of AI Fluency
+              {t(UI.dimensions.sectionTitle, lang)}
             </h2>
             <p className="text-lg text-muted-foreground">
-              Our assessment framework evaluates your competencies across the
-              critical dimensions of AI literacy in the modern workplace.
+              {t(UI.dimensions.sectionDesc, lang)}
             </p>
           </motion.div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {dimensions.map((dim, index) => {
-              const Icon = iconMap[dim.icon] || Wrench;
+              const Icon = iconMap[dim.icon] || Brain;
               return (
                 <motion.div
                   key={dim.id}
@@ -289,10 +300,10 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                         <Icon className="h-6 w-6 text-foreground" />
                       </div>
                       <h3 className="mb-2 text-lg font-semibold text-foreground">
-                        {dim.name}
+                        {dim.name[lang]}
                       </h3>
                       <p className="text-sm leading-relaxed text-muted-foreground">
-                        {dim.description}
+                        {dim.description[lang]}
                       </p>
                     </CardContent>
                   </Card>
@@ -313,10 +324,10 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
             className="mb-16 text-center"
           >
             <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-              Five Proficiency Levels
+              {t(UI.levels.sectionTitle, lang)}
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Understand where you stand and chart your path to AI mastery
+              {t(UI.levels.sectionDesc, lang)}
             </p>
           </motion.div>
 
@@ -337,13 +348,13 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                       <span className="text-xl font-bold">{level.badge}</span>
                     </div>
                     <h4 className="mb-1 text-lg font-semibold text-foreground">
-                      {level.name}
+                      {level.name[lang]}
                     </h4>
                     <p className="mb-3 text-xs text-muted-foreground">
-                      {level.minScore}-{level.maxScore} points
+                      {level.minScore}-{level.maxScore}{t(UI.levels.points, lang)}
                     </p>
                     <p className="mt-auto text-sm leading-relaxed text-muted-foreground">
-                      {level.description}
+                      {level.description[lang]}
                     </p>
                   </CardContent>
                 </Card>
@@ -363,10 +374,10 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
             className="mb-16 text-center"
           >
             <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-              How It Works
+              {t(UI.howItWorks.title, lang)}
             </h2>
             <p className="mx-auto max-w-xl text-lg text-muted-foreground">
-              Three simple steps to discover your AI fluency profile
+              {t(UI.howItWorks.subtitle, lang)}
             </p>
           </motion.div>
 
@@ -374,23 +385,20 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
             {[
               {
                 step: "01",
-                title: "Take the Assessment",
-                description:
-                  "Answer 10 scenario-based questions designed by AI education experts",
+                title: t(UI.howItWorks.step1.title, lang),
+                description: t(UI.howItWorks.step1.desc, lang),
                 icon: Play,
               },
               {
                 step: "02",
-                title: "Get Your Results",
-                description:
-                  "Receive a comprehensive report with your six-dimension radar chart",
+                title: t(UI.howItWorks.step2.title, lang),
+                description: t(UI.howItWorks.step2.desc, lang),
                 icon: BarChart3,
               },
               {
                 step: "03",
-                title: "Start Learning",
-                description:
-                  "Access personalized recommendations to advance your AI skills",
+                title: t(UI.howItWorks.step3.title, lang),
+                description: t(UI.howItWorks.step3.desc, lang),
                 icon: TrendingUp,
               },
             ].map((item, index) => (
@@ -427,65 +435,51 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
             className="mb-16 text-center"
           >
             <h2 className="mb-4 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-              简单透明的定价
+              {t(UI.pricing.title, lang)}
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              选择适合您的方案，随时升级或降级
+              {t(UI.pricing.subtitle, lang)}
             </p>
           </motion.div>
 
           <div className="grid gap-8 md:grid-cols-3">
             {[
               {
-                name: "免费版",
-                price: "¥0",
-                period: "永久免费",
-                description: "适合个人探索 AI 能力基础评估",
-                features: [
-                  "1次 AI 流利度测试",
-                  "六维能力雷达图",
-                  "基础能力报告",
-                  "5 个学习建议",
-                ],
-                cta: "免费开始",
+                key: "free" as const,
+                name: t(UI.pricing.free.name, lang),
+                price: t(UI.pricing.free.price, lang),
+                period: t(UI.pricing.free.period, lang),
+                description: t(UI.pricing.free.desc, lang),
+                features: UI.pricing.free.features[lang] as readonly string[],
+                cta: t(UI.pricing.free.cta, lang),
                 highlighted: false,
                 action: onStartTest,
               },
               {
-                name: "专业版",
-                price: "¥29",
-                period: "每月",
-                description: "适合持续提升 AI 技能的专业人士",
-                features: [
-                  "无限次测试",
-                  "详细历史记录与趋势分析",
-                  "完整个性化学习路径",
-                  "可分享的专业证书",
-                  "优先客户支持",
-                ],
-                cta: "升级专业版",
+                key: "pro" as const,
+                name: t(UI.pricing.pro.name, lang),
+                price: t(UI.pricing.pro.price, lang),
+                period: t(UI.pricing.pro.period, lang),
+                description: t(UI.pricing.pro.desc, lang),
+                features: UI.pricing.pro.features[lang] as readonly string[],
+                cta: t(UI.pricing.pro.cta, lang),
                 highlighted: true,
-                action: () => session ? null : signIn("google"),
+                action: () => (session ? null : signIn("google")),
               },
               {
-                name: "团队版",
-                price: "¥199",
-                period: "每月 · 最多10人",
-                description: "适合团队管理员和企业培训负责人",
-                features: [
-                  "包含全部专业版功能",
-                  "团队整体能力看板",
-                  "成员管理与邀请",
-                  "批量导出报告 (PDF/Excel)",
-                  "专属客户成功经理",
-                ],
-                cta: "联系销售",
+                key: "team" as const,
+                name: t(UI.pricing.team.name, lang),
+                price: t(UI.pricing.team.price, lang),
+                period: t(UI.pricing.team.period, lang),
+                description: t(UI.pricing.team.desc, lang),
+                features: UI.pricing.team.features[lang] as readonly string[],
+                cta: t(UI.pricing.team.cta, lang),
                 highlighted: false,
-                action: () => session ? null : signIn("google"),
+                action: () => (session ? null : signIn("google")),
               },
             ].map((plan, index) => (
               <motion.div
-                key={plan.name}
+                key={plan.key}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -501,7 +495,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                   {plan.highlighted && (
                     <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                       <Badge className="rounded-full bg-primary px-4 py-1 text-xs font-semibold text-primary-foreground">
-                        最受欢迎
+                        {t(UI.pricing.popular, lang)}
                       </Badge>
                     </div>
                   )}
@@ -559,10 +553,10 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
             className="rounded-3xl bg-foreground p-10 text-center md:p-16"
           >
             <h2 className="mb-4 text-3xl font-bold text-background md:text-4xl">
-              Ready to discover your AI potential?
+              {t(UI.cta.title, lang)}
             </h2>
             <p className="mb-8 text-lg text-background/70">
-              Join 50,000+ professionals who have assessed their AI fluency
+              {t(UI.cta.subtitle, lang)}
             </p>
             <Button
               size="lg"
@@ -570,7 +564,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
               onClick={onStartTest}
               className="h-14 gap-3 rounded-full px-10 text-base font-medium"
             >
-              Start Your Free Assessment
+              {t(UI.cta.btn, lang)}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </motion.div>
@@ -584,9 +578,9 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground">
               <Brain className="h-4 w-4 text-background" />
             </div>
-            <span className="font-medium">AI Fluency Assessment</span>
+            <span className="font-medium">{t(UI.nav.brand, lang)}</span>
           </div>
-          <p>Helping professionals navigate the AI era</p>
+          <p>{t(UI.footer.tagline, lang)}</p>
         </div>
       </footer>
     </div>
