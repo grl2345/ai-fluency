@@ -8,7 +8,7 @@ import { UI, t } from "@/lib/i18n";
 import { NavAuthMenu, redirectToSignIn } from "@/components/auth-ui";
 import { useAuth } from "@/components/auth-provider";
 import {
-  Brain, Target, ChevronRight, Star, ArrowRight, MessageSquare,
+  Brain, Target, ChevronRight, ArrowRight, MessageSquare,
   CheckCircle2, GitMerge, Shield, TrendingUp, Check,
   ChevronDown, ChevronUp, Play, BarChart3,
 } from "lucide-react";
@@ -82,7 +82,7 @@ const FAQS = [
   },
   {
     q: { en: "Can I share my results with my employer?", zh: "我可以把结果分享给雇主吗？" },
-    a: { en: "Yes. Pro users get a shareable certificate link and a PDF report they can attach to a resume or share on LinkedIn. Free users get a summary they can screenshot.", zh: "可以。Pro 用户可获得可分享的证书链接和 PDF 报告，可附在简历或 LinkedIn 上。免费用户可截图保存摘要。" },
+    a: { en: "Yes. You can screenshot your results page and share it. Pro users get full dimension breakdowns they can share with employers or on LinkedIn.", zh: "可以。你可以截图分享结果页。Pro 用户可获取完整维度分析，分享给雇主或发布到 LinkedIn。" },
   },
   {
     q: { en: "What makes this different from other AI literacy tests?", zh: "这和其他 AI 测评有什么不同？" },
@@ -199,34 +199,19 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                 <p className="mt-4 text-sm text-slate-600">{t(UI.auth.signInRequired, lang)}</p>
               )}
 
-              {/* Social proof */}
+              {/* Trust signals */}
               <div className="mt-12 flex flex-wrap items-center gap-6 border-t border-white/6 pt-8">
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-2">
-                    {[
-                      { seed: "Alex7", bg: "b6e3f4" },
-                      { seed: "Jordan3", bg: "c0aede" },
-                      { seed: "Riley9", bg: "ffd5dc" },
-                      { seed: "Morgan5", bg: "c3f4c8" },
-                      { seed: "Taylor2", bg: "fde68a" },
-                    ].map(({ seed, bg }) => (
-                      <img
-                        key={seed}
-                        src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&backgroundColor=${bg}&radius=50`}
-                        alt=""
-                        className="h-8 w-8 rounded-full border-2 border-[#080810]"
-                      />
-                    ))}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-0.5">
-                      {[0,1,2,3,4].map((i) => <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />)}
-                    </div>
-                    <p className="mt-0.5 text-xs text-slate-500">{t(UI.hero.socialProof, lang)}</p>
-                  </div>
+                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                  {lang === "zh" ? "15 分钟完成" : "15 minutes to complete"}
                 </div>
                 <div className="h-5 w-px bg-white/8" />
-                <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                <div className="flex items-center gap-1.5 text-sm text-slate-500">
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                  {lang === "zh" ? "即时获取报告" : "Instant results"}
+                </div>
+                <div className="h-5 w-px bg-white/8" />
+                <div className="flex items-center gap-1.5 text-sm text-slate-500">
                   <Check className="h-3.5 w-3.5 text-emerald-500" />
                   {t(UI.hero.noCard, lang)}
                 </div>
@@ -308,10 +293,10 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
       <section className="border-b border-slate-100 px-5 py-12">
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 md:grid-cols-4">
           {[
-            { v: "50K+", l: lang === "zh" ? "已完成测评" : "Assessments taken" },
             { v: "6", l: lang === "zh" ? "能力维度" : "Skill dimensions" },
             { v: "15 min", l: lang === "zh" ? "平均用时" : "Avg. completion time" },
-            { v: "4.9 ★", l: lang === "zh" ? "用户评分" : "User rating" },
+            { v: "18+", l: lang === "zh" ? "精选学习资源" : "Curated resources" },
+            { v: "3", l: lang === "zh" ? "题型模式" : "Question formats" },
           ].map((s) => (
             <div key={s.l} className="text-center">
               <div className="text-[32px] font-black tabular-nums text-slate-900">{s.v}</div>
@@ -492,8 +477,8 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
 
           <p className="mt-8 text-xs text-slate-400">
             {lang === "zh"
-              ? "以上评价来自真实用户，姓名已缩写以保护隐私。头像为插画形象，与真实用户无关。"
-              : "Reviews from real users; names abbreviated for privacy. Avatars are illustrated characters."}
+              ? "以上评价来自早期测试用户，姓名已缩写以保护隐私。头像为插画形象。"
+              : "Feedback from early beta testers; names abbreviated for privacy. Avatars are illustrated."}
           </p>
         </div>
       </section>
@@ -572,9 +557,11 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   isCurrent: hasActiveSubscription && subscription?.plan === "team",
                   disabled: false,
                   action: () => {
-                    if (!user) redirectToSignIn("/#pricing");
-                    else if (hasActiveSubscription && subscription?.plan === "team") window.location.href = "/account";
-                    else setPaymentPlan("team");
+                    if (hasActiveSubscription && subscription?.plan === "team") {
+                      window.location.href = "/account";
+                    } else {
+                      window.location.href = "mailto:support@aifluency.app?subject=Team%20Plan%20Inquiry";
+                    }
                   },
                 },
               ] as const

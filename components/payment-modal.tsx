@@ -18,8 +18,8 @@ const PLAN_DETAILS = {
     price: { en: "$9.9", zh: "¥9.9" },
     period: { en: "/month", zh: "/月" },
     features: {
-      en: ["Unlimited assessments", "Six-dimension radar chart", "Basic capability report", "Assessment history"],
-      zh: ["无限次测评", "六维能力雷达图", "基础能力报告", "测评历史记录"],
+      en: ["Unlimited assessments & retakes", "Six-dimension radar chart", "Overall score & level report", "2 dimension learning tips"],
+      zh: ["无限次测评与重测", "六维能力雷达图", "总分与等级报告", "2个维度学习建议"],
     },
   },
   pro: {
@@ -27,17 +27,17 @@ const PLAN_DETAILS = {
     price: { en: "$19.9", zh: "¥19.9" },
     period: { en: "/month", zh: "/月" },
     features: {
-      en: ["All Starter features", "History & trend analysis", "Full personalized learning path", "Shareable professional certificate", "Priority support"],
-      zh: ["包含入门版全部功能", "详细历史与趋势分析", "完整个性化学习路径", "可分享的专业证书", "优先客户支持"],
+      en: ["All Starter features", "Full learning path for all 6 dimensions", "Detailed dimension scores & analysis", "Email support"],
+      zh: ["包含入门版全部功能", "全部六维度完整学习路径", "详细维度得分与分析", "邮件支持"],
     },
   },
   team: {
     name: { en: "Team", zh: "团队版" },
-    price: { en: "$49.9", zh: "¥49.9" },
-    period: { en: "/month", zh: "/月" },
+    price: { en: "Custom", zh: "定制" },
+    period: { en: "Contact us", zh: "按需报价" },
     features: {
-      en: ["All Pro features", "Team capability dashboard", "Member management (up to 10)", "Bulk report export (PDF/Excel)", "Dedicated success manager"],
-      zh: ["包含专业版全部功能", "团队整体能力看板", "成员管理（最多10人）", "批量导出报告 (PDF/Excel)", "专属客户成功经理"],
+      en: ["All Pro features", "Team capability dashboard (coming soon)", "Member management (coming soon)", "Bulk report export (coming soon)", "Dedicated support contact"],
+      zh: ["包含专业版全部功能", "团队整体能力看板（开发中）", "成员管理（开发中）", "批量导出报告（开发中）", "专属对接支持"],
     },
   },
 } as const;

@@ -76,7 +76,7 @@ export const UI = {
     ctaSecondary: { zh: '查看示例报告', en: 'See a sample report' },
     minutes: { zh: '分钟', en: 'minutes' },
     questions: { zh: '道题', en: 'questions' },
-    socialProof: { zh: '50,000+ 次测评已完成', en: 'Loved by 50,000+ learners' },
+    socialProof: { zh: '专业人士的 AI 素养测评', en: 'AI fluency for professionals' },
     socialSub: { zh: '加入全球专业人士行列', en: 'Join professionals worldwide' },
     rating: { zh: '4.9/5 平均评分', en: 'Rated 4.9/5' },
     noCard: { zh: '订阅后随时取消', en: 'Cancel anytime' },
@@ -99,7 +99,7 @@ export const UI = {
   },
   cta: {
     title: { zh: '准备好发现你的 AI 潜力了吗？', en: 'Ready to discover your AI potential?' },
-    subtitle: { zh: '加入 50,000+ 名已完成测评的专业人士', en: 'Join 50,000+ professionals who have assessed their AI fluency' },
+    subtitle: { zh: '发现你的 AI 优势和成长空间', en: 'Find your AI strengths and unlock your growth potential' },
     btn: { zh: '免费开始测评', en: 'Start Your Free Assessment' },
   },
   footer: {
@@ -113,10 +113,10 @@ export const UI = {
       name: { zh: '入门版', en: 'Starter' },
       price: { zh: '¥9.9', en: '$9.9' },
       period: { zh: '/月', en: '/month' },
-      desc: { zh: '适合个人开始 AI 素养测评与跟踪', en: 'For individuals starting AI fluency assessment and tracking' },
+      desc: { zh: '适合个人了解自己的 AI 素养水平', en: 'For individuals exploring their AI fluency level' },
       features: {
-        zh: ['无限次测评', '六维能力雷达图', '基础能力报告', '测评历史记录'],
-        en: ['Unlimited assessments', 'Six-dimension radar chart', 'Basic capability report', 'Assessment history'],
+        zh: ['无限次测评与重测', '六维能力雷达图', '总分与等级报告', '2个维度学习建议'],
+        en: ['Unlimited assessments & retakes', 'Six-dimension radar chart', 'Overall score & level report', '2 dimension learning tips'],
       },
       cta: { zh: '订阅入门版', en: 'Subscribe to Starter' },
     },
@@ -126,21 +126,21 @@ export const UI = {
       period: { zh: '/月', en: '/month' },
       desc: { zh: '适合持续提升 AI 技能的专业人士', en: 'For professionals continuously improving AI skills' },
       features: {
-        zh: ['包含入门版全部功能', '详细历史与趋势分析', '完整个性化学习路径', '可分享的专业证书', '优先客户支持'],
-        en: ['All Starter features', 'History & trend analysis', 'Full personalized learning path', 'Shareable professional certificate', 'Priority support'],
+        zh: ['包含入门版全部功能', '全部六维度完整学习路径', '详细维度得分与分析', '邮件支持'],
+        en: ['All Starter features', 'Full learning path for all 6 dimensions', 'Detailed dimension scores & analysis', 'Email support'],
       },
       cta: { zh: '订阅专业版', en: 'Subscribe to Pro' },
     },
     team: {
       name: { zh: '团队版', en: 'Team' },
-      price: { zh: '¥49.9', en: '$49.9' },
-      period: { zh: '/月·最多10人', en: '/month · up to 10' },
+      price: { zh: '定制', en: 'Custom' },
+      period: { zh: '按需报价', en: 'Contact us' },
       desc: { zh: '适合团队管理员和企业培训负责人', en: 'For team managers and enterprise training leads' },
       features: {
-        zh: ['包含专业版全部功能', '团队整体能力看板', '成员管理与邀请', '批量导出报告 (PDF/Excel)', '专属客户成功经理'],
-        en: ['All Pro features', 'Team capability dashboard', 'Member management', 'Bulk report export (PDF/Excel)', 'Dedicated success manager'],
+        zh: ['包含专业版全部功能', '团队整体能力看板（开发中）', '成员管理与邀请（开发中）', '批量导出报告（开发中）', '专属对接支持'],
+        en: ['All Pro features', 'Team capability dashboard (coming soon)', 'Member management (coming soon)', 'Bulk report export (coming soon)', 'Dedicated support contact'],
       },
-      cta: { zh: '订阅团队版', en: 'Subscribe to Team' },
+      cta: { zh: '联系我们', en: 'Contact Us' },
     },
   },
   test: {
@@ -197,7 +197,7 @@ export const UI = {
   },
   testimonials: {
     sectionPill: { zh: '用户评价', en: 'What users say' },
-    sectionTitle: { zh: '50,000+ 专业人士已完成测评', en: '50,000+ professionals have taken it' },
+    sectionTitle: { zh: '来自早期用户的真实反馈', en: 'Real feedback from early users' },
     sectionDesc: { zh: '看看他们发现了什么', en: 'See what they discovered about themselves' },
   },
   faq: {

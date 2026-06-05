@@ -46,6 +46,7 @@ import {
   Users,
   Star,
 } from "lucide-react";
+import { useSubscription } from "@/components/subscription-provider";
 
 interface ResultsPageProps {
   answers: Record<number, string>;
@@ -65,6 +66,8 @@ const iconMap: Record<string, React.ElementType> = {
 
 export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: ResultsPageProps) {
   const { lang } = useLang();
+  const { isPro, isTeam } = useSubscription();
+  const hasPro = isPro || isTeam;
   const [showPayment, setShowPayment] = useState(false);
 
   // Dimension scores from knowledge + scenario questions
@@ -496,7 +499,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-              {improvements.map((dim) => {
+              {(hasPro ? sortedDimensions : improvements.slice(0, 2)).map((dim) => {
                 const resources = learningResources.find((r) => r.dimension === dim.id);
                 const fullDim = dimensions.find((d) => d.id === dim.id);
                 const Icon = iconMap[fullDim?.icon || "Brain"];
@@ -577,6 +580,31 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
               })}
             </div>
 
+            {/* Locked dimensions hint for non-Pro users */}
+            {!hasPro && sortedDimensions.length > 2 && (
+              <div className="mt-6 flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                <Lock className="h-6 w-6 shrink-0 text-slate-400" />
+                <div className="flex-1">
+                  <p className="font-semibold text-slate-700">
+                    {lang === "zh"
+                      ? `还有 ${sortedDimensions.length - 2} 个维度的学习路径未解锁`
+                      : `${sortedDimensions.length - 2} more dimension learning paths locked`}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {lang === "zh"
+                      ? "升级 Pro 解锁全部六维度的个性化学习建议"
+                      : "Upgrade to Pro to unlock personalized learning for all 6 dimensions"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowPayment(true)}
+                  className="shrink-0 rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+                >
+                  {lang === "zh" ? "升级 Pro" : "Upgrade to Pro"}
+                </button>
+              </div>
+            )}
+
             {/* Pro Upsell Card */}
             <div className="mt-10 overflow-hidden rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-600 to-violet-700 shadow-2xl shadow-indigo-500/20">
               <div className="grid md:grid-cols-[1fr_auto]">
@@ -589,8 +617,8 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                   <p className="mt-2 text-indigo-100">{t(UI.results.unlockDesc, lang)}</p>
                   <ul className="mt-5 space-y-2.5">
                     {(lang === "zh"
-                      ? ["无限次测评与历史趋势", "完整学习路径（25+ 资源）", "可分享的专业证书", "个人 AI 成长仪表盘"]
-                      : ["Unlimited assessments & history", "Full learning path (25+ resources)", "Shareable professional certificate", "Personal AI growth dashboard"]
+                      ? ["无限次测评与重测", "全部六维度完整学习路径", "详细维度得分与分析", "邮件支持"]
+                      : ["Unlimited assessments & retakes", "Full learning path for all 6 dimensions", "Detailed dimension scores & analysis", "Email support"]
                     ).map((f) => (
                       <li key={f} className="flex items-center gap-2.5 text-sm text-indigo-100">
                         <CheckCircle className="h-4 w-4 shrink-0 text-emerald-300" />
@@ -612,26 +640,19 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                   <p className="mt-3 text-xs text-indigo-200">{t(UI.results.unlockNote, lang)}</p>
                 </div>
 
-                {/* Certificate teaser */}
+                {/* Visual accent */}
                 <div className="relative hidden items-center justify-center border-l border-white/10 bg-white/5 px-10 md:flex">
-                  <div className="relative">
-                    <div className="w-52 rounded-2xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur-sm">
-                      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/40">
-                        <Award className="h-7 w-7 text-white" />
-                      </div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-white/70">{t(UI.results.certificateTitle, lang)}</p>
-                      <p className="mt-2 text-2xl font-black text-white">L{mainTier}</p>
-                      <div className="mt-3 flex justify-center gap-1">
-                        {[0,1,2,3,4].map((i) => (
-                          <Star key={i} className={`h-3 w-3 ${i < mainTier ? "fill-amber-400 text-amber-400" : "fill-white/20 text-white/20"}`} />
-                        ))}
-                      </div>
+                  <div className="w-52 rounded-2xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur-sm">
+                    <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 shadow-lg shadow-indigo-500/40">
+                      <Zap className="h-7 w-7 text-white" />
                     </div>
-                    {/* Lock overlay */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-black/40 backdrop-blur-[2px]">
-                      <Lock className="h-8 w-8 text-white/80" />
-                      <p className="mt-2 text-xs font-semibold text-white/60">{t(UI.results.proOnly, lang)}</p>
-                    </div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-white/70">
+                      {lang === "zh" ? "全维度解锁" : "All 6 Dimensions"}
+                    </p>
+                    <p className="mt-2 text-2xl font-black text-white">6/6</p>
+                    <p className="mt-2 text-xs text-white/50">
+                      {lang === "zh" ? "完整学习路径" : "Full learning paths"}
+                    </p>
                   </div>
                 </div>
               </div>
