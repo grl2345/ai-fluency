@@ -462,49 +462,139 @@ export const learningResources = [
   {
     dimension: 'ai-understanding',
     resources: [
-      { title: { zh: '大语言模型是怎么工作的', en: 'How Large Language Models Work' }, type: 'article', duration: { zh: '15 分钟', en: '15 min' } },
-      { title: { zh: 'AI 幻觉：原因与应对', en: 'AI Hallucinations: Causes and Responses' }, type: 'video', duration: { zh: '20 分钟', en: '20 min' } },
-      { title: { zh: 'AI 的能力边界精讲', en: 'Deep Dive: AI Capability Boundaries' }, type: 'course', duration: { zh: '2 小时', en: '2 hours' } },
+      {
+        title: { zh: '大语言模型是怎么工作的？Stephen Wolfram 深度解析', en: 'What Is ChatGPT Doing … and Why Does It Work? — Stephen Wolfram' },
+        type: 'article',
+        duration: { zh: '20 分钟', en: '20 min' },
+        url: 'https://writings.stephenwolfram.com/2023/02/what-is-chatgpt-doing-and-why-does-it-work/',
+      },
+      {
+        title: { zh: 'GPT 可视化入门：Transformer 工作原理 — 3Blue1Brown', en: 'But what is a GPT? Visual intro to transformers — 3Blue1Brown' },
+        type: 'video',
+        duration: { zh: '27 分钟', en: '27 min' },
+        url: 'https://www.youtube.com/watch?v=wjZofJX0v4M',
+      },
+      {
+        title: { zh: 'fast.ai 实用深度学习课程（免费）', en: 'Practical Deep Learning for Coders — fast.ai (free)' },
+        type: 'course',
+        duration: { zh: '约 30 小时', en: '~30 hours' },
+        url: 'https://course.fast.ai/',
+      },
     ],
   },
   {
     dimension: 'task-decomposition',
     resources: [
-      { title: { zh: '把大任务拆小的实战指南', en: 'Practical Guide to Breaking Down Large Tasks' }, type: 'article', duration: { zh: '20 分钟', en: '20 min' } },
-      { title: { zh: '任务拆解 × AI 执行：15 个模板', en: 'Task Decomposition × AI Execution: 15 Templates' }, type: 'template', duration: { zh: '即用', en: 'Ready to use' } },
-      { title: { zh: '复杂项目的 AI 拆解法', en: 'AI Decomposition for Complex Projects' }, type: 'course', duration: { zh: '1.5 小时', en: '1.5 hours' } },
+      {
+        title: { zh: 'LLM 驱动的自主 Agent 详解 — Lilian Weng', en: 'LLM Powered Autonomous Agents — Lilian Weng (OpenAI)' },
+        type: 'article',
+        duration: { zh: '30 分钟', en: '30 min' },
+        url: 'https://lilianweng.github.io/posts/2023-06-23-agent/',
+      },
+      {
+        title: { zh: '生产环境 LLM 工程实战 — Chip Huyen', en: 'Building LLM Applications for Production — Chip Huyen' },
+        type: 'article',
+        duration: { zh: '25 分钟', en: '25 min' },
+        url: 'https://huyenchip.com/2023/04/11/llm-engineering.html',
+      },
+      {
+        title: { zh: 'LangChain 官方实战教程', en: 'LangChain Tutorials — Official Docs' },
+        type: 'course',
+        duration: { zh: '自定进度', en: 'Self-paced' },
+        url: 'https://python.langchain.com/docs/tutorials/',
+      },
     ],
   },
   {
     dimension: 'prompt-capability',
     resources: [
-      { title: { zh: '提示词工程基础', en: 'Prompt Engineering Fundamentals' }, type: 'article', duration: { zh: '20 分钟', en: '20 min' } },
-      { title: { zh: '高级提示技巧实战', en: 'Advanced Prompting Techniques in Practice' }, type: 'video', duration: { zh: '30 分钟', en: '30 min' } },
-      { title: { zh: '提示词模板库', en: 'Prompt Template Library' }, type: 'template', duration: { zh: '即用', en: 'Ready to use' } },
+      {
+        title: { zh: 'OpenAI 提示词工程官方指南', en: 'Prompt Engineering Guide — OpenAI' },
+        type: 'article',
+        duration: { zh: '15 分钟', en: '15 min' },
+        url: 'https://platform.openai.com/docs/guides/prompt-engineering',
+      },
+      {
+        title: { zh: 'Andrej Karpathy：大语言模型入门讲座', en: 'Intro to Large Language Models — Andrej Karpathy' },
+        type: 'video',
+        duration: { zh: '60 分钟', en: '60 min' },
+        url: 'https://www.youtube.com/watch?v=zjkBMFhNj_g',
+      },
+      {
+        title: { zh: 'Awesome ChatGPT Prompts 社区精选模板库', en: 'Awesome ChatGPT Prompts — Community Templates' },
+        type: 'template',
+        duration: { zh: '即用', en: 'Ready to use' },
+        url: 'https://github.com/f/awesome-chatgpt-prompts',
+      },
     ],
   },
   {
     dimension: 'output-evaluation',
     resources: [
-      { title: { zh: '识别 AI 幻觉的实用方法', en: 'Practical Methods for Identifying AI Hallucinations' }, type: 'article', duration: { zh: '10 分钟', en: '10 min' } },
-      { title: { zh: '事实核查方法论', en: 'Fact-Checking Methodology' }, type: 'video', duration: { zh: '25 分钟', en: '25 min' } },
-      { title: { zh: 'AI 输出质量评估框架', en: 'AI Output Quality Evaluation Framework' }, type: 'course', duration: { zh: '1 小时', en: '1 hour' } },
+      {
+        title: { zh: 'AI 幻觉是什么以及如何识别 — IBM', en: 'What Are AI Hallucinations? — IBM Think' },
+        type: 'article',
+        duration: { zh: '10 分钟', en: '10 min' },
+        url: 'https://www.ibm.com/think/topics/ai-hallucinations',
+      },
+      {
+        title: { zh: 'LLM 评估完整指南 — Hugging Face', en: 'A Guide to LLM Evaluation — Hugging Face' },
+        type: 'article',
+        duration: { zh: '20 分钟', en: '20 min' },
+        url: 'https://huggingface.co/blog/clefourrier/llm-evaluation',
+      },
+      {
+        title: { zh: 'HELM：斯坦福大语言模型全面评测基准', en: 'HELM — Holistic Evaluation of LMs, Stanford CRFM' },
+        type: 'course',
+        duration: { zh: '参考资料', en: 'Reference' },
+        url: 'https://crfm.stanford.edu/helm/',
+      },
     ],
   },
   {
     dimension: 'risk-awareness',
     resources: [
-      { title: { zh: 'AI 数据隐私实操指南', en: 'AI Data Privacy Practical Guide' }, type: 'article', duration: { zh: '20 分钟', en: '20 min' } },
-      { title: { zh: 'AI 伦理基础', en: 'AI Ethics Fundamentals' }, type: 'video', duration: { zh: '30 分钟', en: '30 min' } },
-      { title: { zh: '企业 AI 安全治理', en: 'Enterprise AI Security Governance' }, type: 'course', duration: { zh: '2 小时', en: '2 hours' } },
+      {
+        title: { zh: 'OWASP LLM Top 10 安全风险权威指南', en: 'OWASP Top 10 for LLM Applications — OWASP' },
+        type: 'article',
+        duration: { zh: '20 分钟', en: '20 min' },
+        url: 'https://owasp.org/www-project-top-10-for-large-language-model-applications/',
+      },
+      {
+        title: { zh: 'AI 安全基础课程 — BlueDot Impact', en: 'AI Safety Fundamentals — BlueDot Impact' },
+        type: 'course',
+        duration: { zh: '约 8 小时', en: '~8 hours' },
+        url: 'https://aisafetyfundamentals.com/',
+      },
+      {
+        title: { zh: '欧盟 AI 法案通俗解读', en: 'EU AI Act — Plain Language Guide' },
+        type: 'article',
+        duration: { zh: '15 分钟', en: '15 min' },
+        url: 'https://artificialintelligenceact.eu/',
+      },
     ],
   },
   {
     dimension: 'workflow-migration',
     resources: [
-      { title: { zh: 'AI 工作流设计原则', en: 'AI Workflow Design Principles' }, type: 'article', duration: { zh: '15 分钟', en: '15 min' } },
-      { title: { zh: '自动化工具入门 101', en: 'Automation Tools 101' }, type: 'video', duration: { zh: '40 分钟', en: '40 min' } },
-      { title: { zh: '团队 AI 协作最佳实践', en: 'Team AI Collaboration Best Practices' }, type: 'course', duration: { zh: '1.5 小时', en: '1.5 hours' } },
+      {
+        title: { zh: '麦肯锡：生成式 AI 的经济潜力报告', en: 'The Economic Potential of Generative AI — McKinsey' },
+        type: 'article',
+        duration: { zh: '30 分钟', en: '30 min' },
+        url: 'https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/the-economic-potential-of-generative-ai-the-next-productivity-frontier',
+      },
+      {
+        title: { zh: 'DeepLearning.AI：人人皆可学 AI — Andrew Ng', en: 'AI for Everyone — Andrew Ng, DeepLearning.AI' },
+        type: 'course',
+        duration: { zh: '约 6 小时', en: '~6 hours' },
+        url: 'https://www.deeplearning.ai/courses/ai-for-everyone/',
+      },
+      {
+        title: { zh: 'n8n 可视化 AI 工作流自动化入门', en: 'AI Workflow Automation with n8n — Templates & Guides' },
+        type: 'video',
+        duration: { zh: '自定进度', en: 'Self-paced' },
+        url: 'https://n8n.io/workflows/',
+      },
     ],
   },
 ];

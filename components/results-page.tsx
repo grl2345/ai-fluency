@@ -518,6 +518,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                       {resources?.resources.map((res, idx) => {
                         const resTitle = typeof res.title === "object" ? res.title[lang] : res.title;
                         const resDuration = typeof res.duration === "object" ? res.duration[lang] : res.duration;
+                        const resUrl = (res as { url?: string }).url;
                         const typeLabel =
                           res.type === "article" ? t(UI.results.article, lang)
                           : res.type === "video" ? t(UI.results.video, lang)
@@ -525,23 +526,46 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                           : res.type === "template" ? t(UI.results.template, lang)
                           : t(UI.results.newsletter, lang);
 
-                        return (
+                        const TYPE_COLORS: Record<string, string> = {
+                          article: "bg-sky-50 text-sky-700",
+                          video: "bg-rose-50 text-rose-700",
+                          course: "bg-violet-50 text-violet-700",
+                          template: "bg-emerald-50 text-emerald-700",
+                          newsletter: "bg-amber-50 text-amber-700",
+                        };
+
+                        const inner = (
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-slate-800 group-hover:text-indigo-600 leading-snug">
+                              {resTitle}
+                            </p>
+                            <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-500">
+                              <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${TYPE_COLORS[res.type] ?? "bg-slate-100 text-slate-600"}`}>
+                                {typeLabel}
+                              </span>
+                              <span>{resDuration}</span>
+                            </div>
+                          </div>
+                        );
+
+                        return resUrl ? (
+                          <a
+                            key={idx}
+                            href={resUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center gap-3 rounded-xl border border-slate-100 p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/40 hover:shadow-sm"
+                          >
+                            {inner}
+                            <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-300 transition-all group-hover:text-indigo-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          </a>
+                        ) : (
                           <div
                             key={idx}
-                            className="group flex cursor-pointer items-center justify-between rounded-xl border border-border/40 p-4 transition-all hover:border-primary/30 hover:bg-secondary/50"
+                            className="group flex items-center gap-3 rounded-xl border border-slate-100 p-4"
                           >
-                            <div className="flex-1">
-                              <p className="font-medium text-foreground group-hover:text-primary">
-                                {resTitle}
-                              </p>
-                              <div className="mt-1.5 flex items-center gap-3 text-sm text-muted-foreground">
-                                <Badge variant="secondary" className="text-xs font-normal">
-                                  {typeLabel}
-                                </Badge>
-                                <span>{resDuration}</span>
-                              </div>
-                            </div>
-                            <ArrowUpRight className="h-5 w-5 text-muted-foreground transition-all group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                            {inner}
+                            <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-200" />
                           </div>
                         );
                       })}
