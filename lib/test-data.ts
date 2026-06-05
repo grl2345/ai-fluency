@@ -121,7 +121,7 @@ export const levels = [
     description: { zh: '用 AI 重构工作系统，能从零构建 AI 工具', en: 'Redesigning work systems with AI, building custom AI tools' },
     minScore: 81,
     maxScore: 100,
-    color: 'bg-rose-500',
+    color: 'bg-violet-600',
     badge: 'L5',
   },
 ];

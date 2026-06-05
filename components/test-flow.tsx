@@ -189,7 +189,7 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
           <div className="mt-3.5">
             <div className="h-[3px] w-full overflow-hidden rounded-full bg-slate-100">
               <div
-                className="h-full rounded-full bg-slate-900 transition-all duration-500"
+                className="h-full rounded-full bg-indigo-600 transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -360,7 +360,7 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
           <button
             onClick={handleNext}
             disabled={!canContinue}
-            className="flex items-center gap-2 rounded-full bg-slate-900 px-8 py-2.5 text-sm font-semibold text-white transition-all hover:bg-slate-800 active:scale-[0.98] disabled:opacity-25"
+            className="flex items-center gap-2 rounded-full bg-indigo-600 px-8 py-2.5 text-sm font-semibold text-white transition-all hover:bg-indigo-500 active:scale-[0.98] disabled:opacity-25"
           >
             {isLast ? t(UI.test.viewResults, lang) : t(UI.test.next, lang)}
             <ChevronRight className="h-4 w-4" />

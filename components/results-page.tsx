@@ -188,8 +188,8 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
       {/* Hero Section — light, celebratory */}
       <section className="relative overflow-hidden px-6 py-16 md:py-20">
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full bg-indigo-300/25 blur-[120px]" />
-          <div className="absolute -right-24 top-10 h-[380px] w-[380px] rounded-full bg-fuchsia-300/20 blur-[120px]" />
+          <div className="absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full bg-indigo-300/20 blur-[120px]" />
+          <div className="absolute -right-24 top-10 h-[380px] w-[380px] rounded-full bg-violet-300/15 blur-[120px]" />
         </div>
         <div className="mx-auto max-w-4xl text-center">
           <motion.div
@@ -272,7 +272,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex flex-wrap justify-center gap-3"
           >
-            <button className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg">
+            <button className="flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:bg-indigo-500 hover:shadow-lg">
               <Share2 className="h-4 w-4" />
               {t(UI.results.share, lang)}
             </button>

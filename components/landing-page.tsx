@@ -162,7 +162,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                 {lang === "zh" ? "AI 素养评估" : "AI Fluency Assessment"}
               </span>
 
-              <h1 className="mt-5 text-[54px] font-black leading-[0.96] tracking-tight text-white md:text-[76px]">
+              <h1 className="mt-5 text-[46px] font-black leading-[0.96] tracking-tight text-white md:text-[72px]">
                 {lang === "zh" ? (
                   <>你真的懂<br /><span className="text-indigo-400">AI</span><br />吗？</>
                 ) : (
@@ -702,7 +702,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
             {isAuthenticated ? t(UI.cta.btn, lang) : startLabel}
             <ChevronRight className="h-4 w-4" />
           </button>
-          <p className="mt-4 text-sm text-slate-700">
+          <p className="mt-4 text-sm text-slate-500">
             {t(UI.hero.noCard, lang)} · {lang === "zh" ? "15 分钟" : "15 minutes"}
           </p>
         </div>
