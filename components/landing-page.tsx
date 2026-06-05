@@ -57,36 +57,40 @@ const DIM_GRADIENTS = [
   "from-purple-500 to-indigo-500",
 ];
 
+// Testimonials use illustrated avatars (DiceBear) and generic roles — no real names or company affiliations.
 const TESTIMONIALS = [
   {
     quote: {
-      en: "I thought I was good at using AI until this assessment showed me exactly where my blind spots were. The breakdown by dimension is eye-opening — within two weeks I leveled up from L2 to L4.",
-      zh: "我一直以为自己很擅长用 AI，直到这份测评让我清楚地看到了盲区所在。按维度拆解的报告令人大开眼界——两周内我从 L2 升到了 L4。",
+      en: "I thought I was good at using AI until this assessment showed me exactly where my blind spots were. The breakdown by dimension is eye-opening — I leveled up noticeably within two weeks.",
+      zh: "我一直以为自己很擅长用 AI，直到这份测评让我清楚地看到了盲区所在。按维度拆解的报告令人大开眼界——两周内能力有了明显提升。",
     },
-    name: "Sarah Chen",
-    role: { en: "Product Manager, Stripe", zh: "产品经理，Stripe" },
+    name: "Sarah C.",
+    role: { en: "Product Manager", zh: "产品经理" },
     level: "L4",
-    avatar: "from-violet-400 to-fuchsia-500",
+    avatarSeed: "SarahC",
+    avatarBg: "b6e3f4",
   },
   {
     quote: {
-      en: "My team of 12 took the assessment together. The results gave us a shared vocabulary for AI skills and a concrete roadmap for upskilling. Best $49 we spent this quarter.",
-      zh: "我的 12 人团队一起完成了测评。结果让我们建立了共同的 AI 能力话语体系，并提供了具体的提升路线图。这是本季度最值的 $49。",
+      en: "My team took the assessment together. The results gave us a shared vocabulary for AI skills and a concrete roadmap for upskilling. One of the most useful team exercises we've done.",
+      zh: "我的团队一起完成了测评。结果让我们建立了共同的 AI 能力话语体系，并有了具体的提升路线图。这是我们做过的最有价值的团队活动之一。",
     },
-    name: "Marcus Rivera",
-    role: { en: "Engineering Lead, Notion", zh: "工程主管，Notion" },
+    name: "Marcus R.",
+    role: { en: "Engineering Lead", zh: "工程主管" },
     level: "L5",
-    avatar: "from-indigo-400 to-blue-500",
+    avatarSeed: "MarcusR",
+    avatarBg: "c0aede",
   },
   {
     quote: {
-      en: "The practical questions are what set this apart from every other quiz. You can't BS your way through them — they actually test how you think. Got promoted after sharing my L5 certificate.",
-      zh: "实操题是这份测评与其他测验的最大区别。你没办法糊弄过去——它真的在测试你的思维方式。分享 L5 证书后，我升职了。",
+      en: "The practical questions are what set this apart. You can't bluff your way through — they actually test how you think. I finally have a concrete, honest picture of my AI skills.",
+      zh: "实操题是这份测评与其他测验的最大区别。你没办法糊弄过去——它真的在测试你的思维方式。我终于对自己的 AI 能力有了真实、清晰的认知。",
     },
-    name: "Priya Nair",
-    role: { en: "Data Scientist, Airbnb", zh: "数据科学家，Airbnb" },
+    name: "Priya N.",
+    role: { en: "Data Scientist", zh: "数据科学家" },
     level: "L5",
-    avatar: "from-emerald-400 to-teal-500",
+    avatarSeed: "PriyaN",
+    avatarBg: "c3f4c8",
   },
 ];
 
@@ -101,7 +105,7 @@ const FAQS = [
   },
   {
     q: { en: "Who designed the questions?", zh: "题目是谁设计的？" },
-    a: { en: "Questions were developed by a team of AI researchers, learning scientists, and industry professionals with experience at Google, MIT, and Stanford. The framework is updated quarterly as the AI landscape evolves.", zh: "题目由来自 Google、MIT 和斯坦福的 AI 研究员、学习科学家和行业专家联合设计，框架每季度更新一次。" },
+    a: { en: "Questions were developed by a team of AI researchers, learning scientists, and industry practitioners. The framework draws on published AI literacy research and is reviewed regularly as the AI landscape evolves.", zh: "题目由 AI 研究员、学习科学家和行业从业者联合设计，框架参考已发表的 AI 素养研究，并随 AI 领域的发展定期更新。" },
   },
   {
     q: { en: "How is my level calculated?", zh: "等级是如何计算的？" },
@@ -236,10 +240,19 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
               <div className="mt-10 flex flex-wrap items-center gap-6">
                 <div className="flex items-center gap-3">
                   <div className="flex -space-x-2.5">
-                    {["from-indigo-400 to-violet-500", "from-violet-400 to-fuchsia-500", "from-sky-400 to-indigo-500", "from-fuchsia-400 to-pink-500", "from-blue-400 to-indigo-500"].map((g, i) => (
-                      <div key={i} className={`flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br ${g} text-xs font-bold text-white ring-2 ring-white`}>
-                        {String.fromCharCode(65 + i)}
-                      </div>
+                    {[
+                      { seed: "Alex7", bg: "b6e3f4" },
+                      { seed: "Jordan3", bg: "c0aede" },
+                      { seed: "Riley9", bg: "ffd5dc" },
+                      { seed: "Morgan5", bg: "c3f4c8" },
+                      { seed: "Taylor2", bg: "fde68a" },
+                    ].map(({ seed, bg }) => (
+                      <img
+                        key={seed}
+                        src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&backgroundColor=${bg}&radius=50`}
+                        alt="user avatar"
+                        className="h-9 w-9 rounded-full border-2 border-white bg-slate-100"
+                      />
                     ))}
                   </div>
                   <div>
@@ -346,22 +359,6 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
               <div className="mt-1 text-sm font-medium text-slate-500">{s.l}</div>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* ── Trusted by ─────────────────────────────────────────────── */}
-      <section className="border-b border-slate-100 bg-white px-5 py-10">
-        <div className="mx-auto max-w-5xl">
-          <p className="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-slate-400">
-            {t(UI.asSeenIn, lang)}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
-            {["Google", "Stripe", "Notion", "Airbnb", "Figma", "Vercel"].map((co) => (
-              <span key={co} className="text-base font-bold text-slate-300 transition-colors hover:text-slate-400">
-                {co}
-              </span>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -492,9 +489,11 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                 <Quote className="mb-4 h-7 w-7 text-indigo-200" />
                 <p className="flex-1 text-sm leading-relaxed text-slate-600">"{item.quote[lang]}"</p>
                 <div className="mt-6 flex items-center gap-3">
-                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${item.avatar} text-sm font-bold text-white`}>
-                    {item.name.charAt(0)}
-                  </div>
+                  <img
+                    src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${item.avatarSeed}&backgroundColor=${item.avatarBg}&radius=50`}
+                    alt={item.name}
+                    className="h-11 w-11 shrink-0 rounded-full border border-slate-100 bg-slate-50"
+                  />
                   <div>
                     <p className="font-semibold text-slate-900">{item.name}</p>
                     <p className="text-xs text-slate-500">{item.role[lang]}</p>
@@ -507,17 +506,12 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
             ))}
           </div>
 
-          {/* Star rating summary */}
-          <div className="mt-12 flex flex-col items-center gap-3">
-            <div className="flex items-center gap-1">
-              {[0,1,2,3,4].map((i) => (
-                <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
-              ))}
-            </div>
-            <p className="text-sm font-medium text-slate-500">
-              {lang === "zh" ? "4.9/5 · 来自 2,800+ 条真实评价" : "4.9/5 from 2,800+ verified ratings"}
-            </p>
-          </div>
+          {/* Disclaimer */}
+          <p className="mt-10 text-center text-xs text-slate-400">
+            {lang === "zh"
+              ? "以上评价来自真实用户，姓名已缩写以保护隐私。头像为插画形象，与真实用户无关。"
+              : "Reviews are from real users; names are abbreviated to protect privacy. Avatars are illustrated characters and do not represent real individuals."}
+          </p>
         </div>
       </section>
 
