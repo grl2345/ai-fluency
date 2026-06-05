@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { dimensions, levels } from "@/lib/test-data";
 import { useLang } from "@/contexts/language-context";
 import { UI, t } from "@/lib/i18n";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { NavAuthMenu, redirectToSignIn } from "@/components/auth-ui";
+import { useAuth } from "@/components/auth-provider";
 import {
   Brain,
   Clock,
@@ -20,13 +21,13 @@ import {
   TrendingUp,
   Play,
   Check,
-  LogIn,
-  LogOut,
   Sparkles,
 } from "lucide-react";
 
 interface LandingPageProps {
   onStartTest: () => void;
+  authLoading?: boolean;
+  isAuthenticated?: boolean;
 }
 
 const iconMap: Record<string, React.ElementType> = {
@@ -57,9 +58,14 @@ function Pill({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function LandingPage({ onStartTest }: LandingPageProps) {
-  const { data: session } = useSession();
+export function LandingPage({ onStartTest, authLoading = false, isAuthenticated = false }: LandingPageProps) {
+  const { user } = useAuth();
   const { lang, setLang } = useLang();
+
+  const startLabel = isAuthenticated
+    ? t(UI.nav.startTest, lang)
+    : t(UI.nav.startTestGuest, lang);
+  const startDisabled = authLoading;
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
@@ -93,27 +99,14 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
               {lang === "zh" ? "EN" : "中文"}
             </button>
 
-            {session ? (
-              <div className="flex items-center gap-2">
-                {session.user?.image && (
-                  <img src={session.user.image} alt={session.user.name ?? "User"} className="h-8 w-8 rounded-full ring-2 ring-indigo-100" />
-                )}
-                <button onClick={() => signOut()} className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700">
-                  <LogOut className="h-4 w-4" />
-                </button>
-              </div>
-            ) : (
-              <button onClick={() => signIn("google")} className="hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-indigo-600 sm:flex">
-                <LogIn className="h-4 w-4" />
-                {lang === "zh" ? "登录" : "Log in"}
-              </button>
-            )}
+            <NavAuthMenu />
 
             <button
               onClick={onStartTest}
-              className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-slate-800"
+              disabled={startDisabled}
+              className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {t(UI.nav.startTest, lang)}
+              {startLabel}
             </button>
           </div>
         </div>
@@ -131,7 +124,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
         <div className="mx-auto max-w-6xl px-5 pb-20 pt-16 md:pb-28 md:pt-24">
           <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
             {/* Left copy */}
-            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <Pill>
                 <Sparkles className="h-3.5 w-3.5" />
                 {t(UI.hero.badge, lang)}
@@ -152,19 +145,24 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <button
                   onClick={onStartTest}
-                  className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 transition-all hover:shadow-xl hover:shadow-indigo-500/40 active:scale-[0.98]"
+                  disabled={startDisabled}
+                  className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 transition-all hover:shadow-xl hover:shadow-indigo-500/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {t(UI.hero.cta, lang)}
+                  {isAuthenticated ? t(UI.hero.cta, lang) : startLabel}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </button>
                 <button
                   onClick={onStartTest}
-                  className="inline-flex h-13 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-7 py-3.5 text-base font-semibold text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50"
+                  disabled={startDisabled}
+                  className="inline-flex h-13 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-7 py-3.5 text-base font-semibold text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <Play className="h-4 w-4 fill-current" />
                   {t(UI.hero.ctaSecondary, lang)}
                 </button>
               </div>
+              {!isAuthenticated && !authLoading && (
+                <p className="mt-3 text-sm text-slate-500">{t(UI.auth.signInRequired, lang)}</p>
+              )}
 
               {/* Trust row */}
               <div className="mt-10 flex flex-wrap items-center gap-6">
@@ -195,7 +193,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
 
             {/* Right: result card mockup */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.15 }}
               className="relative mx-auto w-full max-w-md"
@@ -248,7 +246,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
 
               {/* Floating accent card */}
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
+                initial={false}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
                 className="absolute -bottom-5 -left-5 flex items-center gap-2.5 rounded-2xl border border-slate-100 bg-white p-3 pr-4 shadow-xl shadow-indigo-500/10"
@@ -302,7 +300,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
               return (
                 <motion.div
                   key={item.n}
-                  initial={{ opacity: 0, y: 18 }}
+                  initial={false}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.12 }}
@@ -336,7 +334,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
               return (
                 <motion.div
                   key={dim.id}
-                  initial={{ opacity: 0, y: 18 }}
+                  initial={false}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.06 }}
@@ -367,7 +365,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
             {levels.map((level, i) => (
               <motion.div
                 key={level.level}
-                initial={{ opacity: 0, y: 18 }}
+                initial={false}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
@@ -417,7 +415,7 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                   features: UI.pricing.pro.features[lang] as readonly string[],
                   cta: t(UI.pricing.pro.cta, lang),
                   highlighted: true,
-                  action: () => (session ? null : signIn("google")),
+                  action: () => (user ? null : redirectToSignIn("/#pricing")),
                 },
                 {
                   key: "team" as const,
@@ -428,13 +426,13 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
                   features: UI.pricing.team.features[lang] as readonly string[],
                   cta: t(UI.pricing.team.cta, lang),
                   highlighted: false,
-                  action: () => (session ? null : signIn("google")),
+                  action: () => (user ? null : redirectToSignIn("/#pricing")),
                 },
               ] as const
             ).map((plan, i) => (
               <motion.div
                 key={plan.key}
-                initial={{ opacity: 0, y: 20 }}
+                initial={false}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
@@ -495,14 +493,15 @@ export function LandingPage({ onStartTest }: LandingPageProps) {
           <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 px-6 py-16 text-center shadow-2xl shadow-indigo-500/30 md:px-16 md:py-20">
             <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
             <div className="pointer-events-none absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative">
+            <motion.div initial={false} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative">
               <h2 className="mx-auto max-w-2xl text-3xl font-extrabold text-white md:text-4xl">{t(UI.cta.title, lang)}</h2>
               <p className="mx-auto mt-4 max-w-xl text-lg text-indigo-100">{t(UI.cta.subtitle, lang)}</p>
               <button
                 onClick={onStartTest}
-                className="mt-9 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-base font-semibold text-indigo-700 shadow-lg transition-all hover:bg-indigo-50 active:scale-[0.98]"
+                disabled={startDisabled}
+                className="mt-9 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-base font-semibold text-indigo-700 shadow-lg transition-all hover:bg-indigo-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {t(UI.cta.btn, lang)}
+                {isAuthenticated ? t(UI.cta.btn, lang) : startLabel}
                 <ChevronRight className="h-4 w-4" />
               </button>
               <p className="mt-4 text-sm text-indigo-200">{t(UI.hero.noCard, lang)} · {t(UI.hero.minutes, lang) === "minutes" ? "15 minutes" : "15 分钟"}</p>
