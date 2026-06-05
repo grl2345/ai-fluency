@@ -133,8 +133,8 @@ export default function AccountPage() {
               </div>
             ) : (
               <div className="mt-4">
-                <h2 className="text-2xl font-bold">{lang === "zh" ? "免费版" : "Free"}</h2>
-                <p className="mt-1 text-sm text-slate-500">{t(UI.billing.freePlanDesc, lang)}</p>
+                <h2 className="text-2xl font-bold">{lang === "zh" ? "未订阅" : "No plan"}</h2>
+                <p className="mt-1 text-sm text-slate-500">{t(UI.billing.noPlanDesc, lang)}</p>
                 <Link
                   href="/#pricing"
                   className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
@@ -202,6 +202,14 @@ export default function AccountPage() {
             <p className="mt-1 text-sm text-slate-500">{t(UI.billing.manageDesc, lang)}</p>
 
             <div className="mt-5 flex flex-wrap gap-3">
+              {subscription?.plan === "starter" && (
+                <Link
+                  href="/#pricing"
+                  className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                  {lang === "zh" ? "升级专业版" : "Upgrade to Pro"}
+                </Link>
+              )}
               {subscription?.plan === "pro" && (
                 <Link
                   href="/#pricing"

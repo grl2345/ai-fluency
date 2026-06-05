@@ -1,5 +1,7 @@
+import type { PlanKey } from "@/lib/plans";
+
+export type { PlanKey };
 export type SubscriptionStatus = "active" | "cancelled" | "suspended" | "expired";
-export type PlanKey = "pro" | "team";
 
 export type BillingInfo = {
   nextBillingTime: string | null;
@@ -22,13 +24,21 @@ export function isActiveSubscription(sub: UserSubscription | null | undefined): 
 }
 
 export function planDisplayName(plan: PlanKey, lang: "zh" | "en"): string {
-  if (plan === "pro") return lang === "zh" ? "专业版" : "Pro";
-  return lang === "zh" ? "团队版" : "Team";
+  const names: Record<PlanKey, { zh: string; en: string }> = {
+    starter: { zh: "入门版", en: "Starter" },
+    pro: { zh: "专业版", en: "Pro" },
+    team: { zh: "团队版", en: "Team" },
+  };
+  return names[plan][lang];
 }
 
 export function planPrice(plan: PlanKey, lang: "zh" | "en"): string {
-  if (plan === "pro") return lang === "zh" ? "¥29/月" : "$9/month";
-  return lang === "zh" ? "¥199/月" : "$49/month";
+  const prices: Record<PlanKey, { zh: string; en: string }> = {
+    starter: { zh: "¥9.9/月", en: "$9.9/month" },
+    pro: { zh: "¥19.9/月", en: "$19.9/month" },
+    team: { zh: "¥49.9/月", en: "$49.9/month" },
+  };
+  return prices[plan][lang];
 }
 
 export function statusDisplayName(status: SubscriptionStatus, lang: "zh" | "en"): string {
@@ -42,7 +52,7 @@ export function statusDisplayName(status: SubscriptionStatus, lang: "zh" | "en")
 }
 
 export function formatBillingDate(iso: string | null, lang: "zh" | "en"): string {
-  if (!iso) return lang === "zh" ? "—" : "—";
+  if (!iso) return "—";
   return new Date(iso).toLocaleDateString(lang === "zh" ? "zh-CN" : "en-US", {
     year: "numeric",
     month: "long",

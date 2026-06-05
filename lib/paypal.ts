@@ -1,5 +1,7 @@
 // PayPal REST API helpers (server-side only)
 
+import type { PlanKey } from "@/lib/plans";
+
 const PAYPAL_BASE =
   process.env.PAYPAL_MODE === "live"
     ? "https://api-m.paypal.com"
@@ -47,9 +49,10 @@ export async function cancelSubscription(subscriptionId: string, reason: string)
   return res.ok;
 }
 
-export const PLAN_IDS = {
-  pro: process.env.PAYPAL_PLAN_ID_PRO ?? "",
-  team: process.env.PAYPAL_PLAN_ID_TEAM ?? "",
-} as const;
+export const PLAN_IDS: Record<PlanKey, string> = {
+  starter: process.env.PAYPAL_PLAN_ID_STARTER ?? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER ?? "",
+  pro: process.env.PAYPAL_PLAN_ID_PRO ?? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO ?? "",
+  team: process.env.PAYPAL_PLAN_ID_TEAM ?? process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_TEAM ?? "",
+};
 
-export type PlanKey = keyof typeof PLAN_IDS;
+export type { PlanKey };

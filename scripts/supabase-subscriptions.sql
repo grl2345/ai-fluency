@@ -8,13 +8,18 @@ create table if not exists subscriptions (
   id uuid default gen_random_uuid() primary key,
   user_id uuid not null references auth.users(id) on delete cascade,
   paypal_subscription_id text not null,
-  plan text not null check (plan in ('pro', 'team')),
+  plan text not null check (plan in ('starter', 'pro', 'team')),
   status text not null default 'active'
            check (status in ('active', 'cancelled', 'suspended', 'expired')),
   created_at timestamptz default now(),
   updated_at timestamptz default now(),
   unique(user_id)
 );
+
+-- Migrate existing plans if table already exists
+alter table subscriptions drop constraint if exists subscriptions_plan_check;
+alter table subscriptions add constraint subscriptions_plan_check
+  check (plan in ('starter', 'pro', 'team'));
 
 alter table subscriptions enable row level security;
 

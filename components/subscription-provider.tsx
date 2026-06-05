@@ -9,6 +9,7 @@ type SubscriptionContextValue = {
   loading: boolean;
   refresh: () => Promise<void>;
   hasActiveSubscription: boolean;
+  isStarter: boolean;
   isPro: boolean;
   isTeam: boolean;
 };
@@ -18,6 +19,7 @@ const SubscriptionContext = createContext<SubscriptionContextValue>({
   loading: true,
   refresh: async () => {},
   hasActiveSubscription: false,
+  isStarter: false,
   isPro: false,
   isTeam: false,
 });
@@ -62,6 +64,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
       loading: authLoading || loading,
       refresh,
       hasActiveSubscription: active,
+      isStarter: active && subscription?.plan === "starter",
       isPro: active && subscription?.plan === "pro",
       isTeam: active && subscription?.plan === "team",
     };

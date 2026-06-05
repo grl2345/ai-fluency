@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getSubscription, type PlanKey } from "@/lib/paypal";
+import { getSubscription } from "@/lib/paypal";
+import { PLAN_KEYS, type PlanKey } from "@/lib/plans";
 
-const VALID_PLANS = new Set<PlanKey>(["pro", "team"]);
+const VALID_PLANS = new Set<PlanKey>(PLAN_KEYS);
 
 // User session + RLS: logged-in user can only write their own subscription row.
 export async function POST(req: NextRequest) {

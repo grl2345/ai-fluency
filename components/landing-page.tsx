@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { PaymentModal } from "@/components/payment-modal";
 import { useSubscription } from "@/components/subscription-provider";
-import type { PlanKey } from "@/lib/paypal";
+import { isHigherPlan, type PlanKey } from "@/lib/plans";
 import { planDisplayName } from "@/lib/subscription";
 
 interface LandingPageProps {
@@ -69,8 +69,8 @@ const FAQS = [
     a: { en: "About 15 minutes. You can pause and come back — your answers are saved automatically.", zh: "大约 15 分钟。你可以中途暂停，答案会自动保存。" },
   },
   {
-    q: { en: "Is the free assessment really free?", zh: "免费测评真的免费吗？" },
-    a: { en: "Yes, completely. No credit card required. The free tier includes one full assessment, your radar chart, and five personalized learning recommendations.", zh: "是的，完全免费。无需信用卡。免费版包含一次完整测评、能力雷达图和五条个性化学习建议。" },
+    q: { en: "Can I cancel anytime?", zh: "可以随时取消订阅吗？" },
+    a: { en: "Yes. Cancel from your account page anytime. You keep access until the end of the current billing period.", zh: "可以。在账户页面随时取消，当前计费周期结束前仍可继续使用。" },
   },
   {
     q: { en: "Who designed the questions?", zh: "题目是谁设计的？" },
@@ -106,12 +106,12 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
 
       {/* ── Nav ── */}
       <nav className="fixed top-0 z-50 w-full border-b border-white/8 bg-[#080810]/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
-              <Brain className="h-[18px] w-[18px] text-white" />
+        <div className="mx-auto flex h-12 max-w-6xl items-center justify-between px-5">
+          <div className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600">
+              <Brain className="h-4 w-4 text-white" />
             </div>
-            <span className="text-[15px] font-bold tracking-tight text-white">{t(UI.nav.brand, lang)}</span>
+            <span className="text-sm font-bold tracking-tight text-white">{t(UI.nav.brand, lang)}</span>
           </div>
 
           <div className="hidden items-center gap-8 md:flex">
@@ -133,11 +133,11 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
             >
               {lang === "zh" ? "EN" : "中文"}
             </button>
-            <NavAuthMenu />
+            <NavAuthMenu variant="dark" />
             <button
               onClick={onStartTest}
               disabled={startDisabled}
-              className="rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm font-semibold text-white transition-all hover:border-white/30 hover:bg-white/15 disabled:opacity-50"
+              className="rounded-full border border-white/15 bg-white/8 px-3.5 py-1.5 text-xs font-semibold text-white transition-all hover:border-white/30 hover:bg-white/15 disabled:opacity-50"
             >
               {startLabel}
             </button>
@@ -499,42 +499,49 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" className="px-5 py-24 md:py-32">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-14">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-500">
+      <section id="pricing" className="relative overflow-hidden bg-[#f8f7fc] px-5 py-28 md:py-36">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(99,102,241,0.14),transparent)]" />
+        <div className="pointer-events-none absolute left-1/2 top-1/3 h-[480px] w-[720px] -translate-x-1/2 rounded-full bg-violet-200/20 blur-[120px]" />
+
+        <div className="relative mx-auto max-w-6xl">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <span className="inline-flex items-center rounded-full border border-indigo-200/70 bg-white/80 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-indigo-600 shadow-sm backdrop-blur-sm">
               {t(UI.nav.pricing, lang)}
             </span>
-            <h2 className="mt-3 text-4xl font-extrabold tracking-tight md:text-5xl">
+            <h2 className="mt-6 text-4xl font-light tracking-tight text-slate-900 md:text-[2.75rem] md:leading-tight">
               {t(UI.pricing.title, lang)}
             </h2>
-            <p className="mt-3 text-[15px] text-slate-500">{t(UI.pricing.subtitle, lang)}</p>
+            <p className="mt-4 text-[15px] leading-relaxed text-slate-500">{t(UI.pricing.subtitle, lang)}</p>
             {subscribeToast && (
-              <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+              <div className="mx-auto mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-200/80 bg-white px-5 py-2.5 text-sm font-medium text-emerald-800 shadow-sm">
                 <Check className="h-4 w-4 shrink-0" />
                 {t(UI.billing.subscribeSuccess, lang)} {planDisplayName(subscribeToast, lang)}!
-                <a href="/account" className="ml-1 font-semibold underline hover:no-underline">
+                <a href="/account" className="font-semibold text-emerald-700 hover:underline">
                   {t(UI.billing.manageSubscription, lang)} →
                 </a>
               </div>
             )}
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid items-stretch gap-7 lg:grid-cols-3 lg:gap-6">
             {(
               [
                 {
-                  key: "free" as const,
-                  name: t(UI.pricing.free.name, lang),
-                  price: t(UI.pricing.free.price, lang),
-                  period: t(UI.pricing.free.period, lang),
-                  desc: t(UI.pricing.free.desc, lang),
-                  features: UI.pricing.free.features[lang] as readonly string[],
-                  cta: t(UI.pricing.free.cta, lang),
+                  key: "starter" as const,
+                  name: t(UI.pricing.starter.name, lang),
+                  price: t(UI.pricing.starter.price, lang),
+                  period: t(UI.pricing.starter.period, lang),
+                  desc: t(UI.pricing.starter.desc, lang),
+                  features: UI.pricing.starter.features[lang] as readonly string[],
+                  cta: t(UI.pricing.starter.cta, lang),
                   highlighted: false,
-                  isCurrent: !hasActiveSubscription,
-                  disabled: false,
-                  action: onStartTest,
+                  isCurrent: hasActiveSubscription && subscription?.plan === "starter",
+                  disabled: hasActiveSubscription && subscription ? isHigherPlan(subscription.plan, "starter") : false,
+                  action: () => {
+                    if (!user) redirectToSignIn("/#pricing");
+                    else if (hasActiveSubscription && subscription?.plan === "starter") window.location.href = "/account";
+                    else setPaymentPlan("starter");
+                  },
                 },
                 {
                   key: "pro" as const,
@@ -546,7 +553,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   cta: t(UI.pricing.pro.cta, lang),
                   highlighted: true,
                   isCurrent: hasActiveSubscription && subscription?.plan === "pro",
-                  disabled: hasActiveSubscription && subscription?.plan === "team",
+                  disabled: hasActiveSubscription && subscription ? isHigherPlan(subscription.plan, "pro") : false,
                   action: () => {
                     if (!user) redirectToSignIn("/#pricing");
                     else if (hasActiveSubscription && subscription?.plan === "pro") window.location.href = "/account";
@@ -571,76 +578,132 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   },
                 },
               ] as const
-            ).map((plan, i) => (
+            ).map((plan, i) => {
+              const priceMatch = plan.price.match(/^([¥$])([\d.]+)$/);
+              const currency = priceMatch?.[1] ?? "";
+              const amount = priceMatch?.[2] ?? plan.price;
+              const ctaLabel = plan.isCurrent
+                ? t(UI.billing.manageSubscription, lang)
+                : plan.disabled
+                  ? t(UI.billing.includedInHigher, lang)
+                  : user
+                    ? t(UI.billing.upgradePlan, lang)
+                    : plan.cta;
+
+              const tierIndex = String(i + 1).padStart(2, "0");
+
+              return (
               <motion.div
                 key={plan.key}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
-                className={`relative flex flex-col rounded-xl p-7 ${
-                  plan.highlighted
-                    ? "border-2 border-indigo-600 bg-[#080810]"
-                    : "border border-slate-200 bg-white"
-                }`}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className={`relative flex flex-col ${plan.highlighted ? "lg:-mt-4 lg:mb-4" : ""}`}
               >
-                {plan.highlighted && !plan.isCurrent && (
-                  <span className="absolute -top-3 left-6 rounded-full bg-indigo-600 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
-                    {t(UI.pricing.popular, lang)}
-                  </span>
+                {plan.highlighted && (
+                  <div className="pointer-events-none absolute -inset-px -z-10 rounded-[1.35rem] bg-gradient-to-b from-indigo-400/40 via-violet-500/20 to-transparent blur-sm" />
                 )}
-                {plan.isCurrent && (
-                  <span className="absolute -top-3 left-6 rounded-full bg-emerald-600 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
-                    {t(UI.billing.planBadge, lang)}
-                  </span>
-                )}
-                <div>
-                  <h3 className={`text-base font-bold ${plan.highlighted ? "text-white" : "text-slate-900"}`}>
-                    {plan.name}
-                  </h3>
-                  <p className={`mt-1 text-sm ${plan.highlighted ? "text-slate-500" : "text-slate-500"}`}>
-                    {plan.desc}
-                  </p>
-                </div>
-                <div className="mt-6 flex items-end gap-1">
-                  <span className={`text-5xl font-black leading-none tracking-tight ${plan.highlighted ? "text-white" : "text-slate-900"}`}>
-                    {plan.price}
-                  </span>
-                  <span className={`mb-1.5 text-sm ${plan.highlighted ? "text-slate-600" : "text-slate-400"}`}>
-                    {plan.period}
-                  </span>
-                </div>
 
-                <ul className="mt-7 flex-1 space-y-3">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2.5">
-                      <Check className={`mt-0.5 h-4 w-4 shrink-0 ${plan.highlighted ? "text-indigo-400" : "text-indigo-500"}`} />
-                      <span className={`text-[14px] ${plan.highlighted ? "text-slate-400" : "text-slate-600"}`}>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button
-                  onClick={plan.action}
-                  disabled={plan.disabled}
-                  className={`mt-8 w-full rounded-full py-2.5 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
-                    plan.isCurrent
-                      ? "border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
-                      : plan.highlighted
-                        ? "bg-indigo-600 text-white hover:bg-indigo-500"
-                        : "border border-slate-200 text-slate-900 hover:bg-slate-50"
+                <div
+                  className={`relative flex h-full flex-col overflow-hidden rounded-[1.25rem] p-7 md:p-8 ${
+                    plan.highlighted
+                      ? "bg-gradient-to-br from-[#0a0814] via-[#110e1f] to-[#1a1235] shadow-[0_24px_80px_-12px_rgba(79,70,229,0.45)] ring-1 ring-white/10"
+                      : plan.key === "team"
+                        ? "border border-slate-200/60 bg-gradient-to-b from-white to-slate-50/90 shadow-[0_8px_40px_-12px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/[0.04]"
+                        : "border border-white/80 bg-white/90 shadow-[0_8px_32px_-12px_rgba(99,102,241,0.12)] ring-1 ring-indigo-100/80 backdrop-blur-sm"
                   }`}
                 >
-                  {plan.isCurrent
-                    ? t(UI.billing.manageSubscription, lang)
-                    : plan.disabled && plan.key === "pro"
-                      ? t(UI.billing.includedInTeam, lang)
-                      : (plan.key === "pro" || plan.key === "team") && user
-                        ? t(UI.billing.upgradePlan, lang)
-                        : plan.cta}
-                </button>
+                  {plan.highlighted && (
+                    <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-300/60 to-transparent" />
+                  )}
+
+                  {(plan.highlighted && !plan.isCurrent) || plan.isCurrent ? (
+                    <span
+                      className={`absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-4 py-1 text-[9px] font-bold uppercase tracking-[0.2em] ${
+                        plan.isCurrent
+                          ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/25"
+                          : "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-indigo-500/30"
+                      }`}
+                    >
+                      {plan.isCurrent ? t(UI.billing.planBadge, lang) : t(UI.pricing.popular, lang)}
+                    </span>
+                  ) : null}
+
+                  <div className="mb-8">
+                    <p className={`text-[10px] font-semibold uppercase tracking-[0.24em] ${
+                      plan.highlighted ? "text-indigo-300/70" : plan.key === "team" ? "text-slate-400" : "text-indigo-400/80"
+                    }`}>
+                      {tierIndex}
+                    </p>
+                    <h3 className={`mt-2 text-xl font-semibold tracking-tight ${plan.highlighted ? "text-white" : "text-slate-900"}`}>
+                      {plan.name}
+                    </h3>
+                    <p className={`mt-2 text-[13px] leading-relaxed ${plan.highlighted ? "text-slate-400" : "text-slate-500"}`}>
+                      {plan.desc}
+                    </p>
+                  </div>
+
+                  <div className={`mb-8 border-b pb-8 ${plan.highlighted ? "border-white/[0.07]" : "border-slate-100"}`}>
+                    <div className="flex items-end gap-0.5">
+                      {currency && (
+                        <span className={`mb-2 text-lg font-medium ${plan.highlighted ? "text-indigo-200/80" : "text-slate-400"}`}>
+                          {currency}
+                        </span>
+                      )}
+                      <span className={`text-[3.25rem] font-semibold leading-none tracking-tight tabular-nums ${
+                        plan.highlighted ? "bg-gradient-to-br from-white to-indigo-100 bg-clip-text text-transparent" : "text-slate-900"
+                      }`}>
+                        {amount}
+                      </span>
+                    </div>
+                    <p className={`mt-2 text-sm ${plan.highlighted ? "text-slate-500" : "text-slate-400"}`}>
+                      {plan.period}
+                    </p>
+                  </div>
+
+                  <ul className="flex-1 space-y-3.5">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-start gap-3">
+                        <span className={`mt-1 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full ${
+                          plan.highlighted
+                            ? "bg-indigo-400/15 ring-1 ring-indigo-400/25"
+                            : plan.key === "team"
+                              ? "bg-slate-900/[0.06] ring-1 ring-slate-900/10"
+                              : "bg-indigo-50 ring-1 ring-indigo-100"
+                        }`}>
+                          <Check className={`h-2.5 w-2.5 stroke-[3] ${
+                            plan.highlighted ? "text-indigo-200" : plan.key === "team" ? "text-slate-700" : "text-indigo-600"
+                          }`} />
+                        </span>
+                        <span className={`text-[13px] leading-relaxed ${plan.highlighted ? "text-slate-300/90" : "text-slate-600"}`}>
+                          {f}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={plan.action}
+                    disabled={plan.disabled}
+                    className={`mt-8 w-full rounded-full py-3 text-[13px] font-semibold tracking-wide transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 ${
+                      plan.isCurrent
+                        ? "border border-emerald-200/80 bg-emerald-50/90 text-emerald-800 hover:bg-emerald-100"
+                        : plan.disabled
+                          ? "border border-slate-200 bg-slate-50 text-slate-400"
+                          : plan.highlighted
+                            ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:from-indigo-400 hover:to-violet-400"
+                            : plan.key === "team"
+                              ? "bg-slate-900 text-white shadow-lg shadow-slate-900/20 hover:bg-slate-800"
+                              : "border border-indigo-200/80 bg-white text-indigo-700 shadow-sm hover:border-indigo-300 hover:bg-indigo-50/50"
+                    }`}
+                  >
+                    {ctaLabel}
+                  </button>
+                </div>
               </motion.div>
-            ))}
+            );
+            })}
           </div>
         </div>
       </section>
