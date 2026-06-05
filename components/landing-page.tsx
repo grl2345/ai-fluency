@@ -12,6 +12,8 @@ import {
   CheckCircle2, GitMerge, Shield, TrendingUp, Check,
   ChevronDown, ChevronUp, Play, BarChart3,
 } from "lucide-react";
+import { PaymentModal } from "@/components/payment-modal";
+import type { PlanKey } from "@/lib/paypal";
 
 interface LandingPageProps {
   onStartTest: () => void;
@@ -90,6 +92,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
   const { user } = useAuth();
   const { lang, setLang } = useLang();
   const [openFaq, setOpenFaq] = React.useState<number | null>(null);
+  const [paymentPlan, setPaymentPlan] = React.useState<PlanKey | null>(null);
 
   const startLabel = isAuthenticated ? t(UI.nav.startTest, lang) : t(UI.nav.startTestGuest, lang);
   const startDisabled = authLoading;
@@ -527,7 +530,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   features: UI.pricing.pro.features[lang] as readonly string[],
                   cta: t(UI.pricing.pro.cta, lang),
                   highlighted: true,
-                  action: () => (user ? null : redirectToSignIn("/#pricing")),
+                  action: () => user ? setPaymentPlan("pro") : redirectToSignIn("/#pricing"),
                 },
                 {
                   key: "team" as const,
@@ -538,7 +541,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   features: UI.pricing.team.features[lang] as readonly string[],
                   cta: t(UI.pricing.team.cta, lang),
                   highlighted: false,
-                  action: () => (user ? null : redirectToSignIn("/#pricing")),
+                  action: () => user ? setPaymentPlan("team") : redirectToSignIn("/#pricing"),
                 },
               ] as const
             ).map((plan, i) => (
@@ -663,6 +666,18 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
           </p>
         </div>
       </section>
+
+      {/* ── Payment Modal ── */}
+      {paymentPlan && (
+        <PaymentModal
+          plan={paymentPlan}
+          onClose={() => setPaymentPlan(null)}
+          onSuccess={(plan) => {
+            setPaymentPlan(null);
+            console.info("Subscription activated:", plan);
+          }}
+        />
+      )}
 
       {/* ── Footer ── */}
       <footer className="border-t border-white/6 bg-[#080810] px-5 py-10">

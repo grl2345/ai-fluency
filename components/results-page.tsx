@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { PaymentModal } from "@/components/payment-modal";
 import { motion } from "framer-motion";
 import {
   Radar,
@@ -64,6 +65,7 @@ const iconMap: Record<string, React.ElementType> = {
 
 export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: ResultsPageProps) {
   const { lang } = useLang();
+  const [showPayment, setShowPayment] = useState(false);
 
   // Dimension scores from knowledge + scenario questions
   const dimensionScores = useMemo(() => {
@@ -597,7 +599,10 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                     ))}
                   </ul>
                   <div className="mt-7 flex flex-wrap gap-3">
-                    <button className="rounded-full bg-white px-6 py-2.5 text-sm font-bold text-indigo-700 shadow-md transition-all hover:bg-indigo-50 active:scale-[0.98]">
+                    <button
+                      onClick={() => setShowPayment(true)}
+                      className="rounded-full bg-white px-6 py-2.5 text-sm font-bold text-indigo-700 shadow-md transition-all hover:bg-indigo-50 active:scale-[0.98]"
+                    >
                       {t(UI.results.unlockCta, lang)}
                     </button>
                     <button onClick={onRetake} className="rounded-full border border-white/30 px-6 py-2.5 text-sm font-medium text-white/80 transition-all hover:border-white/60 hover:text-white">
@@ -634,6 +639,13 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
           </TabsContent>
         </Tabs>
       </section>
+      {showPayment && (
+        <PaymentModal
+          plan="pro"
+          onClose={() => setShowPayment(false)}
+          onSuccess={() => setShowPayment(false)}
+        />
+      )}
     </div>
   );
 }
