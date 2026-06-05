@@ -643,7 +643,10 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
         <PaymentModal
           plan="pro"
           onClose={() => setShowPayment(false)}
-          onSuccess={() => setShowPayment(false)}
+          onSuccess={() => {
+            setShowPayment(false);
+            window.location.href = "/account";
+          }}
         />
       )}
     </div>

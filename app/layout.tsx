@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/components/auth-provider'
+import { SubscriptionProvider } from '@/components/subscription-provider'
 import { LanguageProvider } from '@/contexts/language-context'
 
 export const metadata: Metadata = {
@@ -36,10 +37,12 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-background font-sans antialiased">
         <AuthProvider>
-          <LanguageProvider>
-            {children}
-            {process.env.NODE_ENV === 'production' && <Analytics />}
-          </LanguageProvider>
+          <SubscriptionProvider>
+            <LanguageProvider>
+              {children}
+              {process.env.NODE_ENV === 'production' && <Analytics />}
+            </LanguageProvider>
+          </SubscriptionProvider>
         </AuthProvider>
       </body>
     </html>

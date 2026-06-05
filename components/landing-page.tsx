@@ -13,7 +13,9 @@ import {
   ChevronDown, ChevronUp, Play, BarChart3,
 } from "lucide-react";
 import { PaymentModal } from "@/components/payment-modal";
+import { useSubscription } from "@/components/subscription-provider";
 import type { PlanKey } from "@/lib/paypal";
+import { planDisplayName } from "@/lib/subscription";
 
 interface LandingPageProps {
   onStartTest: () => void;
@@ -90,9 +92,11 @@ const FAQS = [
 
 export function LandingPage({ onStartTest, authLoading = false, isAuthenticated = false }: LandingPageProps) {
   const { user } = useAuth();
+  const { subscription, hasActiveSubscription, refresh } = useSubscription();
   const { lang, setLang } = useLang();
   const [openFaq, setOpenFaq] = React.useState<number | null>(null);
   const [paymentPlan, setPaymentPlan] = React.useState<PlanKey | null>(null);
+  const [subscribeToast, setSubscribeToast] = React.useState<PlanKey | null>(null);
 
   const startLabel = isAuthenticated ? t(UI.nav.startTest, lang) : t(UI.nav.startTestGuest, lang);
   const startDisabled = authLoading;
@@ -505,6 +509,15 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
               {t(UI.pricing.title, lang)}
             </h2>
             <p className="mt-3 text-[15px] text-slate-500">{t(UI.pricing.subtitle, lang)}</p>
+            {subscribeToast && (
+              <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+                <Check className="h-4 w-4 shrink-0" />
+                {t(UI.billing.subscribeSuccess, lang)} {planDisplayName(subscribeToast, lang)}!
+                <a href="/account" className="ml-1 font-semibold underline hover:no-underline">
+                  {t(UI.billing.manageSubscription, lang)} →
+                </a>
+              </div>
+            )}
           </div>
 
           <div className="grid gap-5 md:grid-cols-3">
@@ -519,6 +532,8 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   features: UI.pricing.free.features[lang] as readonly string[],
                   cta: t(UI.pricing.free.cta, lang),
                   highlighted: false,
+                  isCurrent: !hasActiveSubscription,
+                  disabled: false,
                   action: onStartTest,
                 },
                 {
@@ -530,7 +545,13 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   features: UI.pricing.pro.features[lang] as readonly string[],
                   cta: t(UI.pricing.pro.cta, lang),
                   highlighted: true,
-                  action: () => user ? setPaymentPlan("pro") : redirectToSignIn("/#pricing"),
+                  isCurrent: hasActiveSubscription && subscription?.plan === "pro",
+                  disabled: hasActiveSubscription && subscription?.plan === "team",
+                  action: () => {
+                    if (!user) redirectToSignIn("/#pricing");
+                    else if (hasActiveSubscription && subscription?.plan === "pro") window.location.href = "/account";
+                    else setPaymentPlan("pro");
+                  },
                 },
                 {
                   key: "team" as const,
@@ -541,7 +562,13 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   features: UI.pricing.team.features[lang] as readonly string[],
                   cta: t(UI.pricing.team.cta, lang),
                   highlighted: false,
-                  action: () => user ? setPaymentPlan("team") : redirectToSignIn("/#pricing"),
+                  isCurrent: hasActiveSubscription && subscription?.plan === "team",
+                  disabled: false,
+                  action: () => {
+                    if (!user) redirectToSignIn("/#pricing");
+                    else if (hasActiveSubscription && subscription?.plan === "team") window.location.href = "/account";
+                    else setPaymentPlan("team");
+                  },
                 },
               ] as const
             ).map((plan, i) => (
@@ -557,9 +584,14 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                     : "border border-slate-200 bg-white"
                 }`}
               >
-                {plan.highlighted && (
+                {plan.highlighted && !plan.isCurrent && (
                   <span className="absolute -top-3 left-6 rounded-full bg-indigo-600 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
                     {t(UI.pricing.popular, lang)}
+                  </span>
+                )}
+                {plan.isCurrent && (
+                  <span className="absolute -top-3 left-6 rounded-full bg-emerald-600 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
+                    {t(UI.billing.planBadge, lang)}
                   </span>
                 )}
                 <div>
@@ -590,13 +622,22 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
 
                 <button
                   onClick={plan.action}
-                  className={`mt-8 w-full rounded-full py-2.5 text-sm font-semibold transition-all ${
-                    plan.highlighted
-                      ? "bg-indigo-600 text-white hover:bg-indigo-500"
-                      : "border border-slate-200 text-slate-900 hover:bg-slate-50"
+                  disabled={plan.disabled}
+                  className={`mt-8 w-full rounded-full py-2.5 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                    plan.isCurrent
+                      ? "border border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+                      : plan.highlighted
+                        ? "bg-indigo-600 text-white hover:bg-indigo-500"
+                        : "border border-slate-200 text-slate-900 hover:bg-slate-50"
                   }`}
                 >
-                  {plan.cta}
+                  {plan.isCurrent
+                    ? t(UI.billing.manageSubscription, lang)
+                    : plan.disabled && plan.key === "pro"
+                      ? t(UI.billing.includedInTeam, lang)
+                      : (plan.key === "pro" || plan.key === "team") && user
+                        ? t(UI.billing.upgradePlan, lang)
+                        : plan.cta}
                 </button>
               </motion.div>
             ))}
@@ -672,9 +713,11 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
         <PaymentModal
           plan={paymentPlan}
           onClose={() => setPaymentPlan(null)}
-          onSuccess={(plan) => {
+          onSuccess={async (plan) => {
             setPaymentPlan(null);
-            console.info("Subscription activated:", plan);
+            setSubscribeToast(plan);
+            await refresh();
+            document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
           }}
         />
       )}

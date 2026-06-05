@@ -1,42 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import { getSubscription } from "@/lib/paypal";
+import { createClient } from "@/lib/supabase/server";
+import { getSubscription, type PlanKey } from "@/lib/paypal";
 
-// Called after user approves subscription in PayPal popup.
-// Records subscription in Supabase against the authenticated user.
+const VALID_PLANS = new Set<PlanKey>(["pro", "team"]);
+
+// User session + RLS: logged-in user can only write their own subscription row.
 export async function POST(req: NextRequest) {
   try {
     const { subscriptionId, planKey } = await req.json();
 
-    if (!subscriptionId || !planKey) {
-      return NextResponse.json({ error: "Missing params" }, { status: 400 });
+    if (!subscriptionId || !planKey || !VALID_PLANS.has(planKey)) {
+      return NextResponse.json({ error: "Missing or invalid params" }, { status: 400 });
     }
 
-    // Verify subscription status with PayPal
     const sub = await getSubscription(subscriptionId);
-    if (sub.status !== "ACTIVE" && sub.status !== "APPROVED") {
+    const allowedStatuses = new Set(["ACTIVE", "APPROVED", "APPROVAL_PENDING"]);
+    if (!allowedStatuses.has(sub.status)) {
       return NextResponse.json({ error: "Subscription not active" }, { status: 400 });
     }
 
-    // Get authenticated user from Supabase
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-      {
-        cookies: {
-          getAll: () => cookieStore.getAll(),
-          setAll: () => {},
-        },
-      }
-    );
+    const supabase = await createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Upsert subscription record
     const { error: dbError } = await supabase.from("subscriptions").upsert({
       user_id: user.id,
       paypal_subscription_id: subscriptionId,

@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Brain, ChevronDown, LogOut } from "lucide-react";
+import { Brain, ChevronDown, CreditCard, LogOut } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
+import { useSubscription } from "@/components/subscription-provider";
 import { useLang } from "@/contexts/language-context";
 import { UI, t } from "@/lib/i18n";
+import { planDisplayName } from "@/lib/subscription";
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -123,6 +125,7 @@ export function SignInCard({ next = "/" }: { next?: string }) {
 
 export function NavAuthMenu() {
   const { user } = useAuth();
+  const { subscription, hasActiveSubscription } = useSubscription();
   const { lang } = useLang();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -186,7 +189,21 @@ export function NavAuthMenu() {
             {user.email && (
               <p className="truncate text-xs text-slate-500">{user.email}</p>
             )}
+            {hasActiveSubscription && subscription && (
+              <span className="mt-2 inline-flex rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-semibold text-indigo-700">
+                {planDisplayName(subscription.plan, lang)}
+              </span>
+            )}
           </div>
+          <Link
+            href="/account"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+          >
+            <CreditCard className="h-4 w-4 text-slate-400" />
+            {t(UI.nav.billing, lang)}
+          </Link>
           <button
             type="button"
             role="menuitem"

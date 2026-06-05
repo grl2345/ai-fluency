@@ -1,22 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { cancelSubscription } from "@/lib/paypal";
 
-export async function POST(req: NextRequest) {
+// User session + RLS: user can only read/update their own subscription.
+export async function POST() {
   try {
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-      {
-        cookies: {
-          getAll: () => cookieStore.getAll(),
-          setAll: () => {},
-        },
-      }
-    );
-
+    const supabase = await createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -38,10 +27,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "PayPal cancel failed" }, { status: 500 });
     }
 
-    await supabase
+    const { error: dbError } = await supabase
       .from("subscriptions")
       .update({ status: "cancelled", updated_at: new Date().toISOString() })
       .eq("user_id", user.id);
+
+    if (dbError) {
+      console.error("DB update error:", dbError);
+      return NextResponse.json({ error: "Database error" }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const HANDLED_EVENTS = new Set([
   "BILLING.SUBSCRIPTION.ACTIVATED",
@@ -9,13 +9,10 @@ const HANDLED_EVENTS = new Set([
   "PAYMENT.SALE.COMPLETED",
 ]);
 
+// Service role: PayPal server callbacks have no user session, so RLS is bypassed.
 export async function POST(req: NextRequest) {
-  const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
   try {
+    const supabaseAdmin = createAdminClient();
     const body = await req.json();
     const eventType: string = body.event_type ?? "";
 
@@ -34,15 +31,16 @@ export async function POST(req: NextRequest) {
     if (eventType === "BILLING.SUBSCRIPTION.CANCELLED") status = "cancelled";
     else if (eventType === "BILLING.SUBSCRIPTION.SUSPENDED") status = "suspended";
     else if (eventType === "BILLING.SUBSCRIPTION.EXPIRED") status = "expired";
-    else if (eventType === "PAYMENT.SALE.COMPLETED") {
-      // Just ensure status stays active on successful payment
-      status = "active";
-    }
 
-    await supabaseAdmin
+    const { error: dbError } = await supabaseAdmin
       .from("subscriptions")
       .update({ status, updated_at: new Date().toISOString() })
       .eq("paypal_subscription_id", subscriptionId);
+
+    if (dbError) {
+      console.error("Webhook DB update error:", dbError);
+      return NextResponse.json({ error: "Database error" }, { status: 500 });
+    }
 
     return NextResponse.json({ received: true });
   } catch (err) {
