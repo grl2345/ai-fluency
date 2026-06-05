@@ -9,7 +9,7 @@ import { selectQuestions, dimensions } from "@/lib/test-data";
 import type { Question } from "@/lib/test-data";
 import { useLang } from "@/contexts/language-context";
 import { UI, t } from "@/lib/i18n";
-import { CheckCircle, ChevronRight, Clock, ArrowLeft, X, ChevronDown, ChevronUp } from "lucide-react";
+import { CheckCircle, ChevronRight, Clock, ArrowLeft, X, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 
 interface TestFlowProps {
   onComplete: (
@@ -134,6 +134,18 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
   }
 
   const isLast = currentQuestion === questions.length - 1;
+  const isMilestone = currentQuestion === Math.floor(questions.length / 2);
+
+  // Dimension gradient map for the banner
+  const DIM_GRADIENT: Record<string, string> = {
+    prompting: "from-indigo-500 to-violet-500",
+    evaluation: "from-violet-500 to-fuchsia-500",
+    integration: "from-blue-500 to-indigo-500",
+    ethics: "from-fuchsia-500 to-pink-500",
+    collaboration: "from-sky-500 to-blue-500",
+    learning: "from-purple-500 to-indigo-500",
+  };
+  const dimGradient = currentDimension ? (DIM_GRADIENT[currentDimension.id] || "from-indigo-500 to-violet-500") : null;
 
   return (
     <div className="min-h-screen bg-white">
@@ -153,9 +165,17 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="hidden rounded bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500 sm:inline">
-                {sectionLabel}
-              </span>
+              {/* Dimension chip */}
+              {currentDimension && dimGradient && (
+                <span className={`hidden items-center gap-1.5 rounded-full bg-gradient-to-r ${dimGradient} px-3 py-1 text-[11px] font-semibold text-white sm:inline-flex`}>
+                  {currentDimension.name[lang]}
+                </span>
+              )}
+              {!currentDimension && (
+                <span className="hidden rounded bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500 sm:inline">
+                  {sectionLabel}
+                </span>
+              )}
               <button
                 onClick={onBack}
                 className="flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
@@ -193,18 +213,36 @@ export function TestFlow({ onComplete, onBack }: TestFlowProps) {
               </span>
             </div>
 
+            {/* Milestone celebration */}
+            {isMilestone && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 flex items-center gap-3 rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 to-violet-50 px-5 py-3"
+              >
+                <Sparkles className="h-5 w-5 shrink-0 text-indigo-500" />
+                <p className="text-sm font-medium text-indigo-700">{t(UI.test.milestone50, lang)}</p>
+              </motion.div>
+            )}
+
             {/* Profile note */}
             {isProfile && (
-              <p className="mb-5 text-sm text-slate-500 italic">
-                {t(UI.test.profileNote, lang)}
-              </p>
+              <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+                <span className="mt-0.5 text-base">👋</span>
+                <p className="text-sm text-slate-500">
+                  {t(UI.test.profileNote, lang)}
+                </p>
+              </div>
             )}
 
             {/* Practical note */}
             {isPractical && (
-              <p className="mb-5 text-sm text-slate-500 italic">
-                {t(UI.test.practicalNote, lang)}
-              </p>
+              <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
+                <span className="mt-0.5 text-base">✍️</span>
+                <p className="text-sm text-amber-800">
+                  {t(UI.test.practicalNote, lang)}
+                </p>
+              </div>
             )}
 
             {/* Question */}

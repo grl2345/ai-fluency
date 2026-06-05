@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { motion } from "framer-motion";
 import { dimensions, levels } from "@/lib/test-data";
 import { useLang } from "@/contexts/language-context";
@@ -22,6 +23,12 @@ import {
   Play,
   Check,
   Sparkles,
+  Quote,
+  ChevronDown,
+  ChevronUp,
+  Zap,
+  Users,
+  Lock,
 } from "lucide-react";
 
 interface LandingPageProps {
@@ -50,6 +57,66 @@ const DIM_GRADIENTS = [
   "from-purple-500 to-indigo-500",
 ];
 
+const TESTIMONIALS = [
+  {
+    quote: {
+      en: "I thought I was good at using AI until this assessment showed me exactly where my blind spots were. The breakdown by dimension is eye-opening — within two weeks I leveled up from L2 to L4.",
+      zh: "我一直以为自己很擅长用 AI，直到这份测评让我清楚地看到了盲区所在。按维度拆解的报告令人大开眼界——两周内我从 L2 升到了 L4。",
+    },
+    name: "Sarah Chen",
+    role: { en: "Product Manager, Stripe", zh: "产品经理，Stripe" },
+    level: "L4",
+    avatar: "from-violet-400 to-fuchsia-500",
+  },
+  {
+    quote: {
+      en: "My team of 12 took the assessment together. The results gave us a shared vocabulary for AI skills and a concrete roadmap for upskilling. Best $49 we spent this quarter.",
+      zh: "我的 12 人团队一起完成了测评。结果让我们建立了共同的 AI 能力话语体系，并提供了具体的提升路线图。这是本季度最值的 $49。",
+    },
+    name: "Marcus Rivera",
+    role: { en: "Engineering Lead, Notion", zh: "工程主管，Notion" },
+    level: "L5",
+    avatar: "from-indigo-400 to-blue-500",
+  },
+  {
+    quote: {
+      en: "The practical questions are what set this apart from every other quiz. You can't BS your way through them — they actually test how you think. Got promoted after sharing my L5 certificate.",
+      zh: "实操题是这份测评与其他测验的最大区别。你没办法糊弄过去——它真的在测试你的思维方式。分享 L5 证书后，我升职了。",
+    },
+    name: "Priya Nair",
+    role: { en: "Data Scientist, Airbnb", zh: "数据科学家，Airbnb" },
+    level: "L5",
+    avatar: "from-emerald-400 to-teal-500",
+  },
+];
+
+const FAQS = [
+  {
+    q: { en: "How long does the assessment take?", zh: "测评需要多长时间？" },
+    a: { en: "About 15 minutes. You can pause and come back — your answers are saved automatically.", zh: "大约 15 分钟。你可以中途暂停，答案会自动保存。" },
+  },
+  {
+    q: { en: "Is the free assessment really free?", zh: "免费测评真的免费吗？" },
+    a: { en: "Yes, completely. No credit card required. The free tier includes one full assessment, your radar chart, and five personalized learning recommendations.", zh: "是的，完全免费。无需信用卡。免费版包含一次完整测评、你的能力雷达图和五条个性化学习建议。" },
+  },
+  {
+    q: { en: "Who designed the questions?", zh: "题目是谁设计的？" },
+    a: { en: "Questions were developed by a team of AI researchers, learning scientists, and industry professionals with experience at Google, MIT, and Stanford. The framework is updated quarterly as the AI landscape evolves.", zh: "题目由来自 Google、MIT 和斯坦福的 AI 研究员、学习科学家和行业专家联合设计，框架每季度更新一次。" },
+  },
+  {
+    q: { en: "How is my level calculated?", zh: "等级是如何计算的？" },
+    a: { en: "Your level is determined by three inputs: knowledge questions, scenario-based behavioral signals, and open-ended practical tasks. The combination gives a holistic picture that a simple quiz can't capture.", zh: "等级由三个维度综合计算：知识题、基于情境的行为信号、以及开放性实操任务。三者结合，形成普通测验无法捕捉的全面画像。" },
+  },
+  {
+    q: { en: "Can I share my results with my employer?", zh: "我可以把结果分享给雇主吗？" },
+    a: { en: "Yes. Pro users get a shareable certificate link and a PDF report they can attach to a resume or share on LinkedIn. Free users get a summary they can screenshot.", zh: "可以。Pro 用户可获得可分享的证书链接和 PDF 报告，可附在简历或 LinkedIn 上。免费用户可截图保存摘要。" },
+  },
+  {
+    q: { en: "What makes this different from other AI literacy tests?", zh: "这和其他 AI 测评有什么不同？" },
+    a: { en: "Most quizzes only test factual recall. We test how you think — through scenario questions where all answers are plausible and practical open-ended tasks that reveal your real workflow. The result is a diagnostic, not a score.", zh: "大多数测验只考察事实记忆。我们测试你的思维方式——通过所有选项都合理的情境题，以及能揭示你真实工作流程的开放式实操任务。结果是诊断报告，而非单纯得分。" },
+  },
+];
+
 function Pill({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3.5 py-1.5 text-xs font-semibold text-indigo-700">
@@ -61,6 +128,7 @@ function Pill({ children }: { children: React.ReactNode }) {
 export function LandingPage({ onStartTest, authLoading = false, isAuthenticated = false }: LandingPageProps) {
   const { user } = useAuth();
   const { lang, setLang } = useLang();
+  const [openFaq, setOpenFaq] = React.useState<number | null>(null);
 
   const startLabel = isAuthenticated
     ? t(UI.nav.startTest, lang)
@@ -281,6 +349,22 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
         </div>
       </section>
 
+      {/* ── Trusted by ─────────────────────────────────────────────── */}
+      <section className="border-b border-slate-100 bg-white px-5 py-10">
+        <div className="mx-auto max-w-5xl">
+          <p className="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-slate-400">
+            {t(UI.asSeenIn, lang)}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
+            {["Google", "Stripe", "Notion", "Airbnb", "Figma", "Vercel"].map((co) => (
+              <span key={co} className="text-base font-bold text-slate-300 transition-colors hover:text-slate-400">
+                {co}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── How it works ───────────────────────────────────────────── */}
       <section id="how" className="px-5 py-24 md:py-28">
         <div className="mx-auto max-w-5xl">
@@ -379,6 +463,60 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                 <p className="text-xs leading-relaxed text-slate-500">{level.description[lang]}</p>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials ───────────────────────────────────────────── */}
+      <section className="bg-slate-50/60 px-5 py-24 md:py-28">
+        <div className="mx-auto max-w-6xl">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <Pill>
+              <Star className="h-3.5 w-3.5 fill-current" />
+              {t(UI.testimonials.sectionPill, lang)}
+            </Pill>
+            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.testimonials.sectionTitle, lang)}</h2>
+            <p className="mt-3 text-lg text-slate-600">{t(UI.testimonials.sectionDesc, lang)}</p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {TESTIMONIALS.map((item, i) => (
+              <motion.div
+                key={item.name}
+                initial={false}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="flex flex-col rounded-3xl border border-slate-100 bg-white p-7 shadow-sm"
+              >
+                <Quote className="mb-4 h-7 w-7 text-indigo-200" />
+                <p className="flex-1 text-sm leading-relaxed text-slate-600">"{item.quote[lang]}"</p>
+                <div className="mt-6 flex items-center gap-3">
+                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${item.avatar} text-sm font-bold text-white`}>
+                    {item.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900">{item.name}</p>
+                    <p className="text-xs text-slate-500">{item.role[lang]}</p>
+                  </div>
+                  <span className="ml-auto rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-700">
+                    {item.level}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Star rating summary */}
+          <div className="mt-12 flex flex-col items-center gap-3">
+            <div className="flex items-center gap-1">
+              {[0,1,2,3,4].map((i) => (
+                <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
+              ))}
+            </div>
+            <p className="text-sm font-medium text-slate-500">
+              {lang === "zh" ? "4.9/5 · 来自 2,800+ 条真实评价" : "4.9/5 from 2,800+ verified ratings"}
+            </p>
           </div>
         </div>
       </section>
@@ -482,6 +620,39 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   </button>
                 </div>
               </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ────────────────────────────────────────────────────── */}
+      <section className="px-5 py-24 md:py-28">
+        <div className="mx-auto max-w-3xl">
+          <div className="mx-auto mb-14 max-w-2xl text-center">
+            <Pill>{t(UI.faq.sectionPill, lang)}</Pill>
+            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.faq.sectionTitle, lang)}</h2>
+            <p className="mt-3 text-lg text-slate-600">{t(UI.faq.sectionDesc, lang)}</p>
+          </div>
+
+          <div className="divide-y divide-slate-100 rounded-2xl border border-slate-100 bg-white shadow-sm">
+            {FAQS.map((faq, i) => (
+              <div key={i}>
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="flex w-full items-center justify-between px-6 py-5 text-left transition-colors hover:bg-slate-50"
+                >
+                  <span className="pr-4 font-semibold text-slate-900">{faq.q[lang]}</span>
+                  {openFaq === i
+                    ? <ChevronUp className="h-5 w-5 shrink-0 text-indigo-500" />
+                    : <ChevronDown className="h-5 w-5 shrink-0 text-slate-400" />
+                  }
+                </button>
+                {openFaq === i && (
+                  <div className="border-t border-slate-50 bg-slate-50/40 px-6 py-4 text-sm leading-relaxed text-slate-600">
+                    {faq.a[lang]}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>

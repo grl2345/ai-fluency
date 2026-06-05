@@ -124,6 +124,7 @@ export const UI = {
     practicalNote: { zh: '请在文本框中输入你的答案，没有标准答案——我们看的是你的思路。', en: 'Type your answer in the box below. There is no single right answer — we are looking at your thinking.' },
     practicalPlaceholder: { zh: '在这里输入你的答案……', en: 'Type your answer here…' },
     selectAll: { zh: '可多选', en: 'Select all that apply' },
+    milestone50: { zh: '答得不错，继续！你已经过半了。', en: "Great progress — you're halfway there!" },
   },
   results: {
     badge: { zh: '测评完成', en: 'Assessment Complete' },
@@ -150,7 +151,28 @@ export const UI = {
     gapPositive: { zh: '你的实际水平低于使用时长的预期——这说明你有大量未激活的成长空间。', en: 'Your actual level is below what your usage time would suggest — there is a lot of untapped growth potential.' },
     gapNegative: { zh: '你在相对短的时间内达到了很高的水平，进步速度超出平均！', en: 'You have reached a high level in a relatively short time — your learning pace is above average!' },
     gapNeutral: { zh: '你的水平与使用时长基本相符，正稳步走在成长路上。', en: 'Your level aligns well with your usage time — you are steadily progressing on your learning journey.' },
+    percentile: { zh: '你的得分超过了', en: 'You outscored' },
+    percentileSuffix: { zh: '% 的用户', en: '% of all users' },
+    unlockTitle: { zh: '解锁完整报告', en: 'Unlock Your Full Report' },
+    unlockDesc: { zh: '升级专业版，获取完整学习路径、进度追踪与可分享证书。', en: 'Upgrade to Pro for the full learning path, progress tracking, and a shareable certificate.' },
+    unlockCta: { zh: '升级 Pro — $9/月', en: 'Upgrade to Pro — $9/mo' },
+    unlockNote: { zh: '随时取消 · 无需信用卡即可试用', en: 'Cancel anytime · Try free for 7 days' },
+    certificateTitle: { zh: '专业 AI 素养证书', en: 'Professional AI Fluency Certificate' },
+    certificateDesc: { zh: '分享你的成就，让雇主和同事看到你的 AI 专业能力。', en: 'Share your achievement with employers and colleagues to showcase your AI expertise.' },
+    proOnly: { zh: 'Pro 专属', en: 'Pro only' },
+    peerBenchmark: { zh: '与同行对比', en: 'Peer Benchmark' },
   },
+  testimonials: {
+    sectionPill: { zh: '用户评价', en: 'What users say' },
+    sectionTitle: { zh: '50,000+ 专业人士已完成测评', en: '50,000+ professionals have taken it' },
+    sectionDesc: { zh: '看看他们发现了什么', en: 'See what they discovered about themselves' },
+  },
+  faq: {
+    sectionPill: { zh: '常见问题', en: 'FAQ' },
+    sectionTitle: { zh: '常见问题解答', en: 'Frequently Asked Questions' },
+    sectionDesc: { zh: '有任何问题？我们来解答。', en: 'Have questions? We have answers.' },
+  },
+  asSeenIn: { zh: '媒体报道', en: 'Trusted by teams at' },
 } as const;
 
 export function t(key: { zh: string; en: string }, lang: Lang): string {

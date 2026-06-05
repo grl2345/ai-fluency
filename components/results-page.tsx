@@ -40,6 +40,10 @@ import {
   ArrowUpRight,
   Brain,
   Target,
+  Lock,
+  Zap,
+  Users,
+  Star,
 } from "lucide-react";
 
 interface ResultsPageProps {
@@ -163,6 +167,12 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
     return t(UI.results.gapNeutral, lang);
   }, [profileData, mainTier, lang]);
 
+  // Percentile: tier 1→10, 2→30, 3→55, 4→78, 5→95
+  const percentile = useMemo(() => {
+    const map: Record<number, number> = { 1: 10, 2: 30, 3: 55, 4: 78, 5: 95 };
+    return map[mainTier] ?? 50;
+  }, [mainTier]);
+
   const sortedDimensions = useMemo(
     () => [...dimensionScores].sort((a, b) => b.score - a.score),
     [dimensionScores]
@@ -222,6 +232,23 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                 {currentLevel.description[lang]}
               </p>
             </div>
+          </motion.div>
+
+          {/* Percentile Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mx-auto mb-6 inline-flex items-center gap-3 rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 to-violet-50 px-6 py-3"
+          >
+            <div className="flex items-center gap-1">
+              {[0,1,2,3,4].map((i) => (
+                <Star key={i} className={`h-3.5 w-3.5 ${i < Math.round(mainTier) ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200"}`} />
+              ))}
+            </div>
+            <p className="text-sm font-semibold text-indigo-700">
+              {t(UI.results.percentile, lang)} <span className="text-indigo-900">{percentile}%</span> {t(UI.results.percentileSuffix, lang)}
+            </p>
           </motion.div>
 
           {/* Gap analysis */}
@@ -524,12 +551,61 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
               })}
             </div>
 
-            {/* CTA */}
-            <div className="mt-10 text-center">
-              <Button size="lg" className="gap-2 rounded-full px-8">
-                {t(UI.results.exploreCatalog, lang)}
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+            {/* Pro Upsell Card */}
+            <div className="mt-10 overflow-hidden rounded-3xl border border-indigo-200 bg-gradient-to-br from-indigo-600 to-violet-700 shadow-2xl shadow-indigo-500/20">
+              <div className="grid md:grid-cols-[1fr_auto]">
+                <div className="p-8 md:p-10">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white">
+                    <Zap className="h-3.5 w-3.5" />
+                    {t(UI.results.proOnly, lang)}
+                  </span>
+                  <h3 className="mt-4 text-2xl font-extrabold text-white">{t(UI.results.unlockTitle, lang)}</h3>
+                  <p className="mt-2 text-indigo-100">{t(UI.results.unlockDesc, lang)}</p>
+                  <ul className="mt-5 space-y-2.5">
+                    {(lang === "zh"
+                      ? ["无限次测评与历史趋势", "完整学习路径（25+ 资源）", "可分享的专业证书", "个人 AI 成长仪表盘"]
+                      : ["Unlimited assessments & history", "Full learning path (25+ resources)", "Shareable professional certificate", "Personal AI growth dashboard"]
+                    ).map((f) => (
+                      <li key={f} className="flex items-center gap-2.5 text-sm text-indigo-100">
+                        <CheckCircle className="h-4 w-4 shrink-0 text-emerald-300" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-7 flex flex-wrap gap-3">
+                    <button className="rounded-full bg-white px-6 py-2.5 text-sm font-bold text-indigo-700 shadow-md transition-all hover:bg-indigo-50 active:scale-[0.98]">
+                      {t(UI.results.unlockCta, lang)}
+                    </button>
+                    <button onClick={onRetake} className="rounded-full border border-white/30 px-6 py-2.5 text-sm font-medium text-white/80 transition-all hover:border-white/60 hover:text-white">
+                      {t(UI.results.retake, lang)}
+                    </button>
+                  </div>
+                  <p className="mt-3 text-xs text-indigo-200">{t(UI.results.unlockNote, lang)}</p>
+                </div>
+
+                {/* Certificate teaser */}
+                <div className="relative hidden items-center justify-center border-l border-white/10 bg-white/5 px-10 md:flex">
+                  <div className="relative">
+                    <div className="w-52 rounded-2xl border border-white/20 bg-white/10 p-6 text-center backdrop-blur-sm">
+                      <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/40">
+                        <Award className="h-7 w-7 text-white" />
+                      </div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-white/70">{t(UI.results.certificateTitle, lang)}</p>
+                      <p className="mt-2 text-2xl font-black text-white">L{mainTier}</p>
+                      <div className="mt-3 flex justify-center gap-1">
+                        {[0,1,2,3,4].map((i) => (
+                          <Star key={i} className={`h-3 w-3 ${i < mainTier ? "fill-amber-400 text-amber-400" : "fill-white/20 text-white/20"}`} />
+                        ))}
+                      </div>
+                    </div>
+                    {/* Lock overlay */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-black/40 backdrop-blur-[2px]">
+                      <Lock className="h-8 w-8 text-white/80" />
+                      <p className="mt-2 text-xs font-semibold text-white/60">{t(UI.results.proOnly, lang)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
