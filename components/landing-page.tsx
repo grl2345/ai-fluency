@@ -8,27 +8,9 @@ import { UI, t } from "@/lib/i18n";
 import { NavAuthMenu, redirectToSignIn } from "@/components/auth-ui";
 import { useAuth } from "@/components/auth-provider";
 import {
-  Brain,
-  Clock,
-  Target,
-  ChevronRight,
-  Star,
-  BarChart3,
-  ArrowRight,
-  MessageSquare,
-  CheckCircle2,
-  GitMerge,
-  Shield,
-  TrendingUp,
-  Play,
-  Check,
-  Sparkles,
-  Quote,
-  ChevronDown,
-  ChevronUp,
-  Zap,
-  Users,
-  Lock,
+  Brain, Target, ChevronRight, Star, ArrowRight, MessageSquare,
+  CheckCircle2, GitMerge, Shield, TrendingUp, Check,
+  ChevronDown, ChevronUp, Play, BarChart3,
 } from "lucide-react";
 
 interface LandingPageProps {
@@ -38,31 +20,14 @@ interface LandingPageProps {
 }
 
 const iconMap: Record<string, React.ElementType> = {
-  Brain,
-  Target,
-  MessageSquare,
-  CheckCircle: CheckCircle2,
-  GitMerge,
-  Shield,
-  TrendingUp,
+  Brain, Target, MessageSquare, CheckCircle: CheckCircle2, GitMerge, Shield, TrendingUp,
 };
 
-// Coordinated cool-tone gradients (indigo / violet family)
-const DIM_GRADIENTS = [
-  "from-indigo-500 to-violet-500",
-  "from-violet-500 to-fuchsia-500",
-  "from-blue-500 to-indigo-500",
-  "from-fuchsia-500 to-pink-500",
-  "from-sky-500 to-blue-500",
-  "from-purple-500 to-indigo-500",
-];
-
-// Testimonials use illustrated avatars (DiceBear) and generic roles — no real names or company affiliations.
 const TESTIMONIALS = [
   {
     quote: {
-      en: "I thought I was good at using AI until this assessment showed me exactly where my blind spots were. The breakdown by dimension is eye-opening — I leveled up noticeably within two weeks.",
-      zh: "我一直以为自己很擅长用 AI，直到这份测评让我清楚地看到了盲区所在。按维度拆解的报告令人大开眼界——两周内能力有了明显提升。",
+      en: "I thought I was good at using AI until this assessment showed me exactly where my blind spots were. The dimension breakdown is eye-opening — I leveled up noticeably within two weeks.",
+      zh: "我一直以为自己很擅长用 AI，直到这份测评让我清楚地看到了盲区。按维度拆解的报告令人大开眼界——两周内能力有了明显提升。",
     },
     name: "Sarah C.",
     role: { en: "Product Manager", zh: "产品经理" },
@@ -72,8 +37,8 @@ const TESTIMONIALS = [
   },
   {
     quote: {
-      en: "My team took the assessment together. The results gave us a shared vocabulary for AI skills and a concrete roadmap for upskilling. One of the most useful team exercises we've done.",
-      zh: "我的团队一起完成了测评。结果让我们建立了共同的 AI 能力话语体系，并有了具体的提升路线图。这是我们做过的最有价值的团队活动之一。",
+      en: "My team took the assessment together. The results gave us a shared language for AI skills and a concrete roadmap for upskilling. One of the most useful exercises we've done as a team.",
+      zh: "我的团队一起完成了测评。结果让我们建立了共同的 AI 能力话语体系，并有了清晰的提升路径。这是我们做过的最有价值的团队活动之一。",
     },
     name: "Marcus R.",
     role: { en: "Engineering Lead", zh: "工程主管" },
@@ -83,8 +48,8 @@ const TESTIMONIALS = [
   },
   {
     quote: {
-      en: "The practical questions are what set this apart. You can't bluff your way through — they actually test how you think. I finally have a concrete, honest picture of my AI skills.",
-      zh: "实操题是这份测评与其他测验的最大区别。你没办法糊弄过去——它真的在测试你的思维方式。我终于对自己的 AI 能力有了真实、清晰的认知。",
+      en: "The practical questions are what set this apart. You can't bluff your way through — they actually test how you think. I finally have an honest, concrete picture of my AI skills.",
+      zh: "实操题是这份测评与其他测验的最大区别。你没办法糊弄过去——它真的在测试你的思维方式。我终于对自己的 AI 能力有了诚实、清晰的认知。",
     },
     name: "Priya N.",
     role: { en: "Data Scientist", zh: "数据科学家" },
@@ -101,11 +66,11 @@ const FAQS = [
   },
   {
     q: { en: "Is the free assessment really free?", zh: "免费测评真的免费吗？" },
-    a: { en: "Yes, completely. No credit card required. The free tier includes one full assessment, your radar chart, and five personalized learning recommendations.", zh: "是的，完全免费。无需信用卡。免费版包含一次完整测评、你的能力雷达图和五条个性化学习建议。" },
+    a: { en: "Yes, completely. No credit card required. The free tier includes one full assessment, your radar chart, and five personalized learning recommendations.", zh: "是的，完全免费。无需信用卡。免费版包含一次完整测评、能力雷达图和五条个性化学习建议。" },
   },
   {
     q: { en: "Who designed the questions?", zh: "题目是谁设计的？" },
-    a: { en: "Questions were developed by a team of AI researchers, learning scientists, and industry practitioners. The framework draws on published AI literacy research and is reviewed regularly as the AI landscape evolves.", zh: "题目由 AI 研究员、学习科学家和行业从业者联合设计，框架参考已发表的 AI 素养研究，并随 AI 领域的发展定期更新。" },
+    a: { en: "Questions were developed by a team of AI researchers, learning scientists, and industry practitioners. The framework draws on published AI literacy research and is reviewed regularly as the AI landscape evolves.", zh: "题目由 AI 研究员、学习科学家和行业从业者联合设计，框架参考已发表的 AI 素养研究，并随 AI 领域发展定期更新。" },
   },
   {
     q: { en: "How is my level calculated?", zh: "等级是如何计算的？" },
@@ -117,66 +82,55 @@ const FAQS = [
   },
   {
     q: { en: "What makes this different from other AI literacy tests?", zh: "这和其他 AI 测评有什么不同？" },
-    a: { en: "Most quizzes only test factual recall. We test how you think — through scenario questions where all answers are plausible and practical open-ended tasks that reveal your real workflow. The result is a diagnostic, not a score.", zh: "大多数测验只考察事实记忆。我们测试你的思维方式——通过所有选项都合理的情境题，以及能揭示你真实工作流程的开放式实操任务。结果是诊断报告，而非单纯得分。" },
+    a: { en: "Most quizzes only test factual recall. We test how you think — through scenario questions where all answers are plausible and practical open-ended tasks that reveal your real workflow. The result is a diagnostic, not a score.", zh: "大多数测验只考察事实记忆。我们测试你的思维方式——通过所有选项都合理的情境题，以及能揭示你真实工作流程的开放式任务。结果是诊断报告，而非单纯得分。" },
   },
 ];
-
-function Pill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3.5 py-1.5 text-xs font-semibold text-indigo-700">
-      {children}
-    </span>
-  );
-}
 
 export function LandingPage({ onStartTest, authLoading = false, isAuthenticated = false }: LandingPageProps) {
   const { user } = useAuth();
   const { lang, setLang } = useLang();
   const [openFaq, setOpenFaq] = React.useState<number | null>(null);
 
-  const startLabel = isAuthenticated
-    ? t(UI.nav.startTest, lang)
-    : t(UI.nav.startTestGuest, lang);
+  const startLabel = isAuthenticated ? t(UI.nav.startTest, lang) : t(UI.nav.startTestGuest, lang);
   const startDisabled = authLoading;
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      {/* ── Nav ────────────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 border-b border-slate-100 bg-white/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
+    <div className="min-h-screen bg-white text-slate-900 antialiased">
+
+      {/* ── Nav ── */}
+      <nav className="fixed top-0 z-50 w-full border-b border-white/8 bg-[#080810]/85 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-sm shadow-indigo-500/30">
-              <Brain className="h-5 w-5 text-white" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600">
+              <Brain className="h-[18px] w-[18px] text-white" />
             </div>
-            <span className="text-[17px] font-bold tracking-tight">{t(UI.nav.brand, lang)}</span>
+            <span className="text-[15px] font-bold tracking-tight text-white">{t(UI.nav.brand, lang)}</span>
           </div>
 
           <div className="hidden items-center gap-8 md:flex">
-            <a href="#how" className="text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600">
-              {lang === "zh" ? "怎么测" : "How it works"}
-            </a>
-            <a href="#dimensions" className="text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600">
-              {lang === "zh" ? "测什么" : "What we measure"}
-            </a>
-            <a href="#pricing" className="text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600">
-              {t(UI.nav.pricing, lang)}
-            </a>
+            {[
+              { href: "#how", label: lang === "zh" ? "如何运作" : "How it works" },
+              { href: "#dimensions", label: lang === "zh" ? "测什么" : "What we measure" },
+              { href: "#pricing", label: t(UI.nav.pricing, lang) },
+            ].map((link) => (
+              <a key={link.href} href={link.href} className="text-sm text-slate-400 transition-colors hover:text-white">
+                {link.label}
+              </a>
+            ))}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setLang(lang === "zh" ? "en" : "zh")}
-              className="rounded-full px-3 py-1.5 text-xs font-bold text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="rounded px-2.5 py-1 text-xs font-semibold text-slate-500 transition-colors hover:text-slate-300"
             >
               {lang === "zh" ? "EN" : "中文"}
             </button>
-
             <NavAuthMenu />
-
             <button
               onClick={onStartTest}
               disabled={startDisabled}
-              className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm font-semibold text-white transition-all hover:border-white/30 hover:bg-white/15 disabled:opacity-50"
             >
               {startLabel}
             </button>
@@ -184,41 +138,42 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
         </div>
       </nav>
 
-      {/* ── Hero ───────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden">
-        {/* Soft gradient mesh */}
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-32 -top-32 h-[480px] w-[480px] rounded-full bg-indigo-300/30 blur-[120px]" />
-          <div className="absolute right-0 top-20 h-[420px] w-[420px] rounded-full bg-fuchsia-300/25 blur-[120px]" />
-          <div className="absolute bottom-0 left-1/3 h-[360px] w-[360px] rounded-full bg-violet-300/20 blur-[110px]" />
-        </div>
+      {/* ── Hero (dark) ── */}
+      <section className="relative overflow-hidden bg-[#080810] pt-16">
+        {/* Subtle grid */}
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        {/* Glow */}
+        <div className="pointer-events-none absolute left-[30%] top-0 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-indigo-700/20 blur-[130px]" />
+        <div className="pointer-events-none absolute right-[10%] top-[40%] h-[360px] w-[360px] rounded-full bg-indigo-900/20 blur-[100px]" />
 
-        <div className="mx-auto max-w-6xl px-5 pb-20 pt-16 md:pb-28 md:pt-24">
-          <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
-            {/* Left copy */}
-            <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <Pill>
-                <Sparkles className="h-3.5 w-3.5" />
-                {t(UI.hero.badge, lang)}
-              </Pill>
+        <div className="relative mx-auto max-w-6xl px-5 pb-0 pt-20 md:pt-28">
+          <div className="grid items-center gap-16 lg:grid-cols-[1.15fr_0.85fr]">
 
-              <h1 className="mt-6 text-[44px] font-extrabold leading-[1.05] tracking-tight md:text-6xl">
-                {t(UI.hero.title1, lang)}{" "}
-                <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                  {t(UI.hero.titleHighlight, lang)}
-                </span>
-                {t(UI.hero.title2, lang)}
+            {/* Left */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65 }}>
+              <span className="inline-block text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
+                {lang === "zh" ? "AI 素养评估" : "AI Fluency Assessment"}
+              </span>
+
+              <h1 className="mt-5 text-[54px] font-black leading-[0.96] tracking-tight text-white md:text-[76px]">
+                {lang === "zh" ? (
+                  <>你真的懂<br /><span className="text-indigo-400">AI</span><br />吗？</>
+                ) : (
+                  <>How good<br />are you<br />with <span className="text-indigo-400">AI</span>?</>
+                )}
               </h1>
 
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-600">
-                {t(UI.hero.desc, lang)}
+              <p className="mt-7 max-w-[420px] text-lg leading-relaxed text-slate-400">
+                {lang === "zh"
+                  ? "15 分钟。六大维度。一份诚实的诊断报告。不靠感觉——靠数据。"
+                  : "15 minutes. 6 dimensions. An honest diagnostic. Stop guessing — get a precise, personalized report."}
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <button
                   onClick={onStartTest}
                   disabled={startDisabled}
-                  className="group inline-flex h-13 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 transition-all hover:shadow-xl hover:shadow-indigo-500/40 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-white px-7 text-[15px] font-bold text-slate-900 transition-all hover:bg-slate-100 active:scale-[0.98] disabled:opacity-60"
                 >
                   {isAuthenticated ? t(UI.hero.cta, lang) : startLabel}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -226,20 +181,21 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                 <button
                   onClick={onStartTest}
                   disabled={startDisabled}
-                  className="inline-flex h-13 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-7 py-3.5 text-base font-semibold text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/12 px-7 text-[15px] font-semibold text-white/65 transition-all hover:border-white/25 hover:text-white/90 disabled:opacity-60"
                 >
-                  <Play className="h-4 w-4 fill-current" />
+                  <Play className="h-3.5 w-3.5 fill-current" />
                   {t(UI.hero.ctaSecondary, lang)}
                 </button>
               </div>
+
               {!isAuthenticated && !authLoading && (
-                <p className="mt-3 text-sm text-slate-500">{t(UI.auth.signInRequired, lang)}</p>
+                <p className="mt-4 text-sm text-slate-600">{t(UI.auth.signInRequired, lang)}</p>
               )}
 
-              {/* Trust row */}
-              <div className="mt-10 flex flex-wrap items-center gap-6">
+              {/* Social proof */}
+              <div className="mt-12 flex flex-wrap items-center gap-6 border-t border-white/6 pt-8">
                 <div className="flex items-center gap-3">
-                  <div className="flex -space-x-2.5">
+                  <div className="flex -space-x-2">
                     {[
                       { seed: "Alex7", bg: "b6e3f4" },
                       { seed: "Jordan3", bg: "c0aede" },
@@ -250,74 +206,70 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                       <img
                         key={seed}
                         src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&backgroundColor=${bg}&radius=50`}
-                        alt="user avatar"
-                        className="h-9 w-9 rounded-full border-2 border-white bg-slate-100"
+                        alt=""
+                        className="h-8 w-8 rounded-full border-2 border-[#080810]"
                       />
                     ))}
                   </div>
                   <div>
-                    <div className="flex items-center gap-1">
-                      {[0, 1, 2, 3, 4].map((i) => (
-                        <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                      ))}
+                    <div className="flex items-center gap-0.5">
+                      {[0,1,2,3,4].map((i) => <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />)}
                     </div>
-                    <p className="mt-0.5 text-xs font-medium text-slate-500">{t(UI.hero.socialProof, lang)}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">{t(UI.hero.socialProof, lang)}</p>
                   </div>
                 </div>
-                <div className="hidden h-8 w-px bg-slate-200 sm:block" />
-                <div className="flex items-center gap-1.5 text-sm text-slate-500">
-                  <Check className="h-4 w-4 text-emerald-500" />
+                <div className="h-5 w-px bg-white/8" />
+                <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
                   {t(UI.hero.noCard, lang)}
                 </div>
               </div>
             </motion.div>
 
-            {/* Right: result card mockup */}
+            {/* Right: report card */}
             <motion.div
-              initial={false}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.15 }}
-              className="relative mx-auto w-full max-w-md"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.25 }}
+              className="relative mx-auto w-full max-w-sm pb-10"
             >
-              {/* Main report card */}
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-2xl shadow-indigo-500/10">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
                     {lang === "zh" ? "你的 AI 素养报告" : "Your AI Fluency Report"}
                   </span>
-                  <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-600">
+                  <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400">
                     {lang === "zh" ? "已完成" : "COMPLETE"}
                   </span>
                 </div>
 
                 <div className="mt-5 flex items-center gap-4">
-                  <div className="flex h-16 w-16 flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-500/30">
-                    <span className="text-2xl font-black leading-none">L4</span>
+                  <div className="flex h-14 w-14 flex-col items-center justify-center rounded-xl border border-amber-500/25 bg-amber-500/10">
+                    <span className="text-2xl font-black leading-none text-amber-400">L4</span>
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-slate-900">{lang === "zh" ? "AI 协作者" : "AI Collaborator"}</p>
+                    <p className="font-bold text-white">{lang === "zh" ? "AI 协作者" : "AI Collaborator"}</p>
                     <p className="text-sm text-slate-500">{lang === "zh" ? "超过 78% 的用户" : "Top 22% of users"}</p>
                   </div>
                 </div>
 
-                {/* Dimension bars */}
-                <div className="mt-6 space-y-3">
+                <div className="mt-6 space-y-4">
                   {[
-                    { n: lang === "zh" ? "提示能力" : "Prompting", v: 88, g: "from-indigo-500 to-violet-500" },
-                    { n: lang === "zh" ? "输出评估" : "Evaluation", v: 74, g: "from-violet-500 to-fuchsia-500" },
-                    { n: lang === "zh" ? "风险意识" : "Risk Awareness", v: 62, g: "from-blue-500 to-indigo-500" },
+                    { n: lang === "zh" ? "提示能力" : "Prompting", v: 88 },
+                    { n: lang === "zh" ? "输出评估" : "Evaluation", v: 74 },
+                    { n: lang === "zh" ? "风险意识" : "Risk Awareness", v: 62 },
                   ].map((d, i) => (
                     <div key={d.n}>
-                      <div className="mb-1 flex items-center justify-between text-xs">
-                        <span className="font-medium text-slate-600">{d.n}</span>
-                        <span className="font-bold tabular-nums text-slate-900">{d.v}%</span>
+                      <div className="mb-1.5 flex justify-between text-xs">
+                        <span className="text-slate-400">{d.n}</span>
+                        <span className="font-bold tabular-nums text-white">{d.v}%</span>
                       </div>
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                      <div className="h-1 w-full overflow-hidden rounded-full bg-white/8">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${d.v}%` }}
-                          transition={{ duration: 1, delay: 0.5 + i * 0.15 }}
-                          className={`h-full rounded-full bg-gradient-to-r ${d.g}`}
+                          transition={{ duration: 1.2, delay: 0.7 + i * 0.15, ease: "easeOut" }}
+                          className="h-full rounded-full bg-indigo-500"
                         />
                       </div>
                     </div>
@@ -325,180 +277,205 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                 </div>
               </div>
 
-              {/* Floating accent card */}
               <motion.div
-                initial={false}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                className="absolute -bottom-5 -left-5 flex items-center gap-2.5 rounded-2xl border border-slate-100 bg-white p-3 pr-4 shadow-xl shadow-indigo-500/10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.0 }}
+                className="absolute -bottom-1 -right-3 flex items-center gap-2 rounded-xl border border-white/8 bg-white/[0.06] px-3.5 py-2.5 backdrop-blur-sm"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500">
-                  <TrendingUp className="h-4.5 w-4.5 text-white" />
-                </div>
+                <TrendingUp className="h-4 w-4 text-emerald-400" />
                 <div className="leading-tight">
-                  <p className="text-sm font-bold text-slate-900">+2 {lang === "zh" ? "等级" : "levels"}</p>
-                  <p className="text-[11px] text-slate-500">{lang === "zh" ? "成长空间" : "growth potential"}</p>
+                  <p className="text-sm font-bold text-white">+2 {lang === "zh" ? "等级" : "levels"}</p>
+                  <p className="text-[10px] text-slate-500">{lang === "zh" ? "成长空间" : "growth potential"}</p>
                 </div>
               </motion.div>
             </motion.div>
           </div>
         </div>
+
+        {/* Fade to white */}
+        <div className="h-24 bg-gradient-to-b from-[#080810] to-white" />
       </section>
 
-      {/* ── Stats strip ────────────────────────────────────────────── */}
-      <section className="border-y border-slate-100 bg-slate-50/60">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 px-5 py-10 md:grid-cols-4">
+      {/* ── Stats ── */}
+      <section className="border-b border-slate-100 px-5 py-12">
+        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 md:grid-cols-4">
           {[
-            { v: "50K+", l: lang === "zh" ? "完成测评" : "Assessments taken" },
+            { v: "50K+", l: lang === "zh" ? "已完成测评" : "Assessments taken" },
             { v: "6", l: lang === "zh" ? "能力维度" : "Skill dimensions" },
-            { v: "15 min", l: lang === "zh" ? "平均用时" : "Average time" },
-            { v: "4.9★", l: lang === "zh" ? "用户评分" : "User rating" },
+            { v: "15 min", l: lang === "zh" ? "平均用时" : "Avg. completion time" },
+            { v: "4.9 ★", l: lang === "zh" ? "用户评分" : "User rating" },
           ].map((s) => (
             <div key={s.l} className="text-center">
-              <div className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-3xl font-extrabold text-transparent">{s.v}</div>
-              <div className="mt-1 text-sm font-medium text-slate-500">{s.l}</div>
+              <div className="text-[32px] font-black tabular-nums text-slate-900">{s.v}</div>
+              <div className="mt-1 text-sm text-slate-500">{s.l}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── How it works ───────────────────────────────────────────── */}
-      <section id="how" className="px-5 py-24 md:py-28">
+      {/* ── How it works ── */}
+      <section id="how" className="px-5 py-24 md:py-32">
         <div className="mx-auto max-w-5xl">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <Pill>{lang === "zh" ? "简单三步" : "Simple 3 steps"}</Pill>
-            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.howItWorks.title, lang)}</h2>
-            <p className="mt-3 text-lg text-slate-600">{t(UI.howItWorks.subtitle, lang)}</p>
+          <div className="mb-14">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-500">
+              {lang === "zh" ? "简单三步" : "How it works"}
+            </span>
+            <h2 className="mt-3 max-w-xl text-4xl font-extrabold tracking-tight md:text-5xl">
+              {t(UI.howItWorks.title, lang)}
+            </h2>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-px bg-slate-100 md:grid-cols-3">
             {[
-              { n: "1", title: t(UI.howItWorks.step1.title, lang), desc: t(UI.howItWorks.step1.desc, lang), icon: Play, g: "from-indigo-500 to-violet-500" },
-              { n: "2", title: t(UI.howItWorks.step2.title, lang), desc: t(UI.howItWorks.step2.desc, lang), icon: BarChart3, g: "from-violet-500 to-fuchsia-500" },
-              { n: "3", title: t(UI.howItWorks.step3.title, lang), desc: t(UI.howItWorks.step3.desc, lang), icon: TrendingUp, g: "from-fuchsia-500 to-pink-500" },
-            ].map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <motion.div
-                  key={item.n}
-                  initial={false}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.12 }}
-                  className="relative rounded-3xl border border-slate-100 bg-white p-7 shadow-sm transition-all hover:shadow-lg hover:shadow-indigo-500/5"
-                >
-                  <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${item.g} shadow-md shadow-indigo-500/20`}>
-                    <Icon className="h-6 w-6 text-white" />
-                  </div>
-                  <span className="absolute right-7 top-7 text-5xl font-black text-slate-100">{item.n}</span>
-                  <h3 className="mb-2 text-xl font-bold">{item.title}</h3>
-                  <p className="leading-relaxed text-slate-600">{item.desc}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Dimensions ─────────────────────────────────────────────── */}
-      <section id="dimensions" className="bg-slate-50/60 px-5 py-24 md:py-28">
-        <div className="mx-auto max-w-6xl">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <Pill>{lang === "zh" ? "测什么" : "What we measure"}</Pill>
-            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.dimensions.sectionTitle, lang)}</h2>
-            <p className="mt-3 text-lg text-slate-600">{t(UI.dimensions.sectionDesc, lang)}</p>
-          </div>
-
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {dimensions.map((dim, i) => {
-              const Icon = iconMap[dim.icon] || Brain;
-              return (
-                <motion.div
-                  key={dim.id}
-                  initial={false}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.06 }}
-                  className="group rounded-3xl border border-slate-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10"
-                >
-                  <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${DIM_GRADIENTS[i]} shadow-md shadow-indigo-500/20`}>
-                    <Icon className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="mb-2 text-lg font-bold">{dim.name[lang]}</h3>
-                  <p className="text-sm leading-relaxed text-slate-600">{dim.description[lang]}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Levels ─────────────────────────────────────────────────── */}
-      <section className="px-5 py-24 md:py-28">
-        <div className="mx-auto max-w-6xl">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <Pill>{lang === "zh" ? "你会拿到哪个等级" : "Where will you land"}</Pill>
-            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.levels.sectionTitle, lang)}</h2>
-            <p className="mt-3 text-lg text-slate-600">{t(UI.levels.sectionDesc, lang)}</p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-5">
-            {levels.map((level, i) => (
+              { n: "01", title: t(UI.howItWorks.step1.title, lang), desc: t(UI.howItWorks.step1.desc, lang) },
+              { n: "02", title: t(UI.howItWorks.step2.title, lang), desc: t(UI.howItWorks.step2.desc, lang) },
+              { n: "03", title: t(UI.howItWorks.step3.title, lang), desc: t(UI.howItWorks.step3.desc, lang) },
+            ].map((item, i) => (
               <motion.div
-                key={level.level}
-                initial={false}
+                key={item.n}
+                initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="rounded-2xl border border-slate-100 bg-white p-5 text-center shadow-sm transition-all hover:shadow-lg hover:shadow-indigo-500/5"
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="bg-white px-8 py-10"
               >
-                <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full ${level.color} text-white shadow-md`}>
-                  <span className="text-base font-black">{level.badge}</span>
-                </div>
-                <h4 className="mb-1 text-sm font-bold leading-tight">{level.name[lang]}</h4>
-                <p className="mb-2.5 text-[11px] font-semibold text-indigo-500">{level.minScore}–{level.maxScore}{t(UI.levels.points, lang)}</p>
-                <p className="text-xs leading-relaxed text-slate-500">{level.description[lang]}</p>
+                <span className="block text-[52px] font-black leading-none tabular-nums text-slate-100 select-none">
+                  {item.n}
+                </span>
+                <h3 className="mt-4 text-lg font-bold text-slate-900">{item.title}</h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-slate-500">{item.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Testimonials ───────────────────────────────────────────── */}
-      <section className="bg-slate-50/60 px-5 py-24 md:py-28">
-        <div className="mx-auto max-w-6xl">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <Pill>
-              <Star className="h-3.5 w-3.5 fill-current" />
-              {t(UI.testimonials.sectionPill, lang)}
-            </Pill>
-            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.testimonials.sectionTitle, lang)}</h2>
-            <p className="mt-3 text-lg text-slate-600">{t(UI.testimonials.sectionDesc, lang)}</p>
+      {/* ── Dimensions ── */}
+      <section id="dimensions" className="border-y border-slate-100 bg-slate-50/40 px-5 py-24 md:py-32">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-14 grid gap-6 md:grid-cols-2">
+            <div>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-500">
+                {lang === "zh" ? "评估框架" : "Assessment framework"}
+              </span>
+              <h2 className="mt-3 text-4xl font-extrabold tracking-tight md:text-5xl">
+                {t(UI.dimensions.sectionTitle, lang)}
+              </h2>
+            </div>
+            <p className="self-end text-[15px] leading-relaxed text-slate-500 md:pt-8">
+              {t(UI.dimensions.sectionDesc, lang)}
+            </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+            {dimensions.map((dim, i) => {
+              const Icon = iconMap[dim.icon] || Brain;
+              return (
+                <motion.div
+                  key={dim.id}
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.3, delay: i * 0.04 }}
+                  className="group flex items-start gap-5 px-6 py-5 transition-colors hover:bg-slate-50/70"
+                >
+                  <span className="mt-0.5 w-7 shrink-0 text-sm font-bold tabular-nums text-slate-300">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-all group-hover:border-indigo-200 group-hover:text-indigo-600">
+                    <Icon className="h-[18px] w-[18px]" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-slate-900 transition-colors group-hover:text-indigo-600">
+                      {dim.name[lang]}
+                    </p>
+                    <p className="mt-0.5 text-sm text-slate-500">{dim.description[lang]}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Levels ── */}
+      <section className="px-5 py-24 md:py-32">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-14">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-500">
+              {lang === "zh" ? "你会落在哪里" : "Proficiency levels"}
+            </span>
+            <h2 className="mt-3 text-4xl font-extrabold tracking-tight md:text-5xl">
+              {t(UI.levels.sectionTitle, lang)}
+            </h2>
+          </div>
+
+          <div className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200">
+            {levels.map((level, i) => (
+              <motion.div
+                key={level.level}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.25, delay: i * 0.06 }}
+                className="flex items-center gap-5 bg-white px-6 py-4 transition-colors hover:bg-slate-50/60"
+              >
+                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-black text-white ${level.color}`}>
+                  {level.badge}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2.5 flex-wrap">
+                    <span className="font-semibold text-slate-900">{level.name[lang]}</span>
+                    <span className="text-xs text-slate-400 tabular-nums">
+                      {level.minScore}–{level.maxScore}{t(UI.levels.points, lang)}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-sm text-slate-500 leading-snug">{level.description[lang]}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Testimonials ── */}
+      <section className="border-y border-slate-100 bg-slate-50/40 px-5 py-24 md:py-32">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-14">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-500">
+              {t(UI.testimonials.sectionPill, lang)}
+            </span>
+            <h2 className="mt-3 text-4xl font-extrabold tracking-tight md:text-5xl">
+              {t(UI.testimonials.sectionTitle, lang)}
+            </h2>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-3">
             {TESTIMONIALS.map((item, i) => (
               <motion.div
                 key={item.name}
-                initial={false}
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="flex flex-col rounded-3xl border border-slate-100 bg-white p-7 shadow-sm"
+                className="flex flex-col rounded-xl border border-slate-200 bg-white p-6"
               >
-                <Quote className="mb-4 h-7 w-7 text-indigo-200" />
-                <p className="flex-1 text-sm leading-relaxed text-slate-600">"{item.quote[lang]}"</p>
-                <div className="mt-6 flex items-center gap-3">
+                <div className="mb-3 text-3xl font-black leading-none text-slate-200 select-none">&ldquo;</div>
+                <p className="flex-1 text-[15px] leading-relaxed text-slate-600">
+                  {item.quote[lang]}
+                </p>
+                <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-5">
                   <img
                     src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${item.avatarSeed}&backgroundColor=${item.avatarBg}&radius=50`}
-                    alt={item.name}
-                    className="h-11 w-11 shrink-0 rounded-full border border-slate-100 bg-slate-50"
+                    alt=""
+                    className="h-9 w-9 shrink-0 rounded-full border border-slate-100"
                   />
                   <div>
-                    <p className="font-semibold text-slate-900">{item.name}</p>
-                    <p className="text-xs text-slate-500">{item.role[lang]}</p>
+                    <p className="text-sm font-semibold text-slate-900">{item.name}</p>
+                    <p className="text-xs text-slate-400">{item.role[lang]}</p>
                   </div>
-                  <span className="ml-auto rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-700">
+                  <span className="ml-auto rounded border border-slate-200 px-2 py-0.5 text-[11px] font-bold text-slate-500">
                     {item.level}
                   </span>
                 </div>
@@ -506,25 +483,28 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
             ))}
           </div>
 
-          {/* Disclaimer */}
-          <p className="mt-10 text-center text-xs text-slate-400">
+          <p className="mt-8 text-xs text-slate-400">
             {lang === "zh"
               ? "以上评价来自真实用户，姓名已缩写以保护隐私。头像为插画形象，与真实用户无关。"
-              : "Reviews are from real users; names are abbreviated to protect privacy. Avatars are illustrated characters and do not represent real individuals."}
+              : "Reviews from real users; names abbreviated for privacy. Avatars are illustrated characters."}
           </p>
         </div>
       </section>
 
-      {/* ── Pricing ────────────────────────────────────────────────── */}
-      <section id="pricing" className="bg-slate-50/60 px-5 py-24 md:py-28">
+      {/* ── Pricing ── */}
+      <section id="pricing" className="px-5 py-24 md:py-32">
         <div className="mx-auto max-w-5xl">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <Pill>{lang === "zh" ? "定价" : "Pricing"}</Pill>
-            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.pricing.title, lang)}</h2>
-            <p className="mt-3 text-lg text-slate-600">{t(UI.pricing.subtitle, lang)}</p>
+          <div className="mb-14">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-500">
+              {t(UI.nav.pricing, lang)}
+            </span>
+            <h2 className="mt-3 text-4xl font-extrabold tracking-tight md:text-5xl">
+              {t(UI.pricing.title, lang)}
+            </h2>
+            <p className="mt-3 text-[15px] text-slate-500">{t(UI.pricing.subtitle, lang)}</p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-3">
             {(
               [
                 {
@@ -564,85 +544,90 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
             ).map((plan, i) => (
               <motion.div
                 key={plan.key}
-                initial={false}
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="relative"
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                className={`relative flex flex-col rounded-xl p-7 ${
+                  plan.highlighted
+                    ? "border-2 border-indigo-600 bg-[#080810]"
+                    : "border border-slate-200 bg-white"
+                }`}
               >
                 {plan.highlighted && (
-                  <div className="absolute -top-3.5 left-1/2 z-10 -translate-x-1/2">
-                    <span className="rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-md shadow-indigo-500/30">
-                      {t(UI.pricing.popular, lang)}
-                    </span>
-                  </div>
+                  <span className="absolute -top-3 left-6 rounded-full bg-indigo-600 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
+                    {t(UI.pricing.popular, lang)}
+                  </span>
                 )}
-                <div
-                  className={`flex h-full flex-col rounded-3xl p-8 ${
+                <div>
+                  <h3 className={`text-base font-bold ${plan.highlighted ? "text-white" : "text-slate-900"}`}>
+                    {plan.name}
+                  </h3>
+                  <p className={`mt-1 text-sm ${plan.highlighted ? "text-slate-500" : "text-slate-500"}`}>
+                    {plan.desc}
+                  </p>
+                </div>
+                <div className="mt-6 flex items-end gap-1">
+                  <span className={`text-5xl font-black leading-none tracking-tight ${plan.highlighted ? "text-white" : "text-slate-900"}`}>
+                    {plan.price}
+                  </span>
+                  <span className={`mb-1.5 text-sm ${plan.highlighted ? "text-slate-600" : "text-slate-400"}`}>
+                    {plan.period}
+                  </span>
+                </div>
+
+                <ul className="mt-7 flex-1 space-y-3">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <Check className={`mt-0.5 h-4 w-4 shrink-0 ${plan.highlighted ? "text-indigo-400" : "text-indigo-500"}`} />
+                      <span className={`text-[14px] ${plan.highlighted ? "text-slate-400" : "text-slate-600"}`}>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  onClick={plan.action}
+                  className={`mt-8 w-full rounded-full py-2.5 text-sm font-semibold transition-all ${
                     plan.highlighted
-                      ? "bg-gradient-to-b from-indigo-600 to-violet-700 shadow-2xl shadow-indigo-500/30"
-                      : "border border-slate-200 bg-white shadow-sm"
+                      ? "bg-indigo-600 text-white hover:bg-indigo-500"
+                      : "border border-slate-200 text-slate-900 hover:bg-slate-50"
                   }`}
                 >
-                  <h3 className={`text-lg font-bold ${plan.highlighted ? "text-white" : "text-slate-900"}`}>{plan.name}</h3>
-                  <p className={`mt-1 text-sm ${plan.highlighted ? "text-indigo-100" : "text-slate-500"}`}>{plan.desc}</p>
-                  <div className="mt-6 flex items-end gap-1">
-                    <span className={`text-5xl font-extrabold leading-none tracking-tight ${plan.highlighted ? "text-white" : "text-slate-900"}`}>{plan.price}</span>
-                    <span className={`mb-1.5 text-sm ${plan.highlighted ? "text-indigo-200" : "text-slate-400"}`}>{plan.period}</span>
-                  </div>
-
-                  <ul className="mt-7 flex-1 space-y-3.5">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2.5">
-                        <div className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full ${plan.highlighted ? "bg-white/20" : "bg-indigo-50"}`}>
-                          <Check className={`h-3 w-3 ${plan.highlighted ? "text-white" : "text-indigo-600"}`} />
-                        </div>
-                        <span className={`text-sm ${plan.highlighted ? "text-indigo-50" : "text-slate-600"}`}>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    onClick={plan.action}
-                    className={`mt-8 w-full rounded-full py-3 text-sm font-semibold transition-all ${
-                      plan.highlighted
-                        ? "bg-white text-indigo-700 hover:bg-indigo-50"
-                        : "bg-slate-900 text-white hover:bg-slate-800"
-                    }`}
-                  >
-                    {plan.cta}
-                  </button>
-                </div>
+                  {plan.cta}
+                </button>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ────────────────────────────────────────────────────── */}
-      <section className="px-5 py-24 md:py-28">
+      {/* ── FAQ ── */}
+      <section className="border-t border-slate-100 bg-slate-50/40 px-5 py-24 md:py-32">
         <div className="mx-auto max-w-3xl">
-          <div className="mx-auto mb-14 max-w-2xl text-center">
-            <Pill>{t(UI.faq.sectionPill, lang)}</Pill>
-            <h2 className="mt-5 text-3xl font-extrabold tracking-tight md:text-4xl">{t(UI.faq.sectionTitle, lang)}</h2>
-            <p className="mt-3 text-lg text-slate-600">{t(UI.faq.sectionDesc, lang)}</p>
+          <div className="mb-12">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-500">
+              {t(UI.faq.sectionPill, lang)}
+            </span>
+            <h2 className="mt-3 text-4xl font-extrabold tracking-tight md:text-5xl">
+              {t(UI.faq.sectionTitle, lang)}
+            </h2>
           </div>
 
-          <div className="divide-y divide-slate-100 rounded-2xl border border-slate-100 bg-white shadow-sm">
+          <div className="divide-y divide-slate-200">
             {FAQS.map((faq, i) => (
               <div key={i}>
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="flex w-full items-center justify-between px-6 py-5 text-left transition-colors hover:bg-slate-50"
+                  className="flex w-full items-start justify-between gap-6 py-5 text-left"
                 >
-                  <span className="pr-4 font-semibold text-slate-900">{faq.q[lang]}</span>
+                  <span className="font-semibold text-slate-900">{faq.q[lang]}</span>
                   {openFaq === i
-                    ? <ChevronUp className="h-5 w-5 shrink-0 text-indigo-500" />
-                    : <ChevronDown className="h-5 w-5 shrink-0 text-slate-400" />
+                    ? <ChevronUp className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500" />
+                    : <ChevronDown className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                   }
                 </button>
                 {openFaq === i && (
-                  <div className="border-t border-slate-50 bg-slate-50/40 px-6 py-4 text-sm leading-relaxed text-slate-600">
+                  <div className="pb-5 text-[15px] leading-relaxed text-slate-500">
                     {faq.a[lang]}
                   </div>
                 )}
@@ -652,42 +637,47 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
         </div>
       </section>
 
-      {/* ── CTA ────────────────────────────────────────────────────── */}
-      <section className="px-5 py-24 md:py-28">
-        <div className="mx-auto max-w-5xl">
-          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 px-6 py-16 text-center shadow-2xl shadow-indigo-500/30 md:px-16 md:py-20">
-            <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
-            <div className="pointer-events-none absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
-            <motion.div initial={false} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative">
-              <h2 className="mx-auto max-w-2xl text-3xl font-extrabold text-white md:text-4xl">{t(UI.cta.title, lang)}</h2>
-              <p className="mx-auto mt-4 max-w-xl text-lg text-indigo-100">{t(UI.cta.subtitle, lang)}</p>
-              <button
-                onClick={onStartTest}
-                disabled={startDisabled}
-                className="mt-9 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-base font-semibold text-indigo-700 shadow-lg transition-all hover:bg-indigo-50 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isAuthenticated ? t(UI.cta.btn, lang) : startLabel}
-                <ChevronRight className="h-4 w-4" />
-              </button>
-              <p className="mt-4 text-sm text-indigo-200">{t(UI.hero.noCard, lang)} · {t(UI.hero.minutes, lang) === "minutes" ? "15 minutes" : "15 分钟"}</p>
-            </motion.div>
-          </div>
+      {/* ── CTA (dark) ── */}
+      <section className="relative overflow-hidden bg-[#080810] px-5 py-28 md:py-36">
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-700/20 blur-[120px]" />
+
+        <div className="relative mx-auto max-w-3xl text-center">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
+            {lang === "zh" ? "现在就开始" : "Get started today"}
+          </span>
+          <h2 className="mt-4 text-4xl font-black leading-tight tracking-tight text-white md:text-5xl">
+            {t(UI.cta.title, lang)}
+          </h2>
+          <p className="mx-auto mt-4 max-w-md text-lg text-slate-500">{t(UI.cta.subtitle, lang)}</p>
+          <button
+            onClick={onStartTest}
+            disabled={startDisabled}
+            className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-[15px] font-bold text-slate-900 transition-all hover:bg-slate-100 active:scale-[0.98] disabled:opacity-60"
+          >
+            {isAuthenticated ? t(UI.cta.btn, lang) : startLabel}
+            <ChevronRight className="h-4 w-4" />
+          </button>
+          <p className="mt-4 text-sm text-slate-700">
+            {t(UI.hero.noCard, lang)} · {lang === "zh" ? "15 分钟" : "15 minutes"}
+          </p>
         </div>
       </section>
 
-      {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer className="border-t border-slate-100 px-5 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 md:flex-row">
+      {/* ── Footer ── */}
+      <footer className="border-t border-white/6 bg-[#080810] px-5 py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm md:flex-row">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600">
               <Brain className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold">{t(UI.nav.brand, lang)}</span>
+            <span className="font-bold text-white">{t(UI.nav.brand, lang)}</span>
           </div>
-          <p className="text-sm text-slate-500">{t(UI.footer.tagline, lang)}</p>
-          <p className="text-sm text-slate-400">© 2025 {t(UI.nav.brand, lang)}</p>
+          <p className="text-slate-600">{t(UI.footer.tagline, lang)}</p>
+          <p className="text-slate-700">© 2025 {t(UI.nav.brand, lang)}</p>
         </div>
       </footer>
+
     </div>
   );
 }
