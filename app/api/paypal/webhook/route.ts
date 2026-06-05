@@ -13,6 +13,7 @@ const HANDLED_EVENTS = new Set([
 export async function POST(req: NextRequest) {
   try {
     const supabaseAdmin = createAdminClient();
+    if (!supabaseAdmin) return NextResponse.json({ error: "Not configured" }, { status: 503 });
     const body = await req.json();
     const eventType: string = body.event_type ?? "";
 

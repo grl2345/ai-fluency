@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = await createClient();
+    if (!supabase) return NextResponse.json({ error: "Not configured" }, { status: 503 });
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -8,6 +8,7 @@ export async function GET(request: Request) {
   const provider = parseOAuthProvider(searchParams.get('provider'))
 
   const supabase = await createClient()
+  if (!supabase) return NextResponse.redirect(`${origin}/auth/auth-code-error`)
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {

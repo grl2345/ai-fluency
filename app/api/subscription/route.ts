@@ -22,6 +22,7 @@ async function fetchBillingInfo(paypalSubscriptionId: string): Promise<BillingIn
 export async function GET() {
   try {
     const supabase = await createClient();
+    if (!supabase) return NextResponse.json({ subscription: null });
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) {
       return NextResponse.json({ subscription: null }, { status: 401 });
