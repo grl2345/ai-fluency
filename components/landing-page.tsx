@@ -158,83 +158,47 @@ const STEP_NAMES = [
   { zh: "专家", en: "Expert" },
 ];
 
-// Per-level face palette (blue → teal → cyan → indigo → violet)
-const STEP_PALETTE = [
-  { topA: "#6f8bff", topB: "#3f56d4", fA: "#4d63e6", fB: "#26329e", lA: "#2b389e", lB: "#19206a", edge: "#bccaff", halo: "#4f6bf0", badge: "#3a52d6", icon: "#dbe6ff" },
-  { topA: "#4fe9d7", topB: "#13b3a1", fA: "#1ec9b6", fB: "#0b8074", lA: "#0c8174", lB: "#06564f", edge: "#a8f6ec", halo: "#17c4b2", badge: "#0e9e8e", icon: "#d4fff9" },
-  { topA: "#67caff", topB: "#2897e4", fA: "#33a4ec", fB: "#146eb2", lA: "#135d9a", lB: "#0b4069", edge: "#bce6ff", halo: "#37a5ec", badge: "#1f8ad6", icon: "#ddf1ff" },
-  { topA: "#948fff", topB: "#5851e6", fA: "#6760ef", fB: "#3a35ad", lA: "#312a90", lB: "#1f1a60", edge: "#cfcbff", halo: "#6760ef", badge: "#4f48d6", icon: "#e3e0ff" },
-  { topA: "#d4a0ff", topB: "#9656f6", fA: "#a96cf9", fB: "#6c30c6", lA: "#5a28a8", lB: "#3c1a76", edge: "#eddaff", halo: "#b06cf9", badge: "#8e4ef0", icon: "#f4e9ff" },
+const LEVEL_ICONS: { icon: typeof Lightbulb; bg: string; text: string }[] = [
+  { icon: Lightbulb, bg: "bg-amber-500/20", text: "text-amber-400" },
+  { icon: LayoutGrid, bg: "bg-emerald-500/20", text: "text-emerald-400" },
+  { icon: Star, bg: "bg-blue-500/20", text: "text-blue-400" },
+  { icon: Layers, bg: "bg-violet-500/20", text: "text-violet-400" },
+  { icon: Crown, bg: "bg-yellow-500/20", text: "text-yellow-400" },
 ];
 
-const STEP_ICONS = [Lightbulb, Layers, Wrench, LayoutGrid, Crown];
-
 function Staircase({ lang }: { lang: "zh" | "en" }) {
-  // Isometric projection ─ blocks advance +1 in X and +1 in base Z per step,
-  // so the staircase reads as rising up-and-to-the-right.
-  const U = 50;
-  const OX = 70, OY = 352;
-  const VBW = 360, VBH = 460;
+  const U = 44;
+  const OX = 50, OY = 390;
   const K = 0.866;
-  const proj = (x: number, y: number, z: number): [number, number] => [
-    OX + (x - y) * K * U,
-    OY + (x + y) * 0.5 * U - z * U,
-  ];
-  const pt = (x: number, y: number, z: number) => proj(x, y, z).map((n) => n.toFixed(1)).join(",");
+  const pt = (x: number, y: number, z: number) =>
+    `${(OX + (x - y) * K * U).toFixed(1)},${(OY + (x + y) * 0.5 * U - z * U).toFixed(1)}`;
   const poly = (...pts: [number, number, number][]) => pts.map((p) => pt(...p)).join(" ");
-  const pctOf = (x: number, y: number, z: number) => {
-    const [sx, sy] = proj(x, y, z);
-    return { left: `${(sx / VBW) * 100}%`, top: `${(sy / VBH) * 100}%` };
-  };
 
-  // Geometry per block (front-to-back index i)
-  const blocks = Array.from({ length: 5 }).map((_, i) => {
-    const x0 = i, x1 = i + 1, y0 = 0, y1 = 1;
-    const bz = i;                         // base rises one unit per step
-    const h = 2.0 + i * 0.45;             // blocks grow taller toward the top
-    const tz = bz + h;
-    return { i, x0, x1, y0, y1, bz, tz };
-  });
+  const D = 1.8;
 
   return (
-    <div className="relative mx-auto aspect-[360/460] w-full max-w-[440px]">
-      {/* Ambient glow */}
-      <div className="pointer-events-none absolute right-[6%] top-[8%] h-[55%] w-[60%] rounded-full bg-violet-600/30 blur-[90px]" />
-      <div className="pointer-events-none absolute bottom-[18%] left-[10%] h-[40%] w-[55%] rounded-full bg-indigo-600/20 blur-[80px]" />
-      <div className="pointer-events-none absolute bottom-[24%] right-[28%] h-[24%] w-[30%] rounded-full bg-cyan-400/15 blur-[60px]" />
+    <div className="relative mx-auto h-[440px] w-full max-w-[500px]">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="h-[65%] w-[65%] translate-x-[15%] translate-y-[-5%] rounded-full bg-violet-600/30 blur-[90px]" />
+      </div>
+      <div className="pointer-events-none absolute right-[5%] top-[10%] h-[30%] w-[30%] rounded-full bg-fuchsia-500/20 blur-[60px]" />
 
-      <svg
-        viewBox={`0 0 ${VBW} ${VBH}`}
-        className="relative h-full w-full overflow-visible drop-shadow-[0_8px_40px_rgba(124,58,237,0.35)]"
-      >
+      <svg viewBox="0 0 460 440" className="relative h-full w-full">
         <defs>
-          {STEP_PALETTE.map((p, i) => (
-            <React.Fragment key={`grad${i}`}>
-              <linearGradient id={`top${i}`} x1="0" y1="0" x2="0.4" y2="1">
-                <stop offset="0%" stopColor={p.topA} />
-                <stop offset="100%" stopColor={p.topB} />
-              </linearGradient>
-              <linearGradient id={`front${i}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={p.fA} stopOpacity="0.96" />
-                <stop offset="100%" stopColor={p.fB} stopOpacity="0.92" />
-              </linearGradient>
-              <linearGradient id={`left${i}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={p.lA} stopOpacity="0.95" />
-                <stop offset="100%" stopColor={p.lB} stopOpacity="0.92" />
-              </linearGradient>
-            </React.Fragment>
-          ))}
-          <radialGradient id="floorGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="swoosh" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#a855f7" stopOpacity="0" />
-            <stop offset="55%" stopColor="#a855f7" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.1" />
+          <linearGradient id="stTop" x1="0" y1="0" x2="0.3" y2="1">
+            <stop offset="0%" stopColor="#8b7cf8" />
+            <stop offset="100%" stopColor="#6354d0" />
+          </linearGradient>
+          <linearGradient id="stFront" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#5448bb" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="#3a3096" stopOpacity="0.92" />
+          </linearGradient>
+          <linearGradient id="stLeft" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#4238a6" stopOpacity="0.92" />
+            <stop offset="100%" stopColor="#2a2278" stopOpacity="0.9" />
           </linearGradient>
           <filter id="edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2.4" result="b" />
+            <feGaussianBlur stdDeviation="2" result="b" />
             <feMerge>
               <feMergeNode in="b" />
               <feMergeNode in="SourceGraphic" />
@@ -242,123 +206,54 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
           </filter>
         </defs>
 
-        {/* Floor reflection */}
-        <ellipse cx="160" cy="396" rx="150" ry="34" fill="url(#floorGlow)" />
+        {Array.from({ length: 5 }).map((_, i) => {
+          const x0 = i, x1 = i + 1, y0 = 0, y1 = D;
+          const bz = i;
+          const h = 1.7;
+          const tz = bz + h;
 
-        {/* Sweeping base path */}
-        <path
-          d="M 60 392 C 150 418, 268 404, 322 318"
-          fill="none"
-          stroke="url(#swoosh)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          filter="url(#edgeGlow)"
-        />
-
-        {/* Particle dots */}
-        {[
-          [300, 120], [322, 168], [338, 210], [286, 96], [250, 70],
-          [120, 360], [86, 392], [196, 374], [44, 300], [340, 250],
-        ].map(([cx, cy], k) => (
-          <circle key={k} cx={cx} cy={cy} r={k % 3 === 0 ? 2 : 1.3} fill="#c4b5fd" opacity={0.5} />
-        ))}
-
-        {/* Blocks — drawn back (highest index) to front for correct overlap */}
-        {[...blocks].reverse().map(({ i, x0, x1, y0, y1, bz, tz }) => {
-          const p = STEP_PALETTE[i];
           const top = poly([x0, y0, tz], [x1, y0, tz], [x1, y1, tz], [x0, y1, tz]);
           const front = poly([x1, y0, bz], [x1, y1, bz], [x1, y1, tz], [x1, y0, tz]);
           const left = poly([x0, y1, bz], [x1, y1, bz], [x1, y1, tz], [x0, y1, tz]);
-          const isTop = i === 4;
-          const apex: [number, number, number] = [(x0 + x1) / 2, (y0 + y1) / 2, tz + 1.7];
+
+          const fx = OX + (x1 - (y0 + y1) / 2) * K * U;
+          const fy = OY + (x1 + (y0 + y1) / 2) * 0.5 * U - (bz + h * 0.45) * U;
 
           return (
             <g key={i}>
-              {/* Left (icon-side) face */}
-              <polygon points={left} fill={`url(#left${i})`} stroke={p.edge} strokeOpacity="0.25" strokeWidth="0.8" />
-              {/* Front (label) face */}
-              <polygon points={front} fill={`url(#front${i})`} stroke={p.edge} strokeOpacity="0.3" strokeWidth="0.8" />
-              {/* Top face */}
-              <polygon points={top} fill={`url(#top${i})`} stroke={p.edge} strokeOpacity="0.55" strokeWidth="1" />
-
-              {/* Glowing top edges */}
+              <polygon points={left} fill="url(#stLeft)" stroke="rgba(139,124,248,0.2)" strokeWidth="0.6" />
+              <polygon points={front} fill="url(#stFront)" stroke="rgba(139,124,248,0.25)" strokeWidth="0.6" />
+              <polygon points={top} fill="url(#stTop)" stroke="rgba(196,181,253,0.45)" strokeWidth="0.8" />
               <polyline
-                points={`${pt(x0, y1, tz)} ${pt(x0, y0, tz)} ${pt(x1, y0, tz)} ${pt(x1, y1, tz)}`}
-                fill="none" stroke={p.edge} strokeOpacity="0.85" strokeWidth="1.4"
-                strokeLinejoin="round" filter="url(#edgeGlow)"
+                points={`${pt(x0, y0, tz)} ${pt(x1, y0, tz)}`}
+                fill="none" stroke="rgba(196,181,253,0.55)" strokeWidth="1.2"
+                filter="url(#edgeGlow)"
               />
-              {/* Bright front vertical edge */}
-              <line
-                x1={pt(x1, y0, bz).split(",")[0]} y1={pt(x1, y0, bz).split(",")[1]}
-                x2={pt(x1, y0, tz).split(",")[0]} y2={pt(x1, y0, tz).split(",")[1]}
-                stroke={p.edge} strokeOpacity="0.5" strokeWidth="1"
+              <polyline
+                points={`${pt(x0, y0, tz)} ${pt(x0, y1, tz)}`}
+                fill="none" stroke="rgba(196,181,253,0.3)" strokeWidth="0.8"
               />
-
-              {/* Peaked roof on the top level (L5) */}
-              {isTop && (
-                <g filter="url(#edgeGlow)">
-                  <polygon
-                    points={poly([x1, y0, tz], [x1, y1, tz], apex)}
-                    fill={`url(#top${i})`} stroke={p.edge} strokeOpacity="0.6" strokeWidth="1"
-                  />
-                  <polygon
-                    points={poly([x0, y1, tz], [x1, y1, tz], apex)}
-                    fill={p.fB} fillOpacity="0.92" stroke={p.edge} strokeOpacity="0.45" strokeWidth="1"
-                  />
-                  <polyline
-                    points={`${pt(x1, y0, tz)} ${pt(...apex)} ${pt(x0, y1, tz)}`}
-                    fill="none" stroke={p.edge} strokeOpacity="0.9" strokeWidth="1.4" strokeLinejoin="round"
-                  />
-                </g>
-              )}
+              <text
+                x={fx} y={fy - 5}
+                textAnchor="middle"
+                fill="white"
+                fontWeight="900"
+                style={{ fontSize: 17, textShadow: "0 2px 8px rgba(0,0,0,0.6)" }}
+              >
+                L{i + 1}
+              </text>
+              <text
+                x={fx} y={fy + 12}
+                textAnchor="middle"
+                fill="rgba(226,232,240,0.85)"
+                style={{ fontSize: 10.5, textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}
+              >
+                {STEP_NAMES[i][lang]}
+              </text>
             </g>
           );
         })}
       </svg>
-
-      {/* HTML overlay: icon badges + labels (crisp text & icons) */}
-      {blocks.map(({ i, x0, x1, y0, y1, bz, tz }) => {
-        const p = STEP_PALETTE[i];
-        const Icon = STEP_ICONS[i];
-        const badge = pctOf((x0 + x1) / 2, y1, tz - 0.62);
-        const label = pctOf(x1, (y0 + y1) / 2, bz + (tz - bz) * 0.4);
-        return (
-          <React.Fragment key={`ov${i}`}>
-            {/* Hexagonal icon badge on the left face */}
-            <div
-              className="pointer-events-none absolute flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-              style={{
-                left: badge.left,
-                top: badge.top,
-                clipPath: "polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)",
-                background: `linear-gradient(160deg, ${p.topA}, ${p.badge})`,
-                boxShadow: `0 0 18px ${p.halo}99`,
-              }}
-            >
-              <Icon className="h-[18px] w-[18px]" style={{ color: p.icon }} strokeWidth={2.2} />
-            </div>
-
-            {/* L# + name on the front face */}
-            <div
-              className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 text-center leading-tight"
-              style={{ left: label.left, top: label.top }}
-            >
-              <div
-                className="text-[19px] font-black text-white"
-                style={{ textShadow: "0 2px 8px rgba(0,0,0,0.55)" }}
-              >
-                L{i + 1}
-              </div>
-              <div
-                className="text-[11px] font-medium text-white/90"
-                style={{ textShadow: "0 1px 5px rgba(0,0,0,0.6)" }}
-              >
-                {STEP_NAMES[i][lang]}
-              </div>
-            </div>
-          </React.Fragment>
-        );
-      })}
     </div>
   );
 }
@@ -733,7 +628,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
         <div className="mx-auto max-w-6xl">
           <div className="mb-14">
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
-              {lang === "zh" ? "能力梯度" : "Proficiency levels"}
+              {lang === "zh" ? "能力评级" : "Proficiency levels"}
             </span>
             <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-white md:text-5xl">
               {t(UI.levels.sectionTitle, lang)}
@@ -747,29 +642,31 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
 
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="overflow-hidden rounded-2xl border border-white/[0.08]">
-              {levels.map((level, i) => (
-                <motion.div
-                  key={level.level}
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.25, delay: i * 0.06 }}
-                  className="flex items-center gap-5 border-b border-white/[0.06] bg-white/[0.02] px-6 py-4 transition-colors last:border-0 hover:bg-white/[0.05]"
-                >
-                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-black text-white ${level.color}`}>
-                    {level.badge}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-baseline gap-2.5">
-                      <span className="font-semibold text-white">{level.name[lang]}</span>
-                      <span className="text-xs tabular-nums text-slate-500">
-                        {level.minScore}–{level.maxScore}{t(UI.levels.points, lang)}
-                      </span>
+              {levels.map((level, i) => {
+                const li = LEVEL_ICONS[i] ?? LEVEL_ICONS[0];
+                const Icon = li.icon;
+                return (
+                  <motion.div
+                    key={level.level}
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.25, delay: i * 0.06 }}
+                    className="flex items-start gap-4 border-b border-white/[0.06] bg-white/[0.02] px-6 py-4 transition-colors last:border-0 hover:bg-white/[0.05]"
+                  >
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${li.bg}`}>
+                      <Icon className={`h-5 w-5 ${li.text}`} />
                     </div>
-                    <p className="mt-0.5 text-sm leading-snug text-slate-400">{level.description[lang]}</p>
-                  </div>
-                </motion.div>
-              ))}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-bold text-white">{level.name[lang]}</span>
+                        <span className="text-xs font-semibold text-indigo-400">L{i + 1}</span>
+                      </div>
+                      <p className="mt-1 text-[13px] leading-snug text-slate-400">{level.description[lang]}</p>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
 
             <motion.div
@@ -782,235 +679,208 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
               <Staircase lang={lang} />
             </motion.div>
           </div>
+
+          <p className="mt-8 flex items-center gap-2 text-sm text-slate-400">
+            <Sparkles className="h-4 w-4 text-indigo-400" />
+            {lang === "zh"
+              ? "等级越高，代表你在 AI 时代的竞争力越强"
+              : "Higher levels represent stronger competitiveness in the AI era"}
+          </p>
         </div>
       </section>
 
-      {/* ── Testimonials ── */}
-      <section className="border-t border-white/[0.06] bg-white/[0.015] px-6 py-24 md:py-28">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-14">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
-              {t(UI.testimonials.sectionPill, lang)}
-            </span>
-            <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-white md:text-5xl">
-              {t(UI.testimonials.sectionTitle, lang)}
-            </h2>
-          </div>
+      {/* ── Testimonials + Pricing ── */}
+      <section id="pricing" className="relative overflow-hidden border-t border-white/[0.06] bg-white/[0.015] px-6 py-24 md:py-28">
+        <div className="mx-auto max-w-6xl">
+          {subscribeToast && (
+            <div className="mx-auto mb-8 inline-flex w-full items-center justify-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-medium text-emerald-300">
+              <Check className="h-4 w-4 shrink-0" />
+              {t(UI.billing.subscribeSuccess, lang)} {planDisplayName(subscribeToast, lang)}!
+              <a href="/account" className="font-semibold text-emerald-200 hover:underline">
+                {t(UI.billing.manageSubscription, lang)} →
+              </a>
+            </div>
+          )}
 
-          <div className="grid gap-5 md:grid-cols-3">
-            {TESTIMONIALS.map((item, i) => (
+          <div className="grid items-start gap-8 lg:grid-cols-[1fr_2.2fr]">
+            {/* Left: testimonial */}
+            <div>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
+                {t(UI.testimonials.sectionPill, lang)}
+              </span>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white md:text-4xl">
+                {t(UI.testimonials.sectionTitle, lang)}
+              </h2>
+
               <motion.div
-                key={item.name}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6"
+                transition={{ duration: 0.4 }}
+                className="mt-8 flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6"
               >
-                <div className="mb-3 text-3xl font-black leading-none text-white/15 select-none">&ldquo;</div>
-                <p className="flex-1 text-[15px] leading-relaxed text-slate-300">{item.quote[lang]}</p>
-                <div className="mt-6 flex items-center gap-3 border-t border-white/[0.06] pt-5">
+                <div className="mb-2 text-2xl font-black leading-none text-white/15 select-none">&ldquo;</div>
+                <p className="text-[14px] leading-relaxed text-slate-300">{TESTIMONIALS[0].quote[lang]}</p>
+                <div className="mt-5 flex items-center gap-3 border-t border-white/[0.06] pt-4">
                   <img
-                    src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${item.avatarSeed}&backgroundColor=${item.avatarBg}&radius=50`}
+                    src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${TESTIMONIALS[0].avatarSeed}&backgroundColor=${TESTIMONIALS[0].avatarBg}&radius=50`}
                     alt=""
                     className="h-9 w-9 shrink-0 rounded-full"
                   />
                   <div>
-                    <p className="text-sm font-semibold text-white">{item.name}</p>
-                    <p className="text-xs text-slate-500">{item.role[lang]}</p>
-                  </div>
-                  <div className="ml-auto flex gap-0.5">
-                    {Array.from({ length: 5 }).map((_, s) => (
-                      <Star key={s} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                    ))}
+                    <p className="text-sm font-semibold text-white">{TESTIMONIALS[0].name}</p>
+                    <p className="text-xs text-indigo-300">{TESTIMONIALS[0].role[lang]}</p>
                   </div>
                 </div>
+                <div className="mt-3 flex gap-0.5">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <Star key={s} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
               </motion.div>
-            ))}
-          </div>
+            </div>
 
-        </div>
-      </section>
-
-      {/* ── Pricing ── */}
-      <section id="pricing" className="relative overflow-hidden border-t border-white/[0.06] px-6 py-28 md:py-32">
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[720px] -translate-x-1/2 rounded-full bg-indigo-600/15 blur-[130px]" />
-
-        <div className="relative mx-auto max-w-6xl">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <h2 className="text-3xl font-extrabold tracking-tight text-white md:text-4xl">
-              {lang === "zh" ? "准备透明的定价" : "Simple, Transparent Pricing"}
-            </h2>
-            <p className="mt-4 text-[15px] leading-relaxed text-slate-400">
-              {lang === "zh" ? "选择适合你的方案，开始提升 AI 实力" : "Choose the plan that fits you, and start building your AI edge"}
-            </p>
-            {subscribeToast && (
-              <div className="mx-auto mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-medium text-emerald-300">
-                <Check className="h-4 w-4 shrink-0" />
-                {t(UI.billing.subscribeSuccess, lang)} {planDisplayName(subscribeToast, lang)}!
-                <a href="/account" className="font-semibold text-emerald-200 hover:underline">
-                  {t(UI.billing.manageSubscription, lang)} →
-                </a>
-              </div>
-            )}
-          </div>
-
-          <div className="grid items-stretch gap-6 lg:grid-cols-3">
-            {(
-              [
-                {
-                  key: "starter" as const,
-                  name: t(UI.pricing.starter.name, lang),
-                  price: t(UI.pricing.starter.price, lang),
-                  period: t(UI.pricing.starter.period, lang),
-                  desc: t(UI.pricing.starter.desc, lang),
-                  features: UI.pricing.starter.features[lang] as readonly string[],
-                  cta: t(UI.pricing.starter.cta, lang),
-                  highlighted: false,
-                  isCurrent: hasActiveSubscription && subscription?.plan === "starter",
-                  disabled: hasActiveSubscription && subscription ? isHigherPlan(subscription.plan, "starter") : false,
-                  action: () => {
-                    if (!user) redirectToSignIn("/#pricing");
-                    else if (hasActiveSubscription && subscription?.plan === "starter") window.location.href = "/account";
-                    else setPaymentPlan("starter");
+            {/* Right: pricing cards */}
+            <div className="grid items-stretch gap-5 md:grid-cols-3">
+              {(
+                [
+                  {
+                    key: "starter" as const,
+                    name: t(UI.pricing.starter.name, lang),
+                    price: t(UI.pricing.starter.price, lang),
+                    period: t(UI.pricing.starter.period, lang),
+                    desc: t(UI.pricing.starter.desc, lang),
+                    features: UI.pricing.starter.features[lang] as readonly string[],
+                    highlighted: false,
+                    isCurrent: hasActiveSubscription && subscription?.plan === "starter",
+                    disabled: hasActiveSubscription && subscription ? isHigherPlan(subscription.plan, "starter") : false,
+                    action: () => {
+                      if (!user) redirectToSignIn("/#pricing");
+                      else if (hasActiveSubscription && subscription?.plan === "starter") window.location.href = "/account";
+                      else setPaymentPlan("starter");
+                    },
                   },
-                },
-                {
-                  key: "pro" as const,
-                  name: t(UI.pricing.pro.name, lang),
-                  price: t(UI.pricing.pro.price, lang),
-                  period: t(UI.pricing.pro.period, lang),
-                  desc: t(UI.pricing.pro.desc, lang),
-                  features: UI.pricing.pro.features[lang] as readonly string[],
-                  cta: t(UI.pricing.pro.cta, lang),
-                  highlighted: true,
-                  isCurrent: hasActiveSubscription && subscription?.plan === "pro",
-                  disabled: hasActiveSubscription && subscription ? isHigherPlan(subscription.plan, "pro") : false,
-                  action: () => {
-                    if (!user) redirectToSignIn("/#pricing");
-                    else if (hasActiveSubscription && subscription?.plan === "pro") window.location.href = "/account";
-                    else setPaymentPlan("pro");
+                  {
+                    key: "pro" as const,
+                    name: t(UI.pricing.pro.name, lang),
+                    price: t(UI.pricing.pro.price, lang),
+                    period: t(UI.pricing.pro.period, lang),
+                    desc: t(UI.pricing.pro.desc, lang),
+                    features: UI.pricing.pro.features[lang] as readonly string[],
+                    highlighted: true,
+                    isCurrent: hasActiveSubscription && subscription?.plan === "pro",
+                    disabled: hasActiveSubscription && subscription ? isHigherPlan(subscription.plan, "pro") : false,
+                    action: () => {
+                      if (!user) redirectToSignIn("/#pricing");
+                      else if (hasActiveSubscription && subscription?.plan === "pro") window.location.href = "/account";
+                      else setPaymentPlan("pro");
+                    },
                   },
-                },
-                {
-                  key: "team" as const,
-                  name: t(UI.pricing.team.name, lang),
-                  price: t(UI.pricing.team.price, lang),
-                  period: t(UI.pricing.team.period, lang),
-                  desc: t(UI.pricing.team.desc, lang),
-                  features: UI.pricing.team.features[lang] as readonly string[],
-                  cta: t(UI.pricing.team.cta, lang),
-                  highlighted: false,
-                  isCurrent: hasActiveSubscription && subscription?.plan === "team",
-                  disabled: false,
-                  action: () => {
-                    if (hasActiveSubscription && subscription?.plan === "team") {
-                      window.location.href = "/account";
-                    } else {
-                      window.location.href = "mailto:support@aifluency.app?subject=Team%20Plan%20Inquiry";
-                    }
+                  {
+                    key: "team" as const,
+                    name: t(UI.pricing.team.name, lang),
+                    price: t(UI.pricing.team.price, lang),
+                    period: t(UI.pricing.team.period, lang),
+                    desc: t(UI.pricing.team.desc, lang),
+                    features: UI.pricing.team.features[lang] as readonly string[],
+                    highlighted: false,
+                    isCurrent: hasActiveSubscription && subscription?.plan === "team",
+                    disabled: false,
+                    action: () => {
+                      if (hasActiveSubscription && subscription?.plan === "team") {
+                        window.location.href = "/account";
+                      } else {
+                        window.location.href = "mailto:support@aifluency.app?subject=Team%20Plan%20Inquiry";
+                      }
+                    },
                   },
-                },
-              ] as const
-            ).map((plan, i) => {
-              const priceMatch = plan.price.match(/^([¥$])([\d.]+)$/);
-              const currency = priceMatch?.[1] ?? "";
-              const amount = priceMatch?.[2] ?? plan.price;
-              const ctaLabel = plan.isCurrent
-                ? t(UI.billing.manageSubscription, lang)
-                : plan.disabled
-                  ? t(UI.billing.includedInHigher, lang)
-                  : plan.key === "team"
-                    ? (lang === "zh" ? "联系我们" : "Contact Us")
-                    : (lang === "zh" ? "立即测评" : "Start Now");
+                ] as const
+              ).map((plan, i) => {
+                const priceMatch = plan.price.match(/^([¥$])([\d.]+)$/);
+                const currency = priceMatch?.[1] ?? "";
+                const amount = priceMatch?.[2] ?? plan.price;
+                const ctaLabel = plan.isCurrent
+                  ? t(UI.billing.manageSubscription, lang)
+                  : plan.disabled
+                    ? t(UI.billing.includedInHigher, lang)
+                    : plan.key === "team"
+                      ? (lang === "zh" ? "联系我们" : "Contact Us")
+                      : (lang === "zh" ? "立即测评" : "Start Now");
 
-              return (
-                <motion.div
-                  key={plan.key}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className={`relative flex flex-col ${plan.highlighted ? "lg:-mt-4 lg:mb-4" : ""}`}
-                >
-                  {plan.highlighted && (
-                    <div className="pointer-events-none absolute -inset-px -z-10 rounded-[1.4rem] bg-gradient-to-b from-indigo-400/50 via-violet-500/25 to-transparent blur-sm" />
-                  )}
-
-                  <div
-                    className={`relative flex h-full flex-col overflow-hidden rounded-[1.3rem] p-7 md:p-8 ${
-                      plan.highlighted
-                        ? "bg-gradient-to-br from-[#15122b] via-[#120f24] to-[#0c0a18] shadow-[0_24px_80px_-12px_rgba(99,70,229,0.5)] ring-1 ring-indigo-400/30"
-                        : "border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm"
-                    }`}
+                return (
+                  <motion.div
+                    key={plan.key}
+                    initial={{ opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: i * 0.08 }}
+                    className="relative flex flex-col"
                   >
                     {plan.highlighted && (
-                      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-300/60 to-transparent" />
+                      <div className="pointer-events-none absolute -inset-px -z-10 rounded-[1.3rem] bg-gradient-to-b from-indigo-400/50 via-violet-500/20 to-transparent blur-sm" />
                     )}
 
-                    {(plan.highlighted && !plan.isCurrent) || plan.isCurrent ? (
-                      <span
-                        className={`absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-4 py-1 text-[9px] font-bold uppercase tracking-[0.2em] ${
-                          plan.isCurrent
-                            ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/25"
-                            : "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-indigo-500/30"
-                        }`}
-                      >
-                        {plan.isCurrent ? t(UI.billing.planBadge, lang) : t(UI.pricing.popular, lang)}
-                      </span>
-                    ) : null}
-
-                    <div className="mb-8">
-                      <h3 className="text-xl font-semibold tracking-tight text-white">{plan.name}</h3>
-                      <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{plan.desc}</p>
-                    </div>
-
-                    <div className={`mb-8 border-b pb-8 ${plan.highlighted ? "border-white/[0.08]" : "border-white/[0.06]"}`}>
-                      <div className="flex items-end gap-0.5">
-                        {currency && (
-                          <span className="mb-2 text-lg font-medium text-slate-400">{currency}</span>
-                        )}
-                        <span className={`text-[3.25rem] font-semibold leading-none tracking-tight tabular-nums ${
-                          plan.highlighted ? "bg-gradient-to-br from-white to-indigo-200 bg-clip-text text-transparent" : "text-white"
-                        }`}>
-                          {amount}
-                        </span>
-                      </div>
-                      <p className="mt-2 text-sm text-slate-500">{plan.period}</p>
-                    </div>
-
-                    <ul className="flex-1 space-y-3.5">
-                      {plan.features.map((f) => (
-                        <li key={f} className="flex items-start gap-3">
-                          <span className={`mt-1 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full ${
-                            plan.highlighted ? "bg-indigo-400/15 ring-1 ring-indigo-400/25" : "bg-white/[0.06] ring-1 ring-white/10"
-                          }`}>
-                            <Check className="h-2.5 w-2.5 stroke-[3] text-indigo-300" />
-                          </span>
-                          <span className="text-[13px] leading-relaxed text-slate-300">{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <button
-                      onClick={plan.action}
-                      disabled={plan.disabled}
-                      className={`mt-8 w-full rounded-full py-3 text-[13px] font-semibold tracking-wide transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 ${
-                        plan.isCurrent
-                          ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                          : plan.disabled
-                            ? "border border-white/10 bg-white/[0.03] text-slate-500"
-                            : plan.highlighted
-                              ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:from-indigo-400 hover:to-violet-400"
-                              : "border border-white/15 bg-white/[0.04] text-white hover:border-white/30 hover:bg-white/10"
+                    <div
+                      className={`relative flex h-full flex-col overflow-hidden rounded-[1.2rem] p-5 md:p-6 ${
+                        plan.highlighted
+                          ? "bg-gradient-to-br from-[#15122b] via-[#120f24] to-[#0c0a18] shadow-[0_16px_60px_-8px_rgba(99,70,229,0.45)] ring-1 ring-indigo-400/30"
+                          : "border border-white/[0.08] bg-white/[0.03]"
                       }`}
                     >
-                      {ctaLabel}
-                    </button>
-                  </div>
-                </motion.div>
-              );
-            })}
+                      {plan.highlighted && (
+                        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-300/60 to-transparent" />
+                      )}
+
+                      <div className="mb-5">
+                        <h3 className="text-base font-semibold text-white">{plan.name}</h3>
+                        <p className="mt-1 text-[12px] leading-snug text-slate-400">{plan.desc}</p>
+                      </div>
+
+                      <div className="mb-5 border-b border-white/[0.06] pb-5">
+                        <div className="flex items-end gap-0.5">
+                          {currency && (
+                            <span className="mb-1.5 text-base font-medium text-slate-400">{currency}</span>
+                          )}
+                          <span className={`text-[2.5rem] font-semibold leading-none tracking-tight tabular-nums ${
+                            plan.highlighted ? "bg-gradient-to-br from-white to-indigo-200 bg-clip-text text-transparent" : "text-white"
+                          }`}>
+                            {amount}
+                          </span>
+                          {plan.key === "team" && (
+                            <span className="mb-1.5 ml-0.5 text-sm text-slate-400">{lang === "zh" ? "/起" : "/mo"}</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <ul className="flex-1 space-y-2.5">
+                        {plan.features.map((f) => (
+                          <li key={f} className="flex items-start gap-2.5">
+                            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 stroke-[3] text-indigo-400" />
+                            <span className="text-[12px] leading-snug text-slate-300">{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <button
+                        onClick={plan.action}
+                        disabled={plan.disabled}
+                        className={`mt-6 w-full rounded-lg py-2.5 text-[12px] font-semibold tracking-wide transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 ${
+                          plan.isCurrent
+                            ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+                            : plan.disabled
+                              ? "border border-white/10 bg-white/[0.03] text-slate-500"
+                              : plan.highlighted
+                                ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-indigo-500/25 hover:from-indigo-400 hover:to-violet-400"
+                                : "border border-white/15 bg-white/[0.04] text-white hover:border-white/30 hover:bg-white/10"
+                        }`}
+                      >
+                        {ctaLabel}
+                      </button>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
