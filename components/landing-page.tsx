@@ -169,45 +169,30 @@ const LEVEL_ICONS: { icon: typeof Lightbulb; bg: string; text: string }[] = [
 const STEP_ICONS = [Lightbulb, LayoutGrid, Star, Layers, Crown];
 
 function Staircase({ lang }: { lang: "zh" | "en" }) {
-  // Row of isometric boxes that all sit on ONE common baseline (aligned bottoms);
-  // only the height grows toward L5, so the tops form an ascending staircase.
-  const U = 54;          // pixels per unit
-  const K = 0.866;
-  const W = 1.45;        // box width  (iso x)
-  const Dp = 1.45;       // box depth  (iso y)
-  const SP = 82;         // horizontal screen spacing between boxes
-  const BX = 112, BY = 398;          // baseline anchor of the first box
   const VBW = 540, VBH = 452;
-  const HEIGHTS = [1.9, 2.6, 3.3, 4.1, 5.0];
+  const BASE_Y = 400;
+  const FW = 72;
+  const GAP = 10;
+  const DX = 24;
+  const DY = 14;
+  const HEIGHTS = [110, 155, 200, 250, 310];
 
-  const vx0 = K * U, vx1 = 0.5 * U;
-  const vy0 = -K * U, vy1 = 0.5 * U;
-  const vz1 = -U;
+  const s = (x: number, y: number) => `${x.toFixed(1)},${y.toFixed(1)}`;
 
-  // Corner of box i at local (x,y,z); near-bottom corner (W,Dp,0) sits on baseline
-  const cc = (i: number, x: number, y: number, z: number): [number, number] => {
-    const nx = BX + i * SP, ny = BY;
-    return [
-      nx + (x - W) * vx0 + (y - Dp) * vy0,
-      ny + (x - W) * vx1 + (y - Dp) * vy1 + z * vz1,
-    ];
-  };
-  const s = (p: [number, number]) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`;
-  const poly = (...pts: [number, number][]) => pts.map(s).join(" ");
-  const pctOf = (p: [number, number]) => ({ left: `${(p[0] / VBW) * 100}%`, top: `${(p[1] / VBH) * 100}%` });
-
-  // Blue → magenta ramp, matching the reference
   const topC = ["#56d6f2", "#5ab0f5", "#7e84f5", "#a96cf2", "#dc66f0"];
   const frontC = ["#2f8fc8", "#356fcc", "#4f48c6", "#7a3ec8", "#b23ec8"];
-  const leftC = ["#1f5f8e", "#234a96", "#362f96", "#592c96", "#852c96"];
+  const rightC = ["#1f5f8e", "#234a96", "#362f96", "#592c96", "#852c96"];
   const edgeC = ["#9fe9ff", "#a8d4ff", "#cfccff", "#e3c7ff", "#f6c2ff"];
   const glowC = ["56,214,242", "90,176,245", "126,132,245", "169,108,242", "220,102,240"];
 
-  const blocks = Array.from({ length: 5 }).map((_, i) => ({ i, h: HEIGHTS[i] }));
+  const blocks = HEIGHTS.map((h, i) => {
+    const x = 40 + i * (FW + GAP);
+    const topY = BASE_Y - h;
+    return { i, x, topY, h };
+  });
 
   return (
     <div className="relative mx-auto aspect-[540/452] w-full max-w-[560px]">
-      {/* Ambient glow */}
       <div className="pointer-events-none absolute right-[6%] top-[4%] h-[55%] w-[55%] rounded-full bg-fuchsia-600/25 blur-[100px]" />
       <div className="pointer-events-none absolute bottom-[16%] left-[6%] h-[42%] w-[48%] rounded-full bg-cyan-500/15 blur-[85px]" />
       <div className="pointer-events-none absolute right-[28%] top-[24%] h-[26%] w-[26%] rounded-full bg-violet-500/20 blur-[60px]" />
@@ -216,16 +201,16 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
         <defs>
           {topC.map((c, i) => (
             <React.Fragment key={`g${i}`}>
-              <linearGradient id={`sTop${i}`} x1="0" y1="0" x2="0.5" y2="1">
+              <linearGradient id={`sTop${i}`} x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor={c} stopOpacity="0.95" />
                 <stop offset="100%" stopColor={frontC[i]} stopOpacity="0.85" />
               </linearGradient>
               <linearGradient id={`sFront${i}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={frontC[i]} stopOpacity="0.92" />
-                <stop offset="100%" stopColor={leftC[i]} stopOpacity="0.78" />
+                <stop offset="100%" stopColor={rightC[i]} stopOpacity="0.78" />
               </linearGradient>
-              <linearGradient id={`sLeft${i}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={leftC[i]} stopOpacity="0.85" />
+              <linearGradient id={`sRight${i}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={rightC[i]} stopOpacity="0.85" />
                 <stop offset="100%" stopColor="#16143e" stopOpacity="0.72" />
               </linearGradient>
             </React.Fragment>
@@ -243,43 +228,34 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
           </filter>
         </defs>
 
-        {/* Floor reflection */}
-        <ellipse cx={BX + 150} cy={BY + 28} rx="250" ry="30" fill="url(#stFloor)" />
+        <ellipse cx={270} cy={BASE_Y + 20} rx="250" ry="30" fill="url(#stFloor)" />
 
-        {/* Draw right (back) to left (front) so the nearest box is on top */}
-        {[...blocks].reverse().map(({ i, h }) => {
-          const top = poly(cc(i, 0, 0, h), cc(i, W, 0, h), cc(i, W, Dp, h), cc(i, 0, Dp, h));
-          const front = poly(cc(i, W, 0, 0), cc(i, W, Dp, 0), cc(i, W, Dp, h), cc(i, W, 0, h));
-          const left = poly(cc(i, 0, Dp, 0), cc(i, W, Dp, 0), cc(i, W, Dp, h), cc(i, 0, Dp, h));
-          const [fx, fy] = cc(i, W, Dp / 2, h * 0.32);
+        {blocks.map(({ i, x, topY, h }) => {
+          const front = `${s(x, BASE_Y)} ${s(x + FW, BASE_Y)} ${s(x + FW, topY)} ${s(x, topY)}`;
+          const top = `${s(x, topY)} ${s(x + FW, topY)} ${s(x + FW + DX, topY - DY)} ${s(x + DX, topY - DY)}`;
+          const right = `${s(x + FW, BASE_Y)} ${s(x + FW + DX, BASE_Y - DY)} ${s(x + FW + DX, topY - DY)} ${s(x + FW, topY)}`;
+
+          const labelX = x + FW / 2;
+          const labelY = topY + h * 0.65;
+          const iconY = topY + h * 0.3;
 
           return (
             <g key={i}>
-              <polygon points={left} fill={`url(#sLeft${i})`} stroke={edgeC[i]} strokeOpacity="0.2" strokeWidth="0.6" />
+              <polygon points={right} fill={`url(#sRight${i})`} stroke={edgeC[i]} strokeOpacity="0.2" strokeWidth="0.6" />
               <polygon points={front} fill={`url(#sFront${i})`} stroke={edgeC[i]} strokeOpacity="0.28" strokeWidth="0.6" />
               <polygon points={top} fill={`url(#sTop${i})`} stroke={edgeC[i]} strokeOpacity="0.55" strokeWidth="0.9" />
-              {/* Glowing top near-edges */}
               <polyline
-                points={`${s(cc(i, W, 0, h))} ${s(cc(i, W, Dp, h))} ${s(cc(i, 0, Dp, h))}`}
+                points={`${s(x, topY)} ${s(x + FW, topY)} ${s(x + FW + DX, topY - DY)}`}
                 fill="none" stroke={edgeC[i]} strokeOpacity="0.95" strokeWidth="1.8"
                 strokeLinejoin="round" filter="url(#edgeGlow)"
               />
-              {/* Bright front-bottom edge */}
               <line
-                x1={cc(i, W, 0, 0)[0]} y1={cc(i, W, 0, 0)[1]}
-                x2={cc(i, W, Dp, 0)[0]} y2={cc(i, W, Dp, 0)[1]}
-                stroke={edgeC[i]} strokeOpacity="0.7" strokeWidth="1.3" filter="url(#edgeGlow)"
-              />
-              {/* Vertical near-corner edge */}
-              <line
-                x1={cc(i, W, 0, 0)[0]} y1={cc(i, W, 0, 0)[1]}
-                x2={cc(i, W, 0, h)[0]} y2={cc(i, W, 0, h)[1]}
+                x1={x + FW} y1={BASE_Y} x2={x + FW} y2={topY}
                 stroke={edgeC[i]} strokeOpacity="0.45" strokeWidth="1"
               />
 
-              {/* Label on the front face */}
               <text
-                x={fx} y={fy - 3}
+                x={labelX} y={labelY}
                 textAnchor="middle"
                 fill="#ffffff"
                 fontWeight="800"
@@ -288,7 +264,7 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
                 L{i + 1}
               </text>
               <text
-                x={fx} y={fy + 15}
+                x={labelX} y={labelY + 18}
                 textAnchor="middle"
                 fill="rgba(222,218,255,0.92)"
                 fontWeight="500"
@@ -301,15 +277,15 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
         })}
       </svg>
 
-      {/* Icons on the upper part of each front face */}
-      {blocks.map(({ i, h }) => {
+      {blocks.map(({ i, x, topY, h }) => {
         const Icon = STEP_ICONS[i];
-        const pos = pctOf(cc(i, W, Dp / 2, h * 0.72));
+        const iconLeft = `${((x + FW / 2) / VBW) * 100}%`;
+        const iconTop = `${((topY + h * 0.28) / VBH) * 100}%`;
         return (
           <div
             key={`icon${i}`}
             className="pointer-events-none absolute flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-            style={{ left: pos.left, top: pos.top }}
+            style={{ left: iconLeft, top: iconTop }}
           >
             <Icon
               className="h-[22px] w-[22px]"
