@@ -5,15 +5,16 @@ import { motion } from "framer-motion";
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer,
 } from "recharts";
-import { dimensions, levels } from "@/lib/test-data";
+import { levels } from "@/lib/test-data";
 import { useLang } from "@/contexts/language-context";
 import { UI, t } from "@/lib/i18n";
 import { NavAuthMenu, redirectToSignIn } from "@/components/auth-ui";
 import { useAuth } from "@/components/auth-provider";
 import {
-  Brain, Target, ChevronRight, ArrowRight, MessageSquare,
-  CheckCircle2, GitMerge, Shield, TrendingUp, Check,
+  Brain, ChevronRight, ArrowRight, MessageSquare,
+  CheckCircle2, Shield, Check,
   ChevronDown, ChevronUp, Play, Sparkles, Star, Layers, Activity, BarChart3,
+  Globe, Zap, Wrench,
 } from "lucide-react";
 import { PaymentModal } from "@/components/payment-modal";
 import { useSubscription } from "@/components/subscription-provider";
@@ -25,10 +26,6 @@ interface LandingPageProps {
   authLoading?: boolean;
   isAuthenticated?: boolean;
 }
-
-const iconMap: Record<string, React.ElementType> = {
-  Brain, Target, MessageSquare, CheckCircle: CheckCircle2, GitMerge, Shield, TrendingUp,
-};
 
 const TESTIMONIALS = [
   {
@@ -96,14 +93,24 @@ const FAQS = [
 // Brand wordmarks for the trust strip (rendered as styled text)
 const ORGS = ["Google", "Meta", "OpenAI", "Shopify", "Microsoft", "Notion", "Canva"];
 
-// Demo radar values for the hero report card, keyed to the real dimensions.
+// Marketing-facing competency dimensions shown on the landing page.
+const DISPLAY_DIMENSIONS = [
+  { icon: MessageSquare, name: { zh: "提示工程", en: "Prompt Engineering" }, desc: { zh: "精准描述需求，引导 AI 输出高质量结果", en: "Frame requests precisely to get high-quality AI output" } },
+  { icon: CheckCircle2, name: { zh: "评估判断", en: "Evaluation" }, desc: { zh: "批判性评估 AI 输出的质量与可信度", en: "Critically assess the quality and reliability of outputs" } },
+  { icon: Zap, name: { zh: "自动化", en: "Automation" }, desc: { zh: "利用 AI 优化流程，提升整体效率", en: "Streamline workflows with AI to boost efficiency" } },
+  { icon: Brain, name: { zh: "推理能力", en: "Reasoning" }, desc: { zh: "运用 AI 进行复杂推理与决策", en: "Use AI for complex reasoning and decision-making" } },
+  { icon: Wrench, name: { zh: "工具使用", en: "Tool Usage" }, desc: { zh: "高效驾驭各类 AI 工具与生态", en: "Skillfully wield the full ecosystem of AI tools" } },
+  { icon: Shield, name: { zh: "风险意识", en: "Risk Awareness" }, desc: { zh: "识别潜在风险，安全合规地使用 AI", en: "Spot risks and use AI safely and responsibly" } },
+];
+
+// Demo radar values for the hero report card (clockwise from top).
 const RADAR = [
-  { id: "prompt-capability", v: 94 },
-  { id: "output-evaluation", v: 90 },
-  { id: "ai-understanding", v: 88 },
-  { id: "workflow-migration", v: 85 },
-  { id: "task-decomposition", v: 89 },
-  { id: "risk-awareness", v: 91 },
+  { name: { zh: "提示工程", en: "Prompting" }, v: 94 },
+  { name: { zh: "评估判断", en: "Evaluation" }, v: 90 },
+  { name: { zh: "自动化", en: "Automation" }, v: 89 },
+  { name: { zh: "工具使用", en: "Tool Usage" }, v: 85 },
+  { name: { zh: "风险意识", en: "Risk" }, v: 91 },
+  { name: { zh: "推理能力", en: "Reasoning" }, v: 88 },
 ];
 
 const SCORE = 92;
@@ -138,6 +145,42 @@ function ScoreRing() {
   );
 }
 
+// Isometric 3D staircase illustrating the five proficiency levels.
+function Staircase() {
+  const N = 5;
+  const U = 26;          // unit size in px
+  const D = 2.3;         // step depth (in units)
+  const OX = 70, OY = 250;
+  const P = (x: number, y: number, z: number) =>
+    `${(OX + (x - y) * 0.866 * U).toFixed(1)},${(OY + (x + y) * 0.5 * U - z * U).toFixed(1)}`;
+
+  return (
+    <div className="relative mx-auto h-[300px] w-full max-w-[360px]">
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[240px] w-[240px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/25 blur-[80px]" />
+      <svg viewBox="0 0 360 300" className="relative h-full w-full">
+        {Array.from({ length: N }).map((_, i) => {
+          const x0 = i, x1 = i + 1, y0 = 0, y1 = D, h = i + 1;
+          const top = `${P(x0, y0, h)} ${P(x1, y0, h)} ${P(x1, y1, h)} ${P(x0, y1, h)}`;
+          const right = `${P(x1, y0, 0)} ${P(x1, y1, 0)} ${P(x1, y1, h)} ${P(x1, y0, h)}`;
+          const left = `${P(x0, y1, 0)} ${P(x1, y1, 0)} ${P(x1, y1, h)} ${P(x0, y1, h)}`;
+          const labelX = OX + (x0 + 0.5 - (y0 + D / 2)) * 0.866 * U;
+          const labelY = OY + (x0 + 0.5 + y0 + D / 2) * 0.5 * U - h * U + 4;
+          return (
+            <g key={i}>
+              <polygon points={left} fill="#4c1d95" stroke="rgba(167,139,250,0.4)" strokeWidth="1" />
+              <polygon points={right} fill="#6d28d9" stroke="rgba(167,139,250,0.4)" strokeWidth="1" />
+              <polygon points={top} fill="#a78bfa" stroke="rgba(221,214,254,0.6)" strokeWidth="1" />
+              <text x={labelX} y={labelY} textAnchor="middle" className="fill-white font-black" style={{ fontSize: 15 }}>
+                L{i + 1}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
 export function LandingPage({ onStartTest, authLoading = false, isAuthenticated = false }: LandingPageProps) {
   const { user } = useAuth();
   const { subscription, hasActiveSubscription, refresh } = useSubscription();
@@ -149,15 +192,11 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
   const startLabel = isAuthenticated ? t(UI.nav.startTest, lang) : t(UI.nav.startTestGuest, lang);
   const startDisabled = authLoading;
 
-  const dimName = (id: string) => {
-    const d = dimensions.find((x) => x.id === id);
-    return d ? d.name[lang] : id;
-  };
-  const radarData = RADAR.map((r) => ({ dim: dimName(r.id), v: r.v }));
+  const radarData = RADAR.map((r) => ({ dim: r.name[lang], v: r.v }));
 
   const navLinks = [
-    { href: "#how", label: lang === "zh" ? "如何运作" : "How it works" },
-    { href: "#dimensions", label: lang === "zh" ? "测什么" : "What we measure" },
+    { href: "#how", label: lang === "zh" ? "如何测评" : "How it works" },
+    { href: "#dimensions", label: lang === "zh" ? "测评内容" : "What we measure" },
     { href: "#pricing", label: t(UI.nav.pricing, lang) },
     { href: "#faq", label: lang === "zh" ? "资源" : "Resources" },
   ];
@@ -187,29 +226,21 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
             ))}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={() => setLang(lang === "zh" ? "en" : "zh")}
-              className="rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white"
+              className="flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
             >
-              {lang === "zh" ? "EN" : "中文"}
+              <Globe className="h-4 w-4" />
+              {lang === "zh" ? "中文" : "EN"}
             </button>
-            {user ? (
-              <NavAuthMenu variant="dark" />
-            ) : (
-              <button
-                onClick={() => redirectToSignIn("/")}
-                className="hidden rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white transition-all hover:border-white/30 hover:bg-white/10 sm:block"
-              >
-                {lang === "zh" ? "登录" : "Sign in"}
-              </button>
-            )}
+            {user && <NavAuthMenu variant="dark" />}
             <button
               onClick={onStartTest}
               disabled={startDisabled}
-              className="rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-violet-400 hover:shadow-indigo-500/40 active:scale-[0.98] disabled:opacity-50"
+              className="rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-violet-400 hover:shadow-indigo-500/40 active:scale-[0.98] disabled:opacity-50"
             >
-              {lang === "zh" ? "获取我的报告" : "Get My AI Report"}
+              {startLabel}
             </button>
           </div>
         </div>
@@ -242,8 +273,8 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
 
               <p className="mt-6 max-w-[440px] text-lg leading-relaxed text-slate-400">
                 {lang === "zh"
-                  ? "发现你在思考、评估与协作中运用 AI 的真实效率。"
-                  : "Discover how effectively you think, evaluate, and collaborate with AI."}
+                  ? "发现你的优势，识别你的 AI 盲点，让 AI 真正成为你的竞争力。"
+                  : "Discover your strengths, spot your AI blind spots, and turn AI into your real competitive edge."}
               </p>
 
               {/* Social proof */}
@@ -263,7 +294,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   </div>
                 </div>
                 <p className="text-sm leading-tight text-slate-400">
-                  {lang === "zh" ? <>受到 12,000+ 名<br />AI 从业者的信赖</> : <>Trusted by 12,000+<br />AI Professionals</>}
+                  {lang === "zh" ? <>超过 12,000+ 专业人士<br />已完成测评</> : <>12,000+ professionals<br />have taken the test</>}
                 </p>
               </div>
 
@@ -273,7 +304,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   disabled={startDisabled}
                   className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-7 text-[15px] font-bold text-white shadow-lg shadow-indigo-500/30 transition-all hover:from-indigo-400 hover:to-violet-400 hover:shadow-indigo-500/50 active:scale-[0.98] disabled:opacity-60"
                 >
-                  {lang === "zh" ? "开始评估" : "Start Assessment"}
+                  {lang === "zh" ? "开始测评" : "Start Assessment"}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </button>
                 <button
@@ -287,11 +318,11 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
               </div>
 
               <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500">
-                <span className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" />{lang === "zh" ? "15 分钟" : "15 minutes"}</span>
+                <span className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" />{lang === "zh" ? "约 15 分钟" : "~15 minutes"}</span>
                 <span className="text-slate-700">·</span>
-                <span className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" />{lang === "zh" ? "即时结果" : "Instant results"}</span>
+                <span className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" />{lang === "zh" ? "即时生成报告" : "Instant report"}</span>
                 <span className="text-slate-700">·</span>
-                <span className="flex items-center gap-1.5"><Shield className="h-3.5 w-3.5 text-emerald-400" />{lang === "zh" ? "安全私密" : "Secure & private"}</span>
+                <span className="flex items-center gap-1.5"><Shield className="h-3.5 w-3.5 text-emerald-400" />{lang === "zh" ? "安全保密" : "Secure & private"}</span>
               </div>
             </motion.div>
 
@@ -306,10 +337,10 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
               <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-6 shadow-2xl shadow-black/50 backdrop-blur-md md:p-8">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
-                    {lang === "zh" ? "你的 AI 素养报告" : "Your AI Fluency Report"}
+                    {lang === "zh" ? "你的 AI 实力报告" : "Your AI Fluency Report"}
                   </span>
                   <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400 ring-1 ring-emerald-500/20">
-                    {lang === "zh" ? "已完成" : "COMPLETE"}
+                    {lang === "zh" ? "优秀" : "EXCELLENT"}
                   </span>
                 </div>
 
@@ -317,7 +348,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   {/* Score ring */}
                   <div className="flex flex-col items-center">
                     <ScoreRing />
-                    <p className="mt-1 text-xs font-medium text-slate-400">{lang === "zh" ? "AI 素养得分" : "AI Fluency Score"}</p>
+                    <p className="mt-1 text-xs font-medium text-slate-400">{lang === "zh" ? "AI 实力得分" : "AI Fluency Score"}</p>
                     <p className="text-[11px] text-indigo-300">{lang === "zh" ? "超过 92% 的用户" : "Top 8% of users"}</p>
                   </div>
 
@@ -350,18 +381,18 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                     <Star className="h-5 w-5 text-indigo-300" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-white">{lang === "zh" ? "卓越的 AI 素养" : "Exceptional AI Fluency"}</p>
+                    <p className="text-sm font-bold text-white">{lang === "zh" ? "卓越的 AI 思维" : "Exceptional AI Mindset"}</p>
                     <p className="mt-0.5 text-[12px] leading-snug text-slate-400">
                       {lang === "zh"
-                        ? "你在运用 AI 解决问题、驱动成果方面超越了 92% 的专业人士。"
-                        : "You outperform 92% of professionals in effectively using AI to solve problems and drive results."}
+                        ? "你在提示工程、评估判断、自动化方面表现出色，建议继续保持。"
+                        : "You excel at prompt engineering, evaluation, and automation — keep it up."}
                     </p>
                   </div>
                   <button
                     onClick={onStartTest}
                     className="hidden shrink-0 items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.04] px-3.5 py-2 text-xs font-semibold text-white transition-all hover:border-white/25 hover:bg-white/10 lg:flex"
                   >
-                    {lang === "zh" ? "查看完整报告" : "View Full Report"}
+                    {lang === "zh" ? "查看详细分析" : "View Details"}
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -372,13 +403,13 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
           {/* ── Framework ── */}
           <div className="mt-24">
             <p className="text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-indigo-400">
-              {lang === "zh" ? "AI 素养评估框架" : "The AI Fluency Framework"}
+              {lang === "zh" ? "测评体系概览" : "The Assessment Framework"}
             </p>
             <div className="relative mt-8 grid gap-5 md:grid-cols-3 md:gap-0">
               {[
-                { icon: Layers, v: "6", t: lang === "zh" ? "维度" : "Dimensions", d: lang === "zh" ? "核心 AI 能力领域" : "Core AI competency areas" },
-                { icon: Activity, v: "42", t: lang === "zh" ? "信号" : "Signals", d: lang === "zh" ? "行为指标深度分析" : "Behavioral indicators analyzed" },
-                { icon: BarChart3, v: "1", t: lang === "zh" ? "素养总分" : "AI Fluency Score", d: lang === "zh" ? "你的整体 AI 素养指数" : "Your overall AI Fluency Index" },
+                { icon: Layers, v: "6", t: lang === "zh" ? "大维度" : "Dimensions", d: lang === "zh" ? "核心 AI 能力评估" : "Core AI competency areas" },
+                { icon: Activity, v: "42", t: lang === "zh" ? "个信号" : "Signals", d: lang === "zh" ? "行为指标深度分析" : "Behavioral indicators analyzed" },
+                { icon: BarChart3, v: "1", t: lang === "zh" ? "份报告" : "AI Fluency Score", d: lang === "zh" ? "全面解读 AI 实力" : "Your overall AI Fluency Index" },
               ].map((c, i) => (
                 <React.Fragment key={c.t}>
                   <motion.div
@@ -412,7 +443,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
           {/* ── Org logos ── */}
           <div className="mt-20 border-t border-white/[0.06] pt-12">
             <p className="text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500">
-              {lang === "zh" ? "受到领先机构的信赖" : "Trusted by leading organizations"}
+              {lang === "zh" ? "受到全球领先团队和组织的信任" : "Trusted by leading teams & organizations"}
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
               {ORGS.map((org) => (
@@ -467,43 +498,33 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
 
       {/* ── Dimensions ── */}
       <section id="dimensions" className="border-t border-white/[0.06] bg-white/[0.015] px-6 py-24 md:py-28">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-14 grid gap-6 md:grid-cols-2">
-            <div>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
-                {lang === "zh" ? "评估框架" : "Assessment framework"}
-              </span>
-              <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-white md:text-5xl">
-                {t(UI.dimensions.sectionTitle, lang)}
-              </h2>
-            </div>
-            <p className="self-end text-[15px] leading-relaxed text-slate-400 md:pt-8">
-              {t(UI.dimensions.sectionDesc, lang)}
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-14 text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight text-white md:text-4xl">
+              {t(UI.dimensions.sectionTitle, lang)}
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-slate-400">
+              {lang === "zh" ? "我们的测评基于全球领先的 AI 素养框架" : t(UI.dimensions.sectionDesc, lang)}
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {dimensions.map((dim, i) => {
-              const Icon = iconMap[dim.icon] || Brain;
+          <div className="grid grid-cols-2 gap-3.5 md:grid-cols-3 lg:grid-cols-6">
+            {DISPLAY_DIMENSIONS.map((dim, i) => {
+              const Icon = dim.icon;
               return (
                 <motion.div
-                  key={dim.id}
+                  key={dim.name.en}
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.3, delay: i * 0.05 }}
-                  className="group flex items-start gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 transition-all hover:border-indigo-400/30 hover:bg-white/[0.04]"
+                  className="group rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4 transition-all hover:border-indigo-400/30 hover:bg-white/[0.04]"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/15 to-violet-500/10 text-indigo-300 ring-1 ring-white/10 transition-all group-hover:from-indigo-500/30 group-hover:to-violet-500/20">
-                    <Icon className="h-5 w-5" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/15 text-indigo-300 ring-1 ring-white/10 transition-all group-hover:from-indigo-500/35 group-hover:to-violet-500/25">
+                    <Icon className="h-[18px] w-[18px]" />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-xs font-bold tabular-nums text-slate-600">{String(i + 1).padStart(2, "0")}</span>
-                      <p className="font-semibold text-white transition-colors group-hover:text-indigo-200">{dim.name[lang]}</p>
-                    </div>
-                    <p className="mt-1 text-sm leading-relaxed text-slate-400">{dim.description[lang]}</p>
-                  </div>
+                  <p className="mt-3 text-sm font-bold text-white transition-colors group-hover:text-indigo-200">{dim.name[lang]}</p>
+                  <p className="mt-1.5 text-[12px] leading-relaxed text-slate-400">{dim.desc[lang]}</p>
                 </motion.div>
               );
             })}
@@ -513,40 +534,53 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
 
       {/* ── Levels ── */}
       <section className="border-t border-white/[0.06] px-6 py-24 md:py-28">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-6xl">
           <div className="mb-14">
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
-              {lang === "zh" ? "你会落在哪里" : "Proficiency levels"}
+              {lang === "zh" ? "能力梯度" : "Proficiency levels"}
             </span>
             <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-white md:text-5xl">
               {t(UI.levels.sectionTitle, lang)}
             </h2>
+            <p className="mt-3 text-[15px] text-slate-400">{t(UI.levels.sectionDesc, lang)}</p>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-white/[0.08]">
-            {levels.map((level, i) => (
-              <motion.div
-                key={level.level}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.25, delay: i * 0.06 }}
-                className="flex items-center gap-5 border-b border-white/[0.06] bg-white/[0.02] px-6 py-4 transition-colors last:border-0 hover:bg-white/[0.05]"
-              >
-                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-black text-white ${level.color}`}>
-                  {level.badge}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-baseline gap-2.5">
-                    <span className="font-semibold text-white">{level.name[lang]}</span>
-                    <span className="text-xs tabular-nums text-slate-500">
-                      {level.minScore}–{level.maxScore}{t(UI.levels.points, lang)}
-                    </span>
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            <div className="overflow-hidden rounded-2xl border border-white/[0.08]">
+              {levels.map((level, i) => (
+                <motion.div
+                  key={level.level}
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.25, delay: i * 0.06 }}
+                  className="flex items-center gap-5 border-b border-white/[0.06] bg-white/[0.02] px-6 py-4 transition-colors last:border-0 hover:bg-white/[0.05]"
+                >
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-black text-white ${level.color}`}>
+                    {level.badge}
                   </div>
-                  <p className="mt-0.5 text-sm leading-snug text-slate-400">{level.description[lang]}</p>
-                </div>
-              </motion.div>
-            ))}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-baseline gap-2.5">
+                      <span className="font-semibold text-white">{level.name[lang]}</span>
+                      <span className="text-xs tabular-nums text-slate-500">
+                        {level.minScore}–{level.maxScore}{t(UI.levels.points, lang)}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-sm leading-snug text-slate-400">{level.description[lang]}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="hidden lg:block"
+            >
+              <Staircase />
+            </motion.div>
           </div>
         </div>
       </section>
@@ -792,31 +826,32 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
 
       {/* ── FAQ ── */}
       <section id="faq" className="border-t border-white/[0.06] bg-white/[0.015] px-6 py-24 md:py-28">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-12">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
-              {t(UI.faq.sectionPill, lang)}
-            </span>
-            <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-white md:text-5xl">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight text-white md:text-4xl">
               {t(UI.faq.sectionTitle, lang)}
             </h2>
+            <p className="mt-3 text-[15px] text-slate-400">{t(UI.faq.sectionDesc, lang)}</p>
           </div>
 
-          <div className="divide-y divide-white/[0.08]">
+          <div className="grid gap-3.5 md:grid-cols-2">
             {FAQS.map((faq, i) => (
-              <div key={i}>
+              <div
+                key={i}
+                className="h-fit overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02]"
+              >
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="flex w-full items-start justify-between gap-6 py-5 text-left"
+                  className="flex w-full items-start justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-white/[0.03]"
                 >
-                  <span className="font-semibold text-white">{faq.q[lang]}</span>
+                  <span className="text-[15px] font-semibold text-white">{faq.q[lang]}</span>
                   {openFaq === i
                     ? <ChevronUp className="mt-0.5 h-4 w-4 shrink-0 text-indigo-400" />
                     : <ChevronDown className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
                   }
                 </button>
                 {openFaq === i && (
-                  <div className="pb-5 text-[15px] leading-relaxed text-slate-400">{faq.a[lang]}</div>
+                  <div className="px-5 pb-4 text-[14px] leading-relaxed text-slate-400">{faq.a[lang]}</div>
                 )}
               </div>
             ))}
@@ -867,15 +902,21 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
 
       {/* ── Footer ── */}
       <footer className="border-t border-white/[0.06] px-6 py-10">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm md:flex-row">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-5 text-sm md:flex-row">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/25">
               <Brain className="h-[18px] w-[18px] text-white" />
             </div>
             <span className="font-bold text-white">{t(UI.nav.brand, lang)}</span>
           </div>
-          <p className="text-slate-500">{t(UI.footer.tagline, lang)}</p>
-          <p className="text-slate-600">© 2025 {t(UI.nav.brand, lang)}</p>
+          <div className="flex items-center gap-6 text-slate-400">
+            <a href="mailto:support@aifluency.app" className="transition-colors hover:text-white">{lang === "zh" ? "帮助中心" : "Help Center"}</a>
+            <a href="#" className="transition-colors hover:text-white">{lang === "zh" ? "隐私政策" : "Privacy Policy"}</a>
+            <a href="#" className="transition-colors hover:text-white">{lang === "zh" ? "服务条款" : "Terms of Service"}</a>
+          </div>
+          <p className="text-slate-600">
+            © 2024 {t(UI.nav.brand, lang)}. {lang === "zh" ? "保留所有权利" : "All rights reserved"}
+          </p>
         </div>
       </footer>
 
