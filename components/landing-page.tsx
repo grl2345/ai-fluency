@@ -159,48 +159,91 @@ const STEP_NAMES = [
 ];
 
 function Staircase({ lang }: { lang: "zh" | "en" }) {
-  const N = 5;
-  const U = 30;
-  const D = 2.6;
-  const OX = 60, OY = 340;
+  const U = 38;
+  const D = 3.2;
+  const OX = 30, OY = 440;
   const P = (x: number, y: number, z: number) =>
     `${(OX + (x - y) * 0.866 * U).toFixed(1)},${(OY + (x + y) * 0.5 * U - z * U).toFixed(1)}`;
 
+  const topColors = ["#8b5cf6", "#9366f9", "#9d70fc", "#a78bfa", "#c4b5fd"];
+  const rightColors = ["#5b21b6", "#6425cc", "#6d28d9", "#7c3aed", "#8b5cf6"];
+  const leftColors = ["#3b0764", "#4a0d82", "#581c87", "#6b21a8", "#7c3aed"];
+
   return (
-    <div className="relative mx-auto h-[400px] w-full max-w-[440px]">
-      <div className="pointer-events-none absolute bottom-[20%] right-[20%] h-[280px] w-[280px] rounded-full bg-violet-500/30 blur-[90px]" />
-      <div className="pointer-events-none absolute bottom-[10%] right-[15%] h-[180px] w-[180px] rounded-full bg-fuchsia-500/15 blur-[70px]" />
-      <svg viewBox="0 0 440 400" className="relative h-full w-full">
+    <div className="relative mx-auto h-[480px] w-full max-w-[520px]">
+      {/* Multi-layer glow */}
+      <div className="pointer-events-none absolute bottom-[15%] right-[10%] h-[360px] w-[360px] rounded-full bg-violet-600/35 blur-[100px]" />
+      <div className="pointer-events-none absolute bottom-[25%] right-[25%] h-[220px] w-[220px] rounded-full bg-fuchsia-500/25 blur-[80px]" />
+      <div className="pointer-events-none absolute bottom-[35%] right-[30%] h-[140px] w-[140px] rounded-full bg-indigo-400/20 blur-[60px]" />
+
+      <svg viewBox="0 0 520 480" className="relative h-full w-full drop-shadow-[0_0_40px_rgba(139,92,246,0.3)]">
         <defs>
-          <linearGradient id="topGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#c4b5fd" />
-            <stop offset="100%" stopColor="#818cf8" />
+          {topColors.map((c, i) => (
+            <linearGradient key={`t${i}`} id={`top${i}`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={c} stopOpacity="1" />
+              <stop offset="100%" stopColor={c} stopOpacity="0.75" />
+            </linearGradient>
+          ))}
+          {/* Edge highlight for the top step */}
+          <linearGradient id="topEdge" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#e9d5ff" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#a78bfa" stopOpacity="0.1" />
           </linearGradient>
-          <linearGradient id="rightGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7c3aed" />
-            <stop offset="100%" stopColor="#4c1d95" />
-          </linearGradient>
-          <linearGradient id="leftGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#6d28d9" />
-            <stop offset="100%" stopColor="#3b0764" />
-          </linearGradient>
+          <filter id="stepGlow">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
-        {Array.from({ length: N }).map((_, i) => {
+
+        {Array.from({ length: 5 }).map((_, i) => {
           const x0 = i, x1 = i + 1, y0 = 0, y1 = D, h = i + 1;
           const top = `${P(x0, y0, h)} ${P(x1, y0, h)} ${P(x1, y1, h)} ${P(x0, y1, h)}`;
           const right = `${P(x1, y0, 0)} ${P(x1, y1, 0)} ${P(x1, y1, h)} ${P(x1, y0, h)}`;
           const left = `${P(x0, y1, 0)} ${P(x1, y1, 0)} ${P(x1, y1, h)} ${P(x0, y1, h)}`;
+          // Front face (visible step riser)
+          const front = `${P(x0, y0, 0)} ${P(x0, y1, 0)} ${P(x0, y1, h)} ${P(x0, y0, h)}`;
+
           const cx = OX + (x0 + 0.5 - (y0 + D / 2)) * 0.866 * U;
           const cy = OY + (x0 + 0.5 + y0 + D / 2) * 0.5 * U - h * U;
+
           return (
-            <g key={i}>
-              <polygon points={left} fill="url(#leftGrad)" stroke="rgba(167,139,250,0.35)" strokeWidth="1" />
-              <polygon points={right} fill="url(#rightGrad)" stroke="rgba(167,139,250,0.35)" strokeWidth="1" />
-              <polygon points={top} fill="url(#topGrad)" stroke="rgba(221,214,254,0.5)" strokeWidth="1" />
-              <text x={cx} y={cy - 4} textAnchor="middle" className="fill-white font-black" style={{ fontSize: 16 }}>
+            <g key={i} filter={i === 4 ? "url(#stepGlow)" : undefined}>
+              {/* Left face */}
+              <polygon points={left} fill={leftColors[i]} stroke="rgba(167,139,250,0.25)" strokeWidth="0.5" />
+              {/* Right face */}
+              <polygon points={right} fill={rightColors[i]} stroke="rgba(167,139,250,0.25)" strokeWidth="0.5" />
+              {/* Front riser — only visible for the first step */}
+              {i === 0 && (
+                <polygon points={front} fill="#2e1065" stroke="rgba(167,139,250,0.15)" strokeWidth="0.5" />
+              )}
+              {/* Top face */}
+              <polygon points={top} fill={`url(#top${i})`} stroke="rgba(221,214,254,0.45)" strokeWidth="0.8" />
+              {/* Top highlight edge */}
+              <line
+                x1={P(x0, y0, h).split(",")[0]} y1={P(x0, y0, h).split(",")[1]}
+                x2={P(x1, y0, h).split(",")[0]} y2={P(x1, y0, h).split(",")[1]}
+                stroke="rgba(233,213,255,0.5)" strokeWidth="1.5"
+              />
+
+              {/* Labels */}
+              <text
+                x={cx} y={cy - 6}
+                textAnchor="middle"
+                fill="white"
+                fontWeight="900"
+                style={{ fontSize: 18, textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}
+              >
                 L{i + 1}
               </text>
-              <text x={cx} y={cy + 13} textAnchor="middle" className="fill-slate-200" style={{ fontSize: 10 }}>
+              <text
+                x={cx} y={cy + 12}
+                textAnchor="middle"
+                fill="rgba(226,232,240,0.9)"
+                style={{ fontSize: 11 }}
+              >
                 {STEP_NAMES[i][lang]}
               </text>
             </g>
