@@ -30,35 +30,32 @@ interface LandingPageProps {
 const TESTIMONIALS = [
   {
     quote: {
-      en: "I thought I was good at using AI until this assessment showed me exactly where my blind spots were. The dimension breakdown is eye-opening — I leveled up noticeably within two weeks.",
-      zh: "我一直以为自己很擅长用 AI，直到这份测评让我清楚地看到了盲区。按维度拆解的报告令人大开眼界——两周内能力有了明显提升。",
+      en: "The AI Fluency assessment revealed many blind spots I didn't know I had. The gains in evaluation and judgment alone were huge!",
+      zh: "AI 实力测评帮我发现了很多盲点，特别是在评估判断方面收获很大！",
     },
     name: "Sarah C.",
     role: { en: "Product Manager", zh: "产品经理" },
-    level: "L4",
     avatarSeed: "SarahC",
     avatarBg: "b6e3f4",
   },
   {
     quote: {
-      en: "My team took the assessment together. The results gave us a shared language for AI skills and a concrete roadmap for upskilling. One of the most useful exercises we've done as a team.",
-      zh: "我的团队一起完成了测评。结果让我们建立了共同的 AI 能力话语体系，并有了清晰的提升路径。这是我们做过的最有价值的团队活动之一。",
+      en: "The report is incredibly detailed, and the suggestions are very practical. I've already improved my work efficiency noticeably by following them.",
+      zh: "报告非常详细，建议也很具体，已经按照建议提升了不少工作效率。",
     },
-    name: "Marcus R.",
-    role: { en: "Engineering Lead", zh: "工程主管" },
-    level: "L5",
-    avatarSeed: "MarcusR",
+    name: "Marcus H.",
+    role: { en: "Data Analyst", zh: "数据分析师" },
+    avatarSeed: "MarcusH",
     avatarBg: "c0aede",
   },
   {
     quote: {
-      en: "The practical questions are what set this apart. You can't bluff your way through — they actually test how you think. I finally have an honest, concrete picture of my AI skills.",
-      zh: "实操题是这份测评与其他测验的最大区别。你没办法糊弄过去——它真的在测试你的思维方式。我终于对自己的 AI 能力有了诚实、清晰的认知。",
+      en: "This assessment framework is truly professional and covers all the core AI competencies our team needs.",
+      zh: "这个测评体系非常专业，覆盖了我们团队需要的所有 AI 核心能力。",
     },
-    name: "Priya N.",
-    role: { en: "Data Scientist", zh: "数据科学家" },
-    level: "L5",
-    avatarSeed: "PriyaN",
+    name: "Priya K.",
+    role: { en: "Technical Director", zh: "技术总监" },
+    avatarSeed: "PriyaK",
     avatarBg: "c3f4c8",
   },
 ];
@@ -69,24 +66,32 @@ const FAQS = [
     a: { en: "About 15 minutes. You can pause and come back — your answers are saved automatically.", zh: "大约 15 分钟。你可以中途暂停，答案会自动保存。" },
   },
   {
-    q: { en: "Can I cancel anytime?", zh: "可以随时取消订阅吗？" },
-    a: { en: "Yes. Cancel from your account page anytime. You keep access until the end of the current billing period.", zh: "可以。在账户页面随时取消，当前计费周期结束前仍可继续使用。" },
+    q: { en: "How accurate are the results?", zh: "测评结果的准确性如何？" },
+    a: { en: "Our framework combines knowledge, scenario, and practical questions to assess real competency — not just recall. Results reflect how you actually think and work with AI.", zh: "我们的框架结合知识题、情境题和实操题来评估真实能力——而非单纯记忆。结果反映你实际运用 AI 的思维方式。" },
   },
   {
-    q: { en: "Who designed the questions?", zh: "题目是谁设计的？" },
-    a: { en: "Questions were developed by a team of AI researchers, learning scientists, and industry practitioners. The framework draws on published AI literacy research and is reviewed regularly as the AI landscape evolves.", zh: "题目由 AI 研究员、学习科学家和行业从业者联合设计，框架参考已发表的 AI 素养研究，并随 AI 领域发展定期更新。" },
+    q: { en: "Can I pause and resume later?", zh: "可以随时暂停继续吗？" },
+    a: { en: "Yes. Your progress is saved automatically. You can close the browser and pick up right where you left off.", zh: "可以。你的进度会自动保存，关闭浏览器后也能从上次的位置继续。" },
   },
   {
-    q: { en: "How is my level calculated?", zh: "等级是如何计算的？" },
-    a: { en: "Your level is determined by three inputs: knowledge questions, scenario-based behavioral signals, and open-ended practical tasks. The combination gives a holistic picture that a simple quiz can't capture.", zh: "等级由三个维度综合计算：知识题、基于情境的行为信号、以及开放性实操任务。三者结合，形成普通测验无法捕捉的全面画像。" },
+    q: { en: "Will my data be shared?", zh: "我的数据会被分享吗？" },
+    a: { en: "No. Your answers and results are private. We never share individual data with third parties.", zh: "不会。你的作答和结果完全私密，我们绝不会将个人数据分享给第三方。" },
   },
   {
-    q: { en: "Can I share my results with my employer?", zh: "我可以把结果分享给雇主吗？" },
-    a: { en: "Yes. You can screenshot your results page and share it. Pro users get full dimension breakdowns they can share with employers or on LinkedIn.", zh: "可以。你可以截图分享结果页。Pro 用户可获取完整维度分析，分享给雇主或发布到 LinkedIn。" },
+    q: { en: "How many questions are there?", zh: "题目数量有多少？" },
+    a: { en: "The assessment includes about 18 questions across three formats: knowledge, scenario-based, and practical open-ended tasks.", zh: "测评包含约 18 道题，涵盖知识题、情境题和开放式实操题三种题型。" },
   },
   {
-    q: { en: "What makes this different from other AI literacy tests?", zh: "这和其他 AI 测评有什么不同？" },
-    a: { en: "Most quizzes only test factual recall. We test how you think — through scenario questions where all answers are plausible and practical open-ended tasks that reveal your real workflow. The result is a diagnostic, not a score.", zh: "大多数测验只考察事实记忆。我们测试你的思维方式——通过所有选项都合理的情境题，以及能揭示你真实工作流程的开放式任务。结果是诊断报告，而非单纯得分。" },
+    q: { en: "How can I get more help?", zh: "如何获得更多帮助？" },
+    a: { en: "Pro subscribers get email support. You can also reach us at support@aifluency.app for any questions.", zh: "Pro 用户可获得邮件支持。你也可以通过 support@aifluency.app 联系我们。" },
+  },
+  {
+    q: { en: "How long are reports kept?", zh: "报告会保存多久？" },
+    a: { en: "Your reports are stored permanently in your account. You can revisit them anytime.", zh: "你的报告会永久保存在账户中，随时可以回顾。" },
+  },
+  {
+    q: { en: "Do you support team or org assessments?", zh: "支持团队或组织测评吗？" },
+    a: { en: "Yes! Our Team plan includes a team dashboard, member management, and bulk report exports. Contact us for details.", zh: "支持！团队版包含团队看板、成员管理和批量导出报告等功能，欢迎联系我们了解详情。" },
   },
 ];
 
@@ -145,33 +150,58 @@ function ScoreRing() {
   );
 }
 
-// Isometric 3D staircase illustrating the five proficiency levels.
-function Staircase() {
+const STEP_NAMES = [
+  { zh: "初学者", en: "Beginner" },
+  { zh: "工具用户", en: "Tool User" },
+  { zh: "应用者", en: "Prompter" },
+  { zh: "熟练者", en: "Collaborator" },
+  { zh: "专家", en: "Expert" },
+];
+
+function Staircase({ lang }: { lang: "zh" | "en" }) {
   const N = 5;
-  const U = 26;          // unit size in px
-  const D = 2.3;         // step depth (in units)
-  const OX = 70, OY = 250;
+  const U = 30;
+  const D = 2.6;
+  const OX = 60, OY = 340;
   const P = (x: number, y: number, z: number) =>
     `${(OX + (x - y) * 0.866 * U).toFixed(1)},${(OY + (x + y) * 0.5 * U - z * U).toFixed(1)}`;
 
   return (
-    <div className="relative mx-auto h-[300px] w-full max-w-[360px]">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[240px] w-[240px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-600/25 blur-[80px]" />
-      <svg viewBox="0 0 360 300" className="relative h-full w-full">
+    <div className="relative mx-auto h-[400px] w-full max-w-[440px]">
+      <div className="pointer-events-none absolute bottom-[20%] right-[20%] h-[280px] w-[280px] rounded-full bg-violet-500/30 blur-[90px]" />
+      <div className="pointer-events-none absolute bottom-[10%] right-[15%] h-[180px] w-[180px] rounded-full bg-fuchsia-500/15 blur-[70px]" />
+      <svg viewBox="0 0 440 400" className="relative h-full w-full">
+        <defs>
+          <linearGradient id="topGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#c4b5fd" />
+            <stop offset="100%" stopColor="#818cf8" />
+          </linearGradient>
+          <linearGradient id="rightGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#7c3aed" />
+            <stop offset="100%" stopColor="#4c1d95" />
+          </linearGradient>
+          <linearGradient id="leftGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#6d28d9" />
+            <stop offset="100%" stopColor="#3b0764" />
+          </linearGradient>
+        </defs>
         {Array.from({ length: N }).map((_, i) => {
           const x0 = i, x1 = i + 1, y0 = 0, y1 = D, h = i + 1;
           const top = `${P(x0, y0, h)} ${P(x1, y0, h)} ${P(x1, y1, h)} ${P(x0, y1, h)}`;
           const right = `${P(x1, y0, 0)} ${P(x1, y1, 0)} ${P(x1, y1, h)} ${P(x1, y0, h)}`;
           const left = `${P(x0, y1, 0)} ${P(x1, y1, 0)} ${P(x1, y1, h)} ${P(x0, y1, h)}`;
-          const labelX = OX + (x0 + 0.5 - (y0 + D / 2)) * 0.866 * U;
-          const labelY = OY + (x0 + 0.5 + y0 + D / 2) * 0.5 * U - h * U + 4;
+          const cx = OX + (x0 + 0.5 - (y0 + D / 2)) * 0.866 * U;
+          const cy = OY + (x0 + 0.5 + y0 + D / 2) * 0.5 * U - h * U;
           return (
             <g key={i}>
-              <polygon points={left} fill="#4c1d95" stroke="rgba(167,139,250,0.4)" strokeWidth="1" />
-              <polygon points={right} fill="#6d28d9" stroke="rgba(167,139,250,0.4)" strokeWidth="1" />
-              <polygon points={top} fill="#a78bfa" stroke="rgba(221,214,254,0.6)" strokeWidth="1" />
-              <text x={labelX} y={labelY} textAnchor="middle" className="fill-white font-black" style={{ fontSize: 15 }}>
+              <polygon points={left} fill="url(#leftGrad)" stroke="rgba(167,139,250,0.35)" strokeWidth="1" />
+              <polygon points={right} fill="url(#rightGrad)" stroke="rgba(167,139,250,0.35)" strokeWidth="1" />
+              <polygon points={top} fill="url(#topGrad)" stroke="rgba(221,214,254,0.5)" strokeWidth="1" />
+              <text x={cx} y={cy - 4} textAnchor="middle" className="fill-white font-black" style={{ fontSize: 16 }}>
                 L{i + 1}
+              </text>
+              <text x={cx} y={cy + 13} textAnchor="middle" className="fill-slate-200" style={{ fontSize: 10 }}>
+                {STEP_NAMES[i][lang]}
               </text>
             </g>
           );
@@ -260,7 +290,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65 }}>
               <span className="inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/10 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-200 backdrop-blur-sm">
                 <Sparkles className="h-3.5 w-3.5 text-indigo-300" />
-                {lang === "zh" ? "AI 素养评估" : "AI Fluency Assessment"}
+                {lang === "zh" ? "AI 实力测评" : "AI Fluency Assessment"}
               </span>
 
               <h1 className="mt-6 text-[52px] font-black leading-[0.98] tracking-tight text-white md:text-[68px]">
@@ -461,37 +491,51 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
 
       {/* ── How it works ── */}
       <section id="how" className="border-t border-white/[0.06] px-6 py-24 md:py-28">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-14">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
-              {lang === "zh" ? "简单三步" : "How it works"}
-            </span>
-            <h2 className="mt-3 max-w-xl text-4xl font-extrabold tracking-tight text-white md:text-5xl">
-              {t(UI.howItWorks.title, lang)}
-            </h2>
-          </div>
+        <div className="mx-auto max-w-6xl">
+          <div className="grid items-start gap-10 lg:grid-cols-[0.35fr_1fr]">
+            <div className="lg:sticky lg:top-28">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
+                {lang === "zh" ? "简单三步" : "Three steps"}
+              </span>
+              <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-white md:text-5xl">
+                {lang === "zh" ? "如何\n运作" : "How it\nworks"}
+              </h2>
+            </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
-            {[
-              { n: "01", title: t(UI.howItWorks.step1.title, lang), desc: t(UI.howItWorks.step1.desc, lang) },
-              { n: "02", title: t(UI.howItWorks.step2.title, lang), desc: t(UI.howItWorks.step2.desc, lang) },
-              { n: "03", title: t(UI.howItWorks.step3.title, lang), desc: t(UI.howItWorks.step3.desc, lang) },
-            ].map((item, i) => (
-              <motion.div
-                key={item.n}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="rounded-2xl border border-white/[0.08] bg-white/[0.02] px-7 py-9 transition-colors hover:border-white/15 hover:bg-white/[0.04]"
-              >
-                <span className="block text-[48px] font-black leading-none tabular-nums text-white/10 select-none">
-                  {item.n}
-                </span>
-                <h3 className="mt-4 text-lg font-bold text-white">{item.title}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-slate-400">{item.desc}</p>
-              </motion.div>
-            ))}
+            <div className="grid gap-5 md:grid-cols-3">
+              {[
+                {
+                  n: "01",
+                  title: lang === "zh" ? "完成测评" : "Take the Assessment",
+                  desc: lang === "zh" ? "回答 42 道题，全面评估你的 AI 实力" : "Answer 42 questions for a complete assessment of your AI skills",
+                },
+                {
+                  n: "02",
+                  title: lang === "zh" ? "获得报告" : "Get Your Report",
+                  desc: lang === "zh" ? "即刻获得个性化的 AI 实力报告" : "Instantly receive your personalized AI Fluency report",
+                },
+                {
+                  n: "03",
+                  title: lang === "zh" ? "开始提升" : "Start Improving",
+                  desc: lang === "zh" ? "获取个性化建议，提升你的 AI 能力" : "Get personalized recommendations to advance your AI skills",
+                },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.n}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                  className="rounded-2xl border border-white/[0.08] bg-white/[0.02] px-6 py-8 transition-colors hover:border-white/15 hover:bg-white/[0.04]"
+                >
+                  <span className="block text-[48px] font-black leading-none tabular-nums text-indigo-500/20 select-none">
+                    {item.n}
+                  </span>
+                  <h3 className="mt-4 text-lg font-bold text-white">{item.title}</h3>
+                  <p className="mt-2 text-[14px] leading-relaxed text-slate-400">{item.desc}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -542,7 +586,11 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
             <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-white md:text-5xl">
               {t(UI.levels.sectionTitle, lang)}
             </h2>
-            <p className="mt-3 text-[15px] text-slate-400">{t(UI.levels.sectionDesc, lang)}</p>
+            <p className="mt-3 text-[15px] text-slate-400">
+              {lang === "zh"
+                ? "从入门到精通，清晰了解你的 AI 实力水平"
+                : "From beginner to expert — understand your AI proficiency clearly"}
+            </p>
           </div>
 
           <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -579,7 +627,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
               transition={{ duration: 0.6 }}
               className="hidden lg:block"
             >
-              <Staircase />
+              <Staircase lang={lang} />
             </motion.div>
           </div>
         </div>
@@ -619,19 +667,16 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                     <p className="text-sm font-semibold text-white">{item.name}</p>
                     <p className="text-xs text-slate-500">{item.role[lang]}</p>
                   </div>
-                  <span className="ml-auto rounded border border-white/15 px-2 py-0.5 text-[11px] font-bold text-slate-400">
-                    {item.level}
-                  </span>
+                  <div className="ml-auto flex gap-0.5">
+                    {Array.from({ length: 5 }).map((_, s) => (
+                      <Star key={s} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             ))}
           </div>
 
-          <p className="mt-8 text-xs text-slate-600">
-            {lang === "zh"
-              ? "以上评价来自早期测试用户，姓名已缩写以保护隐私。头像为插画形象。"
-              : "Feedback from early beta testers; names abbreviated for privacy. Avatars are illustrated."}
-          </p>
         </div>
       </section>
 
@@ -641,13 +686,12 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
 
         <div className="relative mx-auto max-w-6xl">
           <div className="mx-auto mb-16 max-w-2xl text-center">
-            <span className="inline-flex items-center rounded-full border border-indigo-400/20 bg-indigo-500/10 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-indigo-300">
-              {t(UI.nav.pricing, lang)}
-            </span>
-            <h2 className="mt-6 text-4xl font-extrabold tracking-tight text-white md:text-[2.75rem] md:leading-tight">
-              {t(UI.pricing.title, lang)}
+            <h2 className="text-3xl font-extrabold tracking-tight text-white md:text-4xl">
+              {lang === "zh" ? "准备透明的定价" : "Simple, Transparent Pricing"}
             </h2>
-            <p className="mt-4 text-[15px] leading-relaxed text-slate-400">{t(UI.pricing.subtitle, lang)}</p>
+            <p className="mt-4 text-[15px] leading-relaxed text-slate-400">
+              {lang === "zh" ? "选择适合你的方案，开始提升 AI 实力" : "Choose the plan that fits you, and start building your AI edge"}
+            </p>
             {subscribeToast && (
               <div className="mx-auto mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-medium text-emerald-300">
                 <Check className="h-4 w-4 shrink-0" />
@@ -724,11 +768,9 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                 ? t(UI.billing.manageSubscription, lang)
                 : plan.disabled
                   ? t(UI.billing.includedInHigher, lang)
-                  : user
-                    ? t(UI.billing.upgradePlan, lang)
-                    : plan.cta;
-
-              const tierIndex = String(i + 1).padStart(2, "0");
+                  : plan.key === "team"
+                    ? (lang === "zh" ? "联系我们" : "Contact Us")
+                    : (lang === "zh" ? "立即测评" : "Start Now");
 
               return (
                 <motion.div
@@ -767,10 +809,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                     ) : null}
 
                     <div className="mb-8">
-                      <p className={`text-[10px] font-semibold uppercase tracking-[0.24em] ${plan.highlighted ? "text-indigo-300/70" : "text-slate-500"}`}>
-                        {tierIndex}
-                      </p>
-                      <h3 className="mt-2 text-xl font-semibold tracking-tight text-white">{plan.name}</h3>
+                      <h3 className="text-xl font-semibold tracking-tight text-white">{plan.name}</h3>
                       <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{plan.desc}</p>
                     </div>
 
@@ -865,23 +904,22 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
         <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600/20 blur-[120px]" />
 
         <div className="relative mx-auto max-w-3xl text-center">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
-            {lang === "zh" ? "现在就开始" : "Get started today"}
-          </span>
-          <h2 className="mt-4 text-4xl font-black leading-tight tracking-tight text-white md:text-5xl">
-            {t(UI.cta.title, lang)}
+          <h2 className="text-3xl font-black leading-tight tracking-tight text-white md:text-4xl">
+            {lang === "zh" ? "准备好发现你的 AI 潜力了吗？" : "Ready to discover your AI potential?"}
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-lg text-slate-400">{t(UI.cta.subtitle, lang)}</p>
+          <p className="mx-auto mt-4 max-w-md text-lg text-slate-400">
+            {lang === "zh" ? "现在就开始 AI 实力测评之旅" : "Start your AI Fluency assessment journey now"}
+          </p>
           <button
             onClick={onStartTest}
             disabled={startDisabled}
             className="mt-10 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-8 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-indigo-500/30 transition-all hover:from-indigo-400 hover:to-violet-400 hover:shadow-indigo-500/50 active:scale-[0.98] disabled:opacity-60"
           >
-            {isAuthenticated ? t(UI.cta.btn, lang) : startLabel}
-            <ChevronRight className="h-4 w-4" />
+            {lang === "zh" ? "开始你的测评" : "Start Your Assessment"}
+            <ArrowRight className="h-4 w-4" />
           </button>
           <p className="mt-4 text-sm text-slate-500">
-            {t(UI.hero.noCard, lang)} · {lang === "zh" ? "15 分钟" : "15 minutes"}
+            {lang === "zh" ? "15 分钟即可获得你的 AI 实力报告" : "Get your AI Fluency report in just 15 minutes"}
           </p>
         </div>
       </section>
