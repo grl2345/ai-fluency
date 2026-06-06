@@ -169,11 +169,14 @@ const LEVEL_ICONS: { icon: typeof Lightbulb; bg: string; text: string }[] = [
 const STEP_ICONS = [Lightbulb, LayoutGrid, Star, Layers, Crown];
 
 function Staircase({ lang }: { lang: "zh" | "en" }) {
-  const U = 48;
-  const OX = 120, OY = 195;
-  const VBW = 520, VBH = 480;
+  // True isometric staircase: each step is a cube whose BASE rises one unit
+  // per step, so they climb up-and-to-the-right like real stairs.
+  const U = 54;
+  const OX = 140, OY = 292;
+  const VBW = 480, VBH = 440;
   const K = 0.866;
-  const D = 1.8;
+  const D = 1.0;     // depth of each step
+  const H = 1.4;     // height of each step block
 
   const proj = (x: number, y: number, z: number): [number, number] => [
     OX + (x - y) * K * U,
@@ -192,35 +195,32 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
 
   const blocks = Array.from({ length: 5 }).map((_, i) => {
     const x0 = i, x1 = i + 1, y0 = 0, y1 = D;
-    const tz = (i + 1) * 1.22;
-    return { i, x0, x1, y0, y1, tz };
+    const bz = i;            // base rises with each step
+    const tz = i + H;        // top of this block
+    return { i, x0, x1, y0, y1, bz, tz };
   });
 
   return (
-    <div className="relative mx-auto h-[480px] w-full max-w-[540px]">
+    <div className="relative mx-auto h-[440px] w-full max-w-[520px]">
       {/* Ambient glow */}
-      <div className="pointer-events-none absolute right-[10%] top-[5%] h-[60%] w-[55%] rounded-full bg-violet-600/30 blur-[100px]" />
-      <div className="pointer-events-none absolute bottom-[15%] left-[15%] h-[40%] w-[50%] rounded-full bg-indigo-600/20 blur-[80px]" />
-      <div className="pointer-events-none absolute right-[20%] top-[15%] h-[28%] w-[28%] rounded-full bg-fuchsia-500/18 blur-[60px]" />
+      <div className="pointer-events-none absolute right-[8%] top-[6%] h-[55%] w-[55%] rounded-full bg-violet-600/30 blur-[100px]" />
+      <div className="pointer-events-none absolute bottom-[16%] left-[12%] h-[40%] w-[50%] rounded-full bg-indigo-600/20 blur-[80px]" />
 
-      <svg
-        viewBox={`0 0 ${VBW} ${VBH}`}
-        className="relative h-full w-full"
-      >
+      <svg viewBox={`0 0 ${VBW} ${VBH}`} className="relative h-full w-full">
         <defs>
           {topC.map((c, i) => (
             <React.Fragment key={`g${i}`}>
               <linearGradient id={`sTop${i}`} x1="0" y1="0" x2="0.5" y2="1">
-                <stop offset="0%" stopColor={c} stopOpacity="0.95" />
-                <stop offset="100%" stopColor={frontC[i]} stopOpacity="0.85" />
+                <stop offset="0%" stopColor={c} stopOpacity="0.96" />
+                <stop offset="100%" stopColor={frontC[i]} stopOpacity="0.88" />
               </linearGradient>
               <linearGradient id={`sFront${i}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={frontC[i]} stopOpacity="0.95" />
-                <stop offset="100%" stopColor={leftC[i]} stopOpacity="0.88" />
+                <stop offset="0%" stopColor={frontC[i]} stopOpacity="0.96" />
+                <stop offset="100%" stopColor={leftC[i]} stopOpacity="0.9" />
               </linearGradient>
               <linearGradient id={`sLeft${i}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={leftC[i]} stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#1e1854" stopOpacity="0.85" />
+                <stop offset="0%" stopColor={leftC[i]} stopOpacity="0.92" />
+                <stop offset="100%" stopColor="#221b5c" stopOpacity="0.88" />
               </linearGradient>
             </React.Fragment>
           ))}
@@ -229,14 +229,7 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
             <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
           </radialGradient>
           <filter id="edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2.5" result="b" />
-            <feMerge>
-              <feMergeNode in="b" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-          <filter id="strongGlow" x="-80%" y="-80%" width="260%" height="260%">
-            <feGaussianBlur stdDeviation="4" result="b" />
+            <feGaussianBlur stdDeviation="2.2" result="b" />
             <feMerge>
               <feMergeNode in="b" />
               <feMergeNode in="SourceGraphic" />
@@ -245,59 +238,49 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
         </defs>
 
         {/* Floor reflection */}
-        <ellipse cx={OX + 100} cy={OY + 168} rx="210" ry="38" fill="url(#stFloor)" />
+        <ellipse cx={OX + 95} cy={OY + 70} rx="200" ry="34" fill="url(#stFloor)" />
 
-        {/* Draw blocks back-to-front */}
-        {[...blocks].reverse().map(({ i, x0, x1, y0, y1, tz }) => {
+        {/* Draw back (highest index) to front for correct overlap */}
+        {[...blocks].reverse().map(({ i, x0, x1, y0, y1, bz, tz }) => {
           const top = poly([x0, y0, tz], [x1, y0, tz], [x1, y1, tz], [x0, y1, tz]);
-          const front = poly([x1, y0, 0], [x1, y1, 0], [x1, y1, tz], [x1, y0, tz]);
-          const left = poly([x0, y1, 0], [x1, y1, 0], [x1, y1, tz], [x0, y1, tz]);
-
-          // Front face center for labels
-          const [fx, fy] = proj(x1, (y0 + y1) / 2, tz * 0.42);
+          const front = poly([x1, y0, bz], [x1, y1, bz], [x1, y1, tz], [x1, y0, tz]);
+          const left = poly([x0, y1, bz], [x1, y1, bz], [x1, y1, tz], [x0, y1, tz]);
+          const [fx, fy] = proj(x1, (y0 + y1) / 2, bz + H * 0.45);
 
           return (
             <g key={i}>
-              {/* Faces */}
-              <polygon points={left} fill={`url(#sLeft${i})`} stroke="rgba(120,100,240,0.2)" strokeWidth="0.5" />
-              <polygon points={front} fill={`url(#sFront${i})`} stroke="rgba(120,100,240,0.25)" strokeWidth="0.5" />
-              <polygon points={top} fill={`url(#sTop${i})`} stroke="rgba(180,170,255,0.45)" strokeWidth="0.7" />
-
-              {/* Bright glowing top edges */}
+              <polygon points={left} fill={`url(#sLeft${i})`} stroke="rgba(120,100,240,0.22)" strokeWidth="0.6" />
+              <polygon points={front} fill={`url(#sFront${i})`} stroke="rgba(120,100,240,0.28)" strokeWidth="0.6" />
+              <polygon points={top} fill={`url(#sTop${i})`} stroke="rgba(185,175,255,0.5)" strokeWidth="0.8" />
+              {/* Glowing top leading edges */}
               <polyline
                 points={`${pt(x0, y1, tz)} ${pt(x0, y0, tz)} ${pt(x1, y0, tz)}`}
-                fill="none" stroke="rgba(180,170,255,0.9)" strokeWidth="1.8"
+                fill="none" stroke="rgba(196,186,255,0.9)" strokeWidth="1.6"
                 strokeLinejoin="round" filter="url(#edgeGlow)"
               />
-              {/* Vertical front edge */}
+              {/* Bright vertical front-corner edge */}
               <line
-                x1={pt(x1, y0, 0).split(",")[0]} y1={pt(x1, y0, 0).split(",")[1]}
+                x1={pt(x1, y0, bz).split(",")[0]} y1={pt(x1, y0, bz).split(",")[1]}
                 x2={pt(x1, y0, tz).split(",")[0]} y2={pt(x1, y0, tz).split(",")[1]}
-                stroke="rgba(180,170,255,0.45)" strokeWidth="1"
-              />
-              {/* Top right edge */}
-              <line
-                x1={pt(x1, y0, tz).split(",")[0]} y1={pt(x1, y0, tz).split(",")[1]}
-                x2={pt(x1, y1, tz).split(",")[0]} y2={pt(x1, y1, tz).split(",")[1]}
-                stroke="rgba(180,170,255,0.35)" strokeWidth="0.8"
+                stroke="rgba(196,186,255,0.5)" strokeWidth="1"
               />
 
-              {/* Label on front face */}
+              {/* Label on the front face */}
               <text
-                x={fx} y={fy - 4}
+                x={fx} y={fy - 3}
                 textAnchor="middle"
                 fill="#ffffff"
                 fontWeight="800"
-                style={{ fontSize: 20, textShadow: "0 2px 8px rgba(10,5,40,0.8)" }}
+                style={{ fontSize: 19, textShadow: "0 2px 8px rgba(10,5,40,0.85)" }}
               >
                 L{i + 1}
               </text>
               <text
                 x={fx} y={fy + 14}
                 textAnchor="middle"
-                fill="rgba(210,205,255,0.88)"
+                fill="rgba(214,209,255,0.9)"
                 fontWeight="500"
-                style={{ fontSize: 11.5, textShadow: "0 1px 5px rgba(10,5,40,0.7)" }}
+                style={{ fontSize: 11, textShadow: "0 1px 5px rgba(10,5,40,0.8)" }}
               >
                 {STEP_NAMES[i][lang]}
               </text>
@@ -306,10 +289,10 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
         })}
       </svg>
 
-      {/* Icon overlays on treads */}
+      {/* Icons floating just above each tread */}
       {blocks.map(({ i, x0, y0, y1, tz }) => {
         const Icon = STEP_ICONS[i];
-        const pos = pctOf(x0 + 0.5, (y0 + y1) / 2, tz + 0.4);
+        const pos = pctOf(x0 + 0.5, (y0 + y1) / 2, tz + 0.32);
         return (
           <div
             key={`icon${i}`}
@@ -317,8 +300,8 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
             style={{ left: pos.left, top: pos.top }}
           >
             <Icon
-              className="h-6 w-6 text-indigo-200/80 drop-shadow-[0_0_8px_rgba(139,92,246,0.7)]"
-              strokeWidth={1.8}
+              className="h-5 w-5 text-indigo-100/85 drop-shadow-[0_0_8px_rgba(139,92,246,0.8)]"
+              strokeWidth={1.9}
             />
           </div>
         );
