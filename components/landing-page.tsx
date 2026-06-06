@@ -166,15 +166,14 @@ const LEVEL_ICONS: { icon: typeof Lightbulb; bg: string; text: string }[] = [
   { icon: Crown, bg: "bg-yellow-500/20", text: "text-yellow-400" },
 ];
 
+const STEP_ICONS = [Lightbulb, LayoutGrid, Star, Layers, Crown];
+
 function Staircase({ lang }: { lang: "zh" | "en" }) {
-  // Solid isometric staircase: each step is a column rising from the ground,
-  // its tread one unit higher than the previous, advancing to the right.
-  const U = 52;
-  const OX = 150, OY = 206;
-  const VBW = 520, VBH = 460;
+  const U = 48;
+  const OX = 120, OY = 195;
+  const VBW = 520, VBH = 480;
   const K = 0.866;
-  const Hs = 1.15;          // height gained per step
-  const D = 1.45;           // depth of each step
+  const D = 1.8;
 
   const proj = (x: number, y: number, z: number): [number, number] => [
     OX + (x - y) * K * U,
@@ -182,46 +181,62 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
   ];
   const pt = (x: number, y: number, z: number) => proj(x, y, z).map((n) => n.toFixed(1)).join(",");
   const poly = (...pts: [number, number, number][]) => pts.map((p) => pt(...p)).join(" ");
+  const pctOf = (x: number, y: number, z: number) => {
+    const [sx, sy] = proj(x, y, z);
+    return { left: `${(sx / VBW) * 100}%`, top: `${(sy / VBH) * 100}%` };
+  };
 
-  // Per-step purple ramp — brighter toward the top
-  const topC = ["#6f63da", "#7a6ee3", "#8579ec", "#9186f3", "#a094f9"];
-  const frontC = ["#473da6", "#4d43b1", "#544abc", "#5b51c8", "#6359d4"];
-  const leftC = ["#332b82", "#38308c", "#3e3697", "#443ca2", "#4b43ae"];
+  const topC = ["#6a5cd8", "#7468e0", "#7e74e8", "#8b82f0", "#9a92f8"];
+  const frontC = ["#4a3eb0", "#5044ba", "#564ac4", "#5e52ce", "#665ad8"];
+  const leftC = ["#362c8e", "#3b3198", "#4137a2", "#483eac", "#5046b8"];
+
+  const blocks = Array.from({ length: 5 }).map((_, i) => {
+    const x0 = i, x1 = i + 1, y0 = 0, y1 = D;
+    const tz = (i + 1) * 1.22;
+    return { i, x0, x1, y0, y1, tz };
+  });
 
   return (
-    <div className="relative mx-auto h-[420px] w-full max-w-[560px]">
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="h-[70%] w-[70%] translate-y-[-4%] rounded-full bg-violet-600/25 blur-[100px]" />
-      </div>
-      <div className="pointer-events-none absolute right-[14%] top-[16%] h-[34%] w-[34%] rounded-full bg-fuchsia-500/15 blur-[70px]" />
+    <div className="relative mx-auto h-[480px] w-full max-w-[540px]">
+      {/* Ambient glow */}
+      <div className="pointer-events-none absolute right-[10%] top-[5%] h-[60%] w-[55%] rounded-full bg-violet-600/30 blur-[100px]" />
+      <div className="pointer-events-none absolute bottom-[15%] left-[15%] h-[40%] w-[50%] rounded-full bg-indigo-600/20 blur-[80px]" />
+      <div className="pointer-events-none absolute right-[20%] top-[15%] h-[28%] w-[28%] rounded-full bg-fuchsia-500/18 blur-[60px]" />
 
       <svg
         viewBox={`0 0 ${VBW} ${VBH}`}
-        className="relative h-full w-full drop-shadow-[0_10px_36px_rgba(124,58,237,0.3)]"
+        className="relative h-full w-full"
       >
         <defs>
           {topC.map((c, i) => (
             <React.Fragment key={`g${i}`}>
-              <linearGradient id={`sTop${i}`} x1="0" y1="0" x2="0.4" y2="1">
-                <stop offset="0%" stopColor={c} />
-                <stop offset="100%" stopColor={frontC[i]} />
+              <linearGradient id={`sTop${i}`} x1="0" y1="0" x2="0.5" y2="1">
+                <stop offset="0%" stopColor={c} stopOpacity="0.95" />
+                <stop offset="100%" stopColor={frontC[i]} stopOpacity="0.85" />
               </linearGradient>
               <linearGradient id={`sFront${i}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={frontC[i]} />
-                <stop offset="100%" stopColor={leftC[i]} />
+                <stop offset="0%" stopColor={frontC[i]} stopOpacity="0.95" />
+                <stop offset="100%" stopColor={leftC[i]} stopOpacity="0.88" />
               </linearGradient>
               <linearGradient id={`sLeft${i}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={leftC[i]} />
-                <stop offset="100%" stopColor="#241e64" />
+                <stop offset="0%" stopColor={leftC[i]} stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#1e1854" stopOpacity="0.85" />
               </linearGradient>
             </React.Fragment>
           ))}
           <radialGradient id="stFloor" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.4" />
+            <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.35" />
             <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
           </radialGradient>
           <filter id="edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="1.8" result="b" />
+            <feGaussianBlur stdDeviation="2.5" result="b" />
+            <feMerge>
+              <feMergeNode in="b" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="strongGlow" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="4" result="b" />
             <feMerge>
               <feMergeNode in="b" />
               <feMergeNode in="SourceGraphic" />
@@ -230,56 +245,84 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
         </defs>
 
         {/* Floor reflection */}
-        <ellipse cx={OX + 110} cy={OY + 150} rx="200" ry="40" fill="url(#stFloor)" />
+        <ellipse cx={OX + 100} cy={OY + 168} rx="210" ry="38" fill="url(#stFloor)" />
 
-        {/* Steps drawn back (highest) to front (lowest) for correct overlap */}
-        {Array.from({ length: 5 })
-          .map((_, i) => 4 - i)
-          .map((i) => {
-            const x0 = i, x1 = i + 1, y0 = 0, y1 = D;
-            const tz = (i + 1) * Hs;
+        {/* Draw blocks back-to-front */}
+        {[...blocks].reverse().map(({ i, x0, x1, y0, y1, tz }) => {
+          const top = poly([x0, y0, tz], [x1, y0, tz], [x1, y1, tz], [x0, y1, tz]);
+          const front = poly([x1, y0, 0], [x1, y1, 0], [x1, y1, tz], [x1, y0, tz]);
+          const left = poly([x0, y1, 0], [x1, y1, 0], [x1, y1, tz], [x0, y1, tz]);
 
-            const top = poly([x0, y0, tz], [x1, y0, tz], [x1, y1, tz], [x0, y1, tz]);
-            const front = poly([x1, y0, 0], [x1, y1, 0], [x1, y1, tz], [x1, y0, tz]);
-            const left = poly([x0, y1, 0], [x1, y1, 0], [x1, y1, tz], [x0, y1, tz]);
+          // Front face center for labels
+          const [fx, fy] = proj(x1, (y0 + y1) / 2, tz * 0.42);
 
-            // Tread label anchor (center of the top face)
-            const [lx, ly] = proj(x0 + 0.5, y1 / 2, tz);
+          return (
+            <g key={i}>
+              {/* Faces */}
+              <polygon points={left} fill={`url(#sLeft${i})`} stroke="rgba(120,100,240,0.2)" strokeWidth="0.5" />
+              <polygon points={front} fill={`url(#sFront${i})`} stroke="rgba(120,100,240,0.25)" strokeWidth="0.5" />
+              <polygon points={top} fill={`url(#sTop${i})`} stroke="rgba(180,170,255,0.45)" strokeWidth="0.7" />
 
-            return (
-              <g key={i}>
-                <polygon points={left} fill={`url(#sLeft${i})`} stroke="rgba(139,124,248,0.22)" strokeWidth="0.6" />
-                <polygon points={front} fill={`url(#sFront${i})`} stroke="rgba(139,124,248,0.28)" strokeWidth="0.6" />
-                <polygon points={top} fill={`url(#sTop${i})`} stroke="rgba(196,181,253,0.5)" strokeWidth="0.8" />
-                {/* Glowing leading edges of the tread */}
-                <polyline
-                  points={`${pt(x0, y1, tz)} ${pt(x0, y0, tz)} ${pt(x1, y0, tz)}`}
-                  fill="none" stroke="rgba(214,203,255,0.7)" strokeWidth="1.3"
-                  strokeLinejoin="round" filter="url(#edgeGlow)"
-                />
-                {/* Label on the tread */}
-                <text
-                  x={lx} y={ly - 3}
-                  textAnchor="middle"
-                  fill="#ffffff"
-                  fontWeight="800"
-                  style={{ fontSize: 18, textShadow: "0 2px 6px rgba(20,10,50,0.7)" }}
-                >
-                  L{i + 1}
-                </text>
-                <text
-                  x={lx} y={ly + 13}
-                  textAnchor="middle"
-                  fill="rgba(233,228,255,0.92)"
-                  fontWeight="500"
-                  style={{ fontSize: 11, textShadow: "0 1px 4px rgba(20,10,50,0.7)" }}
-                >
-                  {STEP_NAMES[i][lang]}
-                </text>
-              </g>
-            );
-          })}
+              {/* Bright glowing top edges */}
+              <polyline
+                points={`${pt(x0, y1, tz)} ${pt(x0, y0, tz)} ${pt(x1, y0, tz)}`}
+                fill="none" stroke="rgba(180,170,255,0.9)" strokeWidth="1.8"
+                strokeLinejoin="round" filter="url(#edgeGlow)"
+              />
+              {/* Vertical front edge */}
+              <line
+                x1={pt(x1, y0, 0).split(",")[0]} y1={pt(x1, y0, 0).split(",")[1]}
+                x2={pt(x1, y0, tz).split(",")[0]} y2={pt(x1, y0, tz).split(",")[1]}
+                stroke="rgba(180,170,255,0.45)" strokeWidth="1"
+              />
+              {/* Top right edge */}
+              <line
+                x1={pt(x1, y0, tz).split(",")[0]} y1={pt(x1, y0, tz).split(",")[1]}
+                x2={pt(x1, y1, tz).split(",")[0]} y2={pt(x1, y1, tz).split(",")[1]}
+                stroke="rgba(180,170,255,0.35)" strokeWidth="0.8"
+              />
+
+              {/* Label on front face */}
+              <text
+                x={fx} y={fy - 4}
+                textAnchor="middle"
+                fill="#ffffff"
+                fontWeight="800"
+                style={{ fontSize: 20, textShadow: "0 2px 8px rgba(10,5,40,0.8)" }}
+              >
+                L{i + 1}
+              </text>
+              <text
+                x={fx} y={fy + 14}
+                textAnchor="middle"
+                fill="rgba(210,205,255,0.88)"
+                fontWeight="500"
+                style={{ fontSize: 11.5, textShadow: "0 1px 5px rgba(10,5,40,0.7)" }}
+              >
+                {STEP_NAMES[i][lang]}
+              </text>
+            </g>
+          );
+        })}
       </svg>
+
+      {/* Icon overlays on treads */}
+      {blocks.map(({ i, x0, y0, y1, tz }) => {
+        const Icon = STEP_ICONS[i];
+        const pos = pctOf(x0 + 0.5, (y0 + y1) / 2, tz + 0.4);
+        return (
+          <div
+            key={`icon${i}`}
+            className="pointer-events-none absolute flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
+            style={{ left: pos.left, top: pos.top }}
+          >
+            <Icon
+              className="h-6 w-6 text-indigo-200/80 drop-shadow-[0_0_8px_rgba(139,92,246,0.7)]"
+              strokeWidth={1.8}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
