@@ -95,9 +95,6 @@ const FAQS = [
   },
 ];
 
-// Brand wordmarks for the trust strip (rendered as styled text)
-const ORGS = ["Google", "Meta", "OpenAI", "Shopify", "Microsoft", "Notion", "Canva"];
-
 // Marketing-facing competency dimensions shown on the landing page.
 const DISPLAY_DIMENSIONS = [
   { icon: MessageSquare, name: { zh: "提示工程", en: "Prompt Engineering" }, desc: { zh: "精准描述需求，引导 AI 输出高质量结果", en: "Frame requests precisely to get high-quality AI output" } },
@@ -557,23 +554,6 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
               ))}
             </div>
           </div>
-
-          {/* ── Org logos ── */}
-          <div className="mt-20 border-t border-white/[0.06] pt-12">
-            <p className="text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500">
-              {lang === "zh" ? "受到全球领先团队和组织的信任" : "Trusted by leading teams & organizations"}
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
-              {ORGS.map((org) => (
-                <span
-                  key={org}
-                  className="text-xl font-semibold tracking-tight text-slate-500/80 transition-colors hover:text-slate-300"
-                >
-                  {org}
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
@@ -595,7 +575,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                 {
                   n: "01",
                   title: lang === "zh" ? "完成测评" : "Take the Assessment",
-                  desc: lang === "zh" ? "回答 42 道题，全面评估你的 AI 实力" : "Answer 42 questions for a complete assessment of your AI skills",
+                  desc: lang === "zh" ? "回答约 18 道题，全面评估你的 AI 实力" : "Answer ~18 questions for a complete assessment of your AI skills",
                 },
                 {
                   n: "02",
