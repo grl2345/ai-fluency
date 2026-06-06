@@ -105,31 +105,38 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
     <div className="min-h-screen bg-white text-slate-900 antialiased">
 
       {/* ── Nav ── */}
-      <nav className="fixed top-0 z-50 w-full border-b border-white/8 bg-[#080810]/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-12 max-w-6xl items-center justify-between px-5">
-          <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600">
-              <Brain className="h-4 w-4 text-white" />
+      <nav className="fixed top-0 z-50 w-full border-b border-white/[0.06] bg-[#0a0a16]/80 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          {/* Brand */}
+          <a href="#" className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/25">
+              <Brain className="h-[18px] w-[18px] text-white" />
             </div>
-            <span className="text-sm font-bold tracking-tight text-white">{t(UI.nav.brand, lang)}</span>
-          </div>
+            <span className="text-[15px] font-bold tracking-tight text-white">{t(UI.nav.brand, lang)}</span>
+          </a>
 
-          <div className="hidden items-center gap-8 md:flex">
+          {/* Center links */}
+          <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 md:flex">
             {[
               { href: "#how", label: lang === "zh" ? "如何运作" : "How it works" },
               { href: "#dimensions", label: lang === "zh" ? "测什么" : "What we measure" },
               { href: "#pricing", label: t(UI.nav.pricing, lang) },
             ].map((link) => (
-              <a key={link.href} href={link.href} className="text-sm text-slate-400 transition-colors hover:text-white">
+              <a
+                key={link.href}
+                href={link.href}
+                className="rounded-lg px-3.5 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white"
+              >
                 {link.label}
               </a>
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Actions */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setLang(lang === "zh" ? "en" : "zh")}
-              className="rounded px-2.5 py-1 text-xs font-semibold text-slate-500 transition-colors hover:text-slate-300"
+              className="rounded-lg px-2.5 py-2 text-xs font-semibold text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white"
             >
               {lang === "zh" ? "EN" : "中文"}
             </button>
@@ -137,7 +144,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
             <button
               onClick={onStartTest}
               disabled={startDisabled}
-              className="rounded-full border border-white/15 bg-white/8 px-3.5 py-1.5 text-xs font-semibold text-white transition-all hover:border-white/30 hover:bg-white/15 disabled:opacity-50"
+              className="rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-violet-400 hover:shadow-indigo-500/40 active:scale-[0.98] disabled:opacity-50"
             >
               {startLabel}
             </button>
@@ -146,19 +153,21 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
       </nav>
 
       {/* ── Hero (dark) ── */}
-      <section className="relative overflow-hidden bg-[#080810] pt-16">
-        {/* Subtle grid */}
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
-        {/* Glow */}
-        <div className="pointer-events-none absolute left-[30%] top-0 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-indigo-700/20 blur-[130px]" />
-        <div className="pointer-events-none absolute right-[10%] top-[40%] h-[360px] w-[360px] rounded-full bg-indigo-900/20 blur-[100px]" />
+      <section className="relative overflow-hidden bg-[#08080f] pt-16">
+        {/* Subtle grid with radial fade */}
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]" />
+        {/* Gradient mesh glows */}
+        <div className="pointer-events-none absolute left-[28%] top-0 h-[620px] w-[620px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-indigo-600/25 blur-[140px]" />
+        <div className="pointer-events-none absolute right-[6%] top-[28%] h-[420px] w-[420px] rounded-full bg-violet-600/20 blur-[130px]" />
+        <div className="pointer-events-none absolute left-[55%] top-[55%] h-[300px] w-[300px] rounded-full bg-fuchsia-600/10 blur-[120px]" />
 
         <div className="relative mx-auto max-w-6xl px-5 pb-0 pt-20 md:pt-28">
           <div className="grid items-center gap-16 lg:grid-cols-[1.15fr_0.85fr]">
 
             {/* Left */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65 }}>
-              <span className="inline-block text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
+              <span className="inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-300 backdrop-blur-sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 shadow-[0_0_8px_2px_rgba(129,140,248,0.6)]" />
                 {lang === "zh" ? "AI 素养评估" : "AI Fluency Assessment"}
               </span>
 
@@ -225,7 +234,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
               transition={{ duration: 0.7, delay: 0.25 }}
               className="relative mx-auto w-full max-w-sm pb-10"
             >
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+              <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-6 shadow-2xl shadow-black/40 backdrop-blur-md">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
                     {lang === "zh" ? "你的 AI 素养报告" : "Your AI Fluency Report"}
@@ -261,7 +270,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                           initial={{ width: 0 }}
                           animate={{ width: `${d.v}%` }}
                           transition={{ duration: 1.2, delay: 0.7 + i * 0.15, ease: "easeOut" }}
-                          className="h-full rounded-full bg-indigo-500"
+                          className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-400"
                         />
                       </div>
                     </div>
@@ -286,7 +295,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
         </div>
 
         {/* Fade to white */}
-        <div className="h-24 bg-gradient-to-b from-[#080810] to-white" />
+        <div className="h-24 bg-gradient-to-b from-[#08080f] to-white" />
       </section>
 
       {/* ── Stats ── */}
@@ -732,7 +741,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
       </section>
 
       {/* ── CTA (dark) ── */}
-      <section className="relative overflow-hidden bg-[#080810] px-5 py-28 md:py-36">
+      <section className="relative overflow-hidden bg-[#08080f] px-5 py-28 md:py-36">
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
         <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-700/20 blur-[120px]" />
 
@@ -773,11 +782,11 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
       )}
 
       {/* ── Footer ── */}
-      <footer className="border-t border-white/6 bg-[#080810] px-5 py-10">
+      <footer className="border-t border-white/6 bg-[#08080f] px-5 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm md:flex-row">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600">
-              <Brain className="h-4 w-4 text-white" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/25">
+              <Brain className="h-[18px] w-[18px] text-white" />
             </div>
             <span className="font-bold text-white">{t(UI.nav.brand, lang)}</span>
           </div>
