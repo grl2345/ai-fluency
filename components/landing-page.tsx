@@ -169,14 +169,15 @@ const LEVEL_ICONS: { icon: typeof Lightbulb; bg: string; text: string }[] = [
 const STEP_ICONS = [Lightbulb, LayoutGrid, Star, Layers, Crown];
 
 function Staircase({ lang }: { lang: "zh" | "en" }) {
-  // True isometric staircase: each step is a cube whose BASE rises one unit
-  // per step, so they climb up-and-to-the-right like real stairs.
-  const U = 54;
-  const OX = 140, OY = 292;
-  const VBW = 480, VBH = 440;
+  // Isometric staircase: each step is a column rising from the ground, getting
+  // taller toward the top, so the treads form a real ascending stair silhouette.
+  const U = 56;
+  const OX = 156, OY = 232;
+  const VBW = 500, VBH = 460;
   const K = 0.866;
-  const D = 1.0;     // depth of each step
-  const H = 1.4;     // height of each step block
+  const D = 1.2;             // depth of each step
+  const BASE = 1.4;          // height of the first step
+  const INC = 1.0;           // height gained per step
 
   const proj = (x: number, y: number, z: number): [number, number] => [
     OX + (x - y) * K * U,
@@ -195,16 +196,16 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
 
   const blocks = Array.from({ length: 5 }).map((_, i) => {
     const x0 = i, x1 = i + 1, y0 = 0, y1 = D;
-    const bz = i;            // base rises with each step
-    const tz = i + H;        // top of this block
-    return { i, x0, x1, y0, y1, bz, tz };
+    const tz = BASE + i * INC;     // top of this column
+    return { i, x0, x1, y0, y1, tz };
   });
 
   return (
-    <div className="relative mx-auto h-[440px] w-full max-w-[520px]">
+    <div className="relative mx-auto h-[460px] w-full max-w-[540px]">
       {/* Ambient glow */}
-      <div className="pointer-events-none absolute right-[8%] top-[6%] h-[55%] w-[55%] rounded-full bg-violet-600/30 blur-[100px]" />
-      <div className="pointer-events-none absolute bottom-[16%] left-[12%] h-[40%] w-[50%] rounded-full bg-indigo-600/20 blur-[80px]" />
+      <div className="pointer-events-none absolute right-[8%] top-[8%] h-[55%] w-[55%] rounded-full bg-violet-600/30 blur-[100px]" />
+      <div className="pointer-events-none absolute bottom-[14%] left-[10%] h-[42%] w-[50%] rounded-full bg-indigo-600/20 blur-[85px]" />
+      <div className="pointer-events-none absolute right-[18%] top-[16%] h-[26%] w-[26%] rounded-full bg-fuchsia-500/15 blur-[60px]" />
 
       <svg viewBox={`0 0 ${VBW} ${VBH}`} className="relative h-full w-full">
         <defs>
@@ -220,12 +221,12 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
               </linearGradient>
               <linearGradient id={`sLeft${i}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={leftC[i]} stopOpacity="0.92" />
-                <stop offset="100%" stopColor="#221b5c" stopOpacity="0.88" />
+                <stop offset="100%" stopColor="#201a58" stopOpacity="0.88" />
               </linearGradient>
             </React.Fragment>
           ))}
           <radialGradient id="stFloor" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.35" />
+            <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.38" />
             <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
           </radialGradient>
           <filter id="edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -238,31 +239,32 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
         </defs>
 
         {/* Floor reflection */}
-        <ellipse cx={OX + 95} cy={OY + 70} rx="200" ry="34" fill="url(#stFloor)" />
+        <ellipse cx={OX + 90} cy={OY + 150} rx="220" ry="36" fill="url(#stFloor)" />
 
-        {/* Draw back (highest index) to front for correct overlap */}
-        {[...blocks].reverse().map(({ i, x0, x1, y0, y1, bz, tz }) => {
+        {/* Draw back (highest index) to front (lowest) for correct overlap */}
+        {[...blocks].reverse().map(({ i, x0, x1, y0, y1, tz }) => {
           const top = poly([x0, y0, tz], [x1, y0, tz], [x1, y1, tz], [x0, y1, tz]);
-          const front = poly([x1, y0, bz], [x1, y1, bz], [x1, y1, tz], [x1, y0, tz]);
-          const left = poly([x0, y1, bz], [x1, y1, bz], [x1, y1, tz], [x0, y1, tz]);
-          const [fx, fy] = proj(x1, (y0 + y1) / 2, bz + H * 0.45);
+          const front = poly([x1, y0, 0], [x1, y1, 0], [x1, y1, tz], [x1, y0, tz]);
+          const left = poly([x0, y1, 0], [x1, y1, 0], [x1, y1, tz], [x0, y1, tz]);
+          // Label near the top of each riser so they ascend with the stairs
+          const [fx, fy] = proj(x1, (y0 + y1) / 2, tz - 0.55);
 
           return (
             <g key={i}>
               <polygon points={left} fill={`url(#sLeft${i})`} stroke="rgba(120,100,240,0.22)" strokeWidth="0.6" />
               <polygon points={front} fill={`url(#sFront${i})`} stroke="rgba(120,100,240,0.28)" strokeWidth="0.6" />
               <polygon points={top} fill={`url(#sTop${i})`} stroke="rgba(185,175,255,0.5)" strokeWidth="0.8" />
-              {/* Glowing top leading edges */}
+              {/* Glowing tread leading edges */}
               <polyline
                 points={`${pt(x0, y1, tz)} ${pt(x0, y0, tz)} ${pt(x1, y0, tz)}`}
-                fill="none" stroke="rgba(196,186,255,0.9)" strokeWidth="1.6"
+                fill="none" stroke="rgba(200,190,255,0.9)" strokeWidth="1.7"
                 strokeLinejoin="round" filter="url(#edgeGlow)"
               />
               {/* Bright vertical front-corner edge */}
               <line
-                x1={pt(x1, y0, bz).split(",")[0]} y1={pt(x1, y0, bz).split(",")[1]}
+                x1={pt(x1, y0, 0).split(",")[0]} y1={pt(x1, y0, 0).split(",")[1]}
                 x2={pt(x1, y0, tz).split(",")[0]} y2={pt(x1, y0, tz).split(",")[1]}
-                stroke="rgba(196,186,255,0.5)" strokeWidth="1"
+                stroke="rgba(200,190,255,0.5)" strokeWidth="1"
               />
 
               {/* Label on the front face */}
@@ -271,16 +273,16 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
                 textAnchor="middle"
                 fill="#ffffff"
                 fontWeight="800"
-                style={{ fontSize: 19, textShadow: "0 2px 8px rgba(10,5,40,0.85)" }}
+                style={{ fontSize: 20, textShadow: "0 2px 8px rgba(10,5,40,0.85)" }}
               >
                 L{i + 1}
               </text>
               <text
-                x={fx} y={fy + 14}
+                x={fx} y={fy + 15}
                 textAnchor="middle"
                 fill="rgba(214,209,255,0.9)"
                 fontWeight="500"
-                style={{ fontSize: 11, textShadow: "0 1px 5px rgba(10,5,40,0.8)" }}
+                style={{ fontSize: 11.5, textShadow: "0 1px 5px rgba(10,5,40,0.8)" }}
               >
                 {STEP_NAMES[i][lang]}
               </text>
@@ -292,7 +294,7 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
       {/* Icons floating just above each tread */}
       {blocks.map(({ i, x0, y0, y1, tz }) => {
         const Icon = STEP_ICONS[i];
-        const pos = pctOf(x0 + 0.5, (y0 + y1) / 2, tz + 0.32);
+        const pos = pctOf(x0 + 0.5, (y0 + y1) / 2, tz + 0.34);
         return (
           <div
             key={`icon${i}`}
