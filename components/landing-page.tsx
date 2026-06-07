@@ -25,6 +25,8 @@ interface LandingPageProps {
   onStartTest: () => void;
   authLoading?: boolean;
   isAuthenticated?: boolean;
+  subscribePrompt?: boolean;
+  onDismissSubscribePrompt?: () => void;
 }
 
 const TESTIMONIALS = [
@@ -280,15 +282,27 @@ function Staircase({ lang }: { lang: "zh" | "en" }) {
   );
 }
 
-export function LandingPage({ onStartTest, authLoading = false, isAuthenticated = false }: LandingPageProps) {
+export function LandingPage({
+  onStartTest,
+  authLoading = false,
+  isAuthenticated = false,
+  subscribePrompt = false,
+  onDismissSubscribePrompt,
+}: LandingPageProps) {
   const { user } = useAuth();
-  const { subscription, hasActiveSubscription, refresh } = useSubscription();
+  const { subscription, hasActiveSubscription, loading: subLoading, refresh } = useSubscription();
   const { lang, setLang } = useLang();
   const [openFaq, setOpenFaq] = React.useState<number | null>(null);
   const [paymentPlan, setPaymentPlan] = React.useState<PlanKey | null>(null);
   const [subscribeToast, setSubscribeToast] = React.useState<PlanKey | null>(null);
 
-  const startLabel = isAuthenticated ? t(UI.nav.startTest, lang) : t(UI.nav.startTestGuest, lang);
+  // Logged in but no active plan → the test is gated behind a subscription.
+  const needsSubscription = isAuthenticated && !subLoading && !hasActiveSubscription;
+  const startLabel = !isAuthenticated
+    ? t(UI.nav.startTestGuest, lang)
+    : needsSubscription
+      ? (lang === "zh" ? "订阅解锁测评" : "Subscribe to Unlock")
+      : t(UI.nav.startTest, lang);
   const startDisabled = authLoading;
 
   const radarData = RADAR.map((r) => ({ dim: r.name[lang], v: r.v }));
@@ -635,12 +649,27 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
       <section id="pricing" className="relative overflow-hidden border-t border-white/[0.06] bg-white/[0.015] px-6 py-24 md:py-28">
         <div className="mx-auto max-w-6xl">
           {subscribeToast && (
-            <div className="mx-auto mb-8 inline-flex w-full items-center justify-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-medium text-emerald-300">
-              <Check className="h-4 w-4 shrink-0" />
-              {t(UI.billing.subscribeSuccess, lang)} {planDisplayName(subscribeToast, lang)}!
-              <a href="/account" className="font-semibold text-emerald-200 hover:underline">
-                {t(UI.billing.manageSubscription, lang)} →
-              </a>
+            <div className="mx-auto mb-8 flex w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-medium text-emerald-300">
+              <span className="inline-flex items-center gap-2">
+                <Check className="h-4 w-4 shrink-0" />
+                {t(UI.billing.subscribeSuccess, lang)} {planDisplayName(subscribeToast, lang)}!
+              </span>
+              <button
+                onClick={onStartTest}
+                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3.5 py-1 font-semibold text-emerald-100 transition-colors hover:bg-emerald-500/30"
+              >
+                {lang === "zh" ? "开始测评" : "Start the assessment"}
+                <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
+
+          {subscribePrompt && !hasActiveSubscription && !subscribeToast && (
+            <div className="mx-auto mb-8 flex w-full items-center justify-center gap-2.5 rounded-2xl border border-indigo-400/30 bg-indigo-500/10 px-5 py-3 text-center text-sm font-medium text-indigo-100">
+              <Sparkles className="h-4 w-4 shrink-0 text-indigo-300" />
+              {lang === "zh"
+                ? "选择一个套餐，订阅后即可开始 AI 实力测评。"
+                : "Pick a plan below — once subscribed, you can start the assessment."}
             </div>
           )}
 
