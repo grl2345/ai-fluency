@@ -13,7 +13,7 @@ import { useAuth } from "@/components/auth-provider";
 import {
   Brain, ChevronRight, ArrowRight, MessageSquare,
   CheckCircle2, Shield, Check,
-  ChevronDown, ChevronUp, Play, Sparkles, Star, Layers, Activity, BarChart3,
+  ChevronDown, ChevronUp, Play, Sparkles, Star, Layers,
   Globe, Zap, Wrench, Lightbulb, LayoutGrid, Crown,
 } from "lucide-react";
 import { PaymentModal } from "@/components/payment-modal";
@@ -70,24 +70,8 @@ const FAQS = [
     a: { en: "Our framework combines knowledge, scenario, and practical questions to assess real competency — not just recall. Results reflect how you actually think and work with AI.", zh: "我们的框架结合知识题、情境题和实操题来评估真实能力——而非单纯记忆。结果反映你实际运用 AI 的思维方式。" },
   },
   {
-    q: { en: "Can I pause and resume later?", zh: "可以随时暂停继续吗？" },
-    a: { en: "Yes. Your progress is saved automatically. You can close the browser and pick up right where you left off.", zh: "可以。你的进度会自动保存，关闭浏览器后也能从上次的位置继续。" },
-  },
-  {
     q: { en: "Will my data be shared?", zh: "我的数据会被分享吗？" },
     a: { en: "No. Your answers and results are private. We never share individual data with third parties.", zh: "不会。你的作答和结果完全私密，我们绝不会将个人数据分享给第三方。" },
-  },
-  {
-    q: { en: "How many questions are there?", zh: "题目数量有多少？" },
-    a: { en: "The assessment includes about 18 questions across three formats: knowledge, scenario-based, and practical open-ended tasks.", zh: "测评包含约 18 道题，涵盖知识题、情境题和开放式实操题三种题型。" },
-  },
-  {
-    q: { en: "How can I get more help?", zh: "如何获得更多帮助？" },
-    a: { en: "Pro subscribers get email support. You can also reach us at support@aifluency.app for any questions.", zh: "Pro 用户可获得邮件支持。你也可以通过 support@aifluency.app 联系我们。" },
-  },
-  {
-    q: { en: "How long are reports kept?", zh: "报告会保存多久？" },
-    a: { en: "Your reports are stored permanently in your account. You can revisit them anytime.", zh: "你的报告会永久保存在账户中，随时可以回顾。" },
   },
   {
     q: { en: "Do you support team or org assessments?", zh: "支持团队或组织测评吗？" },
@@ -515,67 +499,21 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
             </motion.div>
           </div>
 
-          {/* ── Framework ── */}
-          <div className="mt-24">
-            <p className="text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-indigo-400">
-              {lang === "zh" ? "测评体系概览" : "The Assessment Framework"}
-            </p>
-            <div className="relative mt-8 grid gap-5 md:grid-cols-3 md:gap-0">
-              {[
-                { icon: Layers, v: "6", t: lang === "zh" ? "大维度" : "Dimensions", d: lang === "zh" ? "核心 AI 能力评估" : "Core AI competency areas" },
-                { icon: Activity, v: "42", t: lang === "zh" ? "个信号" : "Signals", d: lang === "zh" ? "行为指标深度分析" : "Behavioral indicators analyzed" },
-                { icon: BarChart3, v: "1", t: lang === "zh" ? "份报告" : "AI Fluency Score", d: lang === "zh" ? "全面解读 AI 实力" : "Your overall AI Fluency Index" },
-              ].map((c, i) => (
-                <React.Fragment key={c.t}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: i * 0.1 }}
-                    className="flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 md:mx-2"
-                  >
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-violet-500/15 ring-1 ring-white/10">
-                      <c.icon className="h-5 w-5 text-indigo-300" />
-                    </div>
-                    <div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-black tabular-nums text-white">{c.v}</span>
-                        <span className="text-base font-bold text-white">{c.t}</span>
-                      </div>
-                      <p className="text-[13px] text-slate-400">{c.d}</p>
-                    </div>
-                  </motion.div>
-                  {i < 2 && (
-                    <div className="hidden items-center justify-center md:flex">
-                      <div className="h-px w-full border-t border-dashed border-white/15" />
-                    </div>
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
       {/* ── How it works ── */}
-      <section id="how" className="border-t border-white/[0.06] px-6 py-24 md:py-28">
-        <div className="mx-auto max-w-6xl">
-          <div className="grid items-start gap-10 lg:grid-cols-[0.35fr_1fr]">
-            <div className="lg:sticky lg:top-28">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
-                {lang === "zh" ? "简单三步" : "Three steps"}
-              </span>
-              <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-white md:text-5xl">
-                {lang === "zh" ? "如何\n运作" : "How it\nworks"}
-              </h2>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-3">
+      <section id="how" className="border-t border-white/[0.06] px-6 py-16 md:py-20">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="mb-10 text-center text-2xl font-extrabold tracking-tight text-white md:text-3xl">
+            {lang === "zh" ? "简单三步，了解你的 AI 实力" : "Three Steps to Your AI Edge"}
+          </h2>
+          <div className="grid gap-5 md:grid-cols-3">
               {[
                 {
                   n: "01",
                   title: lang === "zh" ? "完成测评" : "Take the Assessment",
-                  desc: lang === "zh" ? "回答约 18 道题，全面评估你的 AI 实力" : "Answer ~18 questions for a complete assessment of your AI skills",
+                  desc: lang === "zh" ? "回答约 18 道题，全面评估你的 AI 实力" : "Answer ~18 questions covering real-world AI skills",
                 },
                 {
                   n: "02",
@@ -585,7 +523,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                 {
                   n: "03",
                   title: lang === "zh" ? "开始提升" : "Start Improving",
-                  desc: lang === "zh" ? "获取个性化建议，提升你的 AI 能力" : "Get personalized recommendations to advance your AI skills",
+                  desc: lang === "zh" ? "获取个性化建议，提升你的 AI 能力" : "Get personalized recommendations to level up",
                 },
               ].map((item, i) => (
                 <motion.div
@@ -603,16 +541,15 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
                   <p className="mt-2 text-[14px] leading-relaxed text-slate-400">{item.desc}</p>
                 </motion.div>
               ))}
-            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Dimensions ── */}
-      <section id="dimensions" className="border-t border-white/[0.06] bg-white/[0.015] px-6 py-24 md:py-28">
+      {/* ── Dimensions + Levels ── */}
+      <section id="dimensions" className="border-t border-white/[0.06] bg-white/[0.015] px-6 py-16 md:py-20">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-14 text-center">
-            <h2 className="text-3xl font-extrabold tracking-tight text-white md:text-4xl">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-extrabold tracking-tight text-white md:text-3xl">
               {t(UI.dimensions.sectionTitle, lang)}
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-slate-400">
@@ -641,53 +578,44 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
               );
             })}
           </div>
-        </div>
-      </section>
 
-      {/* ── Levels ── */}
-      <section className="border-t border-white/[0.06] px-6 py-24 md:py-28">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-14">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
-              {lang === "zh" ? "能力评级" : "Proficiency levels"}
-            </span>
-            <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-white md:text-5xl">
-              {t(UI.levels.sectionTitle, lang)}
-            </h2>
-            <p className="mt-3 text-[15px] text-slate-400">
-              {lang === "zh"
-                ? "从入门到精通，清晰了解你的 AI 实力水平"
-                : "From beginner to expert — understand your AI proficiency clearly"}
-            </p>
-          </div>
-
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div className="overflow-hidden rounded-2xl border border-white/[0.08]">
-              {levels.map((level, i) => {
-                const li = LEVEL_ICONS[i] ?? LEVEL_ICONS[0];
-                const Icon = li.icon;
-                return (
-                  <motion.div
-                    key={level.level}
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.25, delay: i * 0.06 }}
-                    className="flex items-start gap-4 border-b border-white/[0.06] bg-white/[0.02] px-6 py-4 transition-colors last:border-0 hover:bg-white/[0.05]"
-                  >
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${li.bg}`}>
-                      <Icon className={`h-5 w-5 ${li.text}`} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline gap-2">
-                        <span className="font-bold text-white">{level.name[lang]}</span>
-                        <span className="text-xs font-semibold text-indigo-400">L{i + 1}</span>
+          {/* Compact level strip + staircase */}
+          <div className="mt-14 grid items-center gap-8 lg:grid-cols-[1fr_1fr]">
+            <div>
+              <h3 className="text-xl font-extrabold tracking-tight text-white md:text-2xl">
+                {t(UI.levels.sectionTitle, lang)}
+              </h3>
+              <p className="mt-2 text-[14px] text-slate-400">
+                {lang === "zh"
+                  ? "从入门到精通，清晰了解你的 AI 实力水平"
+                  : "From beginner to expert — understand your AI proficiency"}
+              </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {levels.map((level, i) => {
+                  const li = LEVEL_ICONS[i] ?? LEVEL_ICONS[0];
+                  const Icon = li.icon;
+                  return (
+                    <div
+                      key={level.level}
+                      className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-2.5"
+                    >
+                      <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${li.bg}`}>
+                        <Icon className={`h-3.5 w-3.5 ${li.text}`} />
                       </div>
-                      <p className="mt-1 text-[13px] leading-snug text-slate-400">{level.description[lang]}</p>
+                      <div>
+                        <span className="text-xs font-bold text-white">L{i + 1}</span>
+                        <span className="ml-1.5 text-xs text-slate-400">{level.name[lang]}</span>
+                      </div>
                     </div>
-                  </motion.div>
-                );
-              })}
+                  );
+                })}
+              </div>
+              <p className="mt-5 flex items-center gap-2 text-sm text-slate-400">
+                <Sparkles className="h-4 w-4 text-indigo-400" />
+                {lang === "zh"
+                  ? "等级越高，代表你在 AI 时代的竞争力越强"
+                  : "Higher levels = stronger competitiveness in the AI era"}
+              </p>
             </div>
 
             <motion.div
@@ -700,13 +628,6 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
               <Staircase lang={lang} />
             </motion.div>
           </div>
-
-          <p className="mt-8 flex items-center gap-2 text-sm text-slate-400">
-            <Sparkles className="h-4 w-4 text-indigo-400" />
-            {lang === "zh"
-              ? "等级越高，代表你在 AI 时代的竞争力越强"
-              : "Higher levels represent stronger competitiveness in the AI era"}
-          </p>
         </div>
       </section>
 
@@ -907,7 +828,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" className="border-t border-white/[0.06] bg-white/[0.015] px-6 py-24 md:py-28">
+      <section id="faq" className="border-t border-white/[0.06] bg-white/[0.015] px-6 py-16 md:py-20">
         <div className="mx-auto max-w-5xl">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-extrabold tracking-tight text-white md:text-4xl">
@@ -942,7 +863,7 @@ export function LandingPage({ onStartTest, authLoading = false, isAuthenticated 
       </section>
 
       {/* ── CTA ── */}
-      <section className="relative overflow-hidden border-t border-white/[0.06] px-6 py-28 md:py-32">
+      <section className="relative overflow-hidden border-t border-white/[0.06] px-6 py-20 md:py-24">
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)]" />
         <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600/20 blur-[120px]" />
 
