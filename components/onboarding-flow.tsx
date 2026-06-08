@@ -566,27 +566,65 @@ function OnboardingPreview({
             </div>
           </div>
 
-          {/* Dimension bars — blurred/abstract, no labels or scores */}
-          <div className="mt-5 space-y-2.5">
-            {DIM_COLORS.map((color, i) => {
-              const widths = [82, 68, 88, 58, 76, 63];
-              const w = Math.min(95, widths[i] + stepBoost);
-              return (
-                <div key={i} className="flex items-center gap-2.5">
-                  <div className="h-2 w-12 rounded-full bg-white/[0.05]" />
-                  <div className="flex-1 overflow-hidden rounded-full bg-white/[0.06]">
-                    <motion.div
-                      className={`h-2.5 rounded-full bg-gradient-to-r ${color}`}
-                      style={{ opacity: 0.5 }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${w}%` }}
-                      transition={{ duration: 0.8, delay: i * 0.08, ease: "easeOut" }}
-                    />
+          {/* Dimension bars — blurred with scanning animation */}
+          <div className="relative mt-5 overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+            {/* Scanning light effect */}
+            <div className="pointer-events-none absolute inset-0 z-10">
+              <div
+                className="absolute inset-x-0 h-8 bg-gradient-to-b from-transparent via-indigo-400/[0.07] to-transparent"
+                style={{
+                  animation: "scanDown 2.5s ease-in-out infinite",
+                }}
+              />
+              <style>{`
+                @keyframes scanDown {
+                  0%, 100% { top: -2rem; }
+                  50% { top: calc(100% + 2rem); }
+                }
+              `}</style>
+            </div>
+
+            <div className="space-y-2.5">
+              {DIM_COLORS.map((color, i) => {
+                const widths = [82, 68, 88, 58, 76, 63];
+                const w = Math.min(95, widths[i] + stepBoost);
+                return (
+                  <div key={i} className="flex items-center gap-2.5">
+                    <div className="h-2 w-12 rounded-full bg-white/[0.05]" />
+                    <div className="flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                      <motion.div
+                        className={`h-2.5 rounded-full bg-gradient-to-r ${color}`}
+                        style={{ opacity: 0.5 }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${w}%` }}
+                        transition={{ duration: 0.8, delay: i * 0.08, ease: "easeOut" }}
+                      />
+                    </div>
+                    <div className="h-2 w-5 rounded-full bg-white/[0.05]" />
                   </div>
-                  <div className="h-2 w-5 rounded-full bg-white/[0.05]" />
+                );
+              })}
+            </div>
+
+            {/* Frosted overlay with unlock CTA */}
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-xl bg-[#0d0b1a]/60 backdrop-blur-[2px]">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 }}
+                className="flex flex-col items-center gap-2"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/20 ring-1 ring-indigo-400/30">
+                  <Sparkles className="h-5 w-5 text-indigo-300" />
                 </div>
-              );
-            })}
+                <p className="text-xs font-bold text-white">
+                  {zh ? "订阅后解锁完整报告" : "Subscribe to unlock full report"}
+                </p>
+                <p className="text-[10px] text-slate-400">
+                  {zh ? "6 大维度详细分析 · 个性化提升建议" : "Detailed analysis across 6 dimensions"}
+                </p>
+              </motion.div>
+            </div>
           </div>
 
           {/* Plan badge — shows on step 4 */}
