@@ -1,14 +1,11 @@
 import { createBrowserClient } from '@supabase/ssr'
-
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
-const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? ''
-const configured = Boolean(url && key)
+import { getSupabaseAnonKey, getSupabaseUrl, isSupabaseEnvConfigured } from '@/lib/supabase/env'
 
 export function isSupabaseConfigured() {
-  return configured
+  return isSupabaseEnvConfigured()
 }
 
 export function createClient() {
-  if (!configured) return null
-  return createBrowserClient(url, key)
+  if (!isSupabaseEnvConfigured()) return null
+  return createBrowserClient(getSupabaseUrl(), getSupabaseAnonKey())
 }

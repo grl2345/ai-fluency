@@ -1,18 +1,49 @@
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getSupabaseAnonKey, getSupabaseUrl } from '@/lib/supabase/env'
+
+function redirectToError(origin: string, reason: string) {
+  const url = new URL(`${origin}/auth/auth-code-error`)
+  url.searchParams.set('reason', reason)
+  return NextResponse.redirect(url)
+}
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const oauthError = searchParams.get('error_description') ?? searchParams.get('error')
   let next = searchParams.get('next') ?? '/'
 
   if (!next.startsWith('/')) {
     next = '/'
   }
 
+  if (oauthError) {
+    return redirectToError(origin, oauthError)
+  }
+
+  const supabaseUrl = getSupabaseUrl()
+  const supabaseKey = getSupabaseAnonKey()
+  if (!supabaseUrl || !supabaseKey) {
+    return redirectToError(origin, 'missing_env')
+  }
+
   if (code) {
-    const supabase = await createClient()
-    if (!supabase) return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+    const cookieStore = await cookies()
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        },
+      },
+    })
+
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
@@ -29,7 +60,9 @@ export async function GET(request: Request) {
 
       return NextResponse.redirect(`${origin}${next}`)
     }
+
+    return redirectToError(origin, error.message)
   }
 
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+  return redirectToError(origin, 'no_code')
 }

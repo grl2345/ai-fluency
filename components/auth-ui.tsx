@@ -164,28 +164,25 @@ export function NavAuthMenu({ variant = "light" }: { variant?: "light" | "dark" 
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className={`flex items-center gap-1.5 rounded-full py-0.5 pl-0.5 pr-2 transition-all ${
+        className={`flex items-center gap-1 rounded-full py-0.5 pl-0.5 pr-1.5 transition-all ${
           isDark
             ? "border border-white/15 bg-white/8 hover:border-white/30 hover:bg-white/15"
             : "border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
         }`}
         aria-expanded={open}
         aria-haspopup="menu"
+        aria-label={displayName}
+        title={displayName}
       >
         {avatarUrl ? (
           <img src={avatarUrl} alt={displayName} className="h-7 w-7 rounded-full object-cover" />
         ) : (
-          <div className={`flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold ${
+          <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
             isDark ? "bg-indigo-500/30 text-indigo-200" : "bg-indigo-100 text-indigo-700"
           }`}>
             {displayName.charAt(0).toUpperCase()}
           </div>
         )}
-        <span className={`hidden max-w-[96px] truncate text-xs font-medium md:block ${
-          isDark ? "text-white/90" : "text-slate-700"
-        }`}>
-          {displayName}
-        </span>
         <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""} ${
           isDark ? "text-white/50" : "text-slate-400"
         }`} />
