@@ -25,8 +25,6 @@ interface LandingPageProps {
   onStartTest: () => void;
   authLoading?: boolean;
   isAuthenticated?: boolean;
-  subscribePrompt?: boolean;
-  onDismissSubscribePrompt?: () => void;
 }
 
 const TESTIMONIALS = [
@@ -286,23 +284,15 @@ export function LandingPage({
   onStartTest,
   authLoading = false,
   isAuthenticated = false,
-  subscribePrompt = false,
-  onDismissSubscribePrompt,
 }: LandingPageProps) {
   const { user } = useAuth();
-  const { subscription, hasActiveSubscription, loading: subLoading, refresh } = useSubscription();
+  const { subscription, hasActiveSubscription, refresh } = useSubscription();
   const { lang, setLang } = useLang();
   const [openFaq, setOpenFaq] = React.useState<number | null>(null);
   const [paymentPlan, setPaymentPlan] = React.useState<PlanKey | null>(null);
   const [subscribeToast, setSubscribeToast] = React.useState<PlanKey | null>(null);
 
-  // Logged in but no active plan → the test is gated behind a subscription.
-  const needsSubscription = isAuthenticated && !subLoading && !hasActiveSubscription;
-  const startLabel = !isAuthenticated
-    ? t(UI.nav.startTestGuest, lang)
-    : needsSubscription
-      ? (lang === "zh" ? "订阅解锁测评" : "Subscribe to Unlock")
-      : t(UI.nav.startTest, lang);
+  const startLabel = isAuthenticated ? t(UI.nav.startTest, lang) : t(UI.nav.startTestGuest, lang);
   const startDisabled = authLoading;
 
   const radarData = RADAR.map((r) => ({ dim: r.name[lang], v: r.v }));
@@ -663,14 +653,6 @@ export function LandingPage({
             </div>
           )}
 
-          {subscribePrompt && !hasActiveSubscription && !subscribeToast && (
-            <div className="mx-auto mb-8 flex w-full items-center justify-center gap-2.5 rounded-2xl border border-indigo-400/30 bg-indigo-500/10 px-5 py-3 text-center text-sm font-medium text-indigo-100">
-              <Sparkles className="h-4 w-4 shrink-0 text-indigo-300" />
-              {lang === "zh"
-                ? "选择一个套餐，订阅后即可开始 AI 实力测评。"
-                : "Pick a plan below — once subscribed, you can start the assessment."}
-            </div>
-          )}
 
           <div className="grid items-start gap-8 lg:grid-cols-[1fr_2.2fr]">
             {/* Left: testimonial */}

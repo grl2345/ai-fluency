@@ -2,35 +2,25 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { LandingPage } from "@/components/landing-page";
+import { OnboardingFlow } from "@/components/onboarding-flow";
 import { TestFlow } from "@/components/test-flow";
 import { ResultsPage } from "@/components/results-page";
 import { useAuth } from "@/components/auth-provider";
 import { useSubscription } from "@/components/subscription-provider";
 import { redirectToSignIn } from "@/components/auth-ui";
 
-type AppState = "landing" | "testing" | "results";
+type AppState = "landing" | "onboarding" | "testing" | "results";
 
 const START_TEST_PATH = "/?start=test";
 
 export default function Page() {
   const { user, loading } = useAuth();
-  const { hasActiveSubscription, loading: subLoading } = useSubscription();
+  const { hasActiveSubscription, loading: subLoading, refresh } = useSubscription();
   const [appState, setAppState] = useState<AppState>("landing");
   const [testAnswers, setTestAnswers] = useState<Record<number, string>>({});
   const [practicalTexts, setPracticalTexts] = useState<Record<string, string>>({});
   const [profileData, setProfileData] = useState<Record<string, string | string[]>>({});
-  // Set when the user wants to start the test but we still need to confirm
-  // their auth/subscription state before deciding where to send them.
   const [pendingStart, setPendingStart] = useState(false);
-  // Toggled when a logged-in, non-subscribed user is nudged toward pricing.
-  const [subscribePrompt, setSubscribePrompt] = useState(false);
-
-  const scrollToPricing = useCallback(() => {
-    setSubscribePrompt(true);
-    requestAnimationFrame(() => {
-      document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
-    });
-  }, []);
 
   const handleStartTest = useCallback(() => {
     if (loading) return;
@@ -38,19 +28,19 @@ export default function Page() {
       redirectToSignIn(START_TEST_PATH);
       return;
     }
-    // Logged in — gate the test behind an active subscription.
+    // If already subscribed, go straight to testing; otherwise onboarding
     if (subLoading) {
       setPendingStart(true);
       return;
     }
-    if (!hasActiveSubscription) {
-      scrollToPricing();
-      return;
+    if (hasActiveSubscription) {
+      setAppState("testing");
+    } else {
+      setAppState("onboarding");
     }
-    setAppState("testing");
-  }, [user, loading, subLoading, hasActiveSubscription, scrollToPricing]);
+  }, [user, loading, subLoading, hasActiveSubscription]);
 
-  // Resolve a deferred start once subscription state is known.
+  // Resolve deferred start once subscription state loads
   useEffect(() => {
     if (!pendingStart || loading || subLoading) return;
     setPendingStart(false);
@@ -59,32 +49,36 @@ export default function Page() {
     } else if (hasActiveSubscription) {
       setAppState("testing");
     } else {
-      scrollToPricing();
+      setAppState("onboarding");
     }
-  }, [pendingStart, loading, subLoading, user, hasActiveSubscription, scrollToPricing]);
+  }, [pendingStart, loading, subLoading, user, hasActiveSubscription]);
 
+  // Handle ?start=test after login redirect
   useEffect(() => {
     if (loading) return;
-
     const params = new URLSearchParams(window.location.search);
     if (params.get("start") !== "test") return;
-
     window.history.replaceState({}, "", "/");
-
     if (user) {
-      // Defer to the subscription gate before entering the test.
       setPendingStart(true);
     } else {
       redirectToSignIn(START_TEST_PATH);
     }
   }, [loading, user]);
 
+  // Guard: kick out of testing if user signs out
   useEffect(() => {
-    if (!loading && appState === "testing" && !user) {
+    if (!loading && (appState === "testing" || appState === "onboarding") && !user) {
       setAppState("landing");
       redirectToSignIn(START_TEST_PATH);
     }
   }, [loading, user, appState]);
+
+  const handleOnboardingComplete = async (profile: Record<string, string | string[]>) => {
+    setProfileData(profile);
+    await refresh();
+    setAppState("testing");
+  };
 
   const handleTestComplete = (
     answers: Record<number, string>,
@@ -93,7 +87,7 @@ export default function Page() {
   ) => {
     setTestAnswers(answers);
     setPracticalTexts(practicals);
-    setProfileData(profile);
+    setProfileData((prev) => ({ ...prev, ...profile }));
     setAppState("results");
   };
 
@@ -103,6 +97,15 @@ export default function Page() {
     setProfileData({});
     setAppState("landing");
   };
+
+  if (appState === "onboarding") {
+    return (
+      <OnboardingFlow
+        onComplete={handleOnboardingComplete}
+        onBack={() => setAppState("landing")}
+      />
+    );
+  }
 
   if (appState === "testing") {
     if (loading || !user) {
@@ -131,8 +134,6 @@ export default function Page() {
       onStartTest={handleStartTest}
       authLoading={loading}
       isAuthenticated={!!user}
-      subscribePrompt={subscribePrompt}
-      onDismissSubscribePrompt={() => setSubscribePrompt(false)}
     />
   );
 }
