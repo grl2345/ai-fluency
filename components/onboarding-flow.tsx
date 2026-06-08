@@ -417,55 +417,234 @@ export function OnboardingFlow({ onComplete, onBack }: OnboardingFlowProps) {
         </div>
       </div>
 
-      {/* Right panel — decorative preview */}
+      {/* Right panel — dynamic preview */}
       <div className="hidden items-center justify-center bg-gradient-to-br from-indigo-950 via-[#0d0b1a] to-violet-950 lg:flex lg:w-1/2">
-        <div className="relative w-[360px]">
-          <div className="pointer-events-none absolute -inset-12 rounded-full bg-indigo-500/10 blur-[80px]" />
-          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl backdrop-blur-sm">
-            <div className="mb-4 flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-red-400/60" />
-              <div className="h-3 w-3 rounded-full bg-yellow-400/60" />
-              <div className="h-3 w-3 rounded-full bg-green-400/60" />
-              <div className="ml-auto h-2.5 w-20 rounded-full bg-white/10" />
+        <div className="pointer-events-none absolute right-[8%] top-[12%] h-[300px] w-[300px] rounded-full bg-indigo-600/15 blur-[120px]" />
+        <div className="pointer-events-none absolute bottom-[15%] right-[25%] h-[250px] w-[250px] rounded-full bg-violet-600/15 blur-[100px]" />
+        <OnboardingPreview step={step} answers={answers} selectedPlan={selectedPlan} lang={lang} />
+      </div>
+    </div>
+  );
+}
+
+/* ── Dynamic right-panel preview ── */
+
+const DIM_NAMES = [
+  { zh: "提示工程", en: "Prompting" },
+  { zh: "评估判断", en: "Evaluation" },
+  { zh: "自动化", en: "Automation" },
+  { zh: "推理能力", en: "Reasoning" },
+  { zh: "工具使用", en: "Tools" },
+  { zh: "风险意识", en: "Risk" },
+];
+
+const DIM_COLORS = [
+  "from-cyan-400 to-cyan-500",
+  "from-indigo-400 to-indigo-500",
+  "from-violet-400 to-violet-500",
+  "from-fuchsia-400 to-fuchsia-500",
+  "from-blue-400 to-blue-500",
+  "from-purple-400 to-purple-500",
+];
+
+function OnboardingPreview({
+  step,
+  answers,
+  selectedPlan,
+  lang,
+}: {
+  step: number;
+  answers: Record<string, string | string[]>;
+  selectedPlan: PlanKey;
+  lang: "zh" | "en";
+}) {
+  const zh = lang === "zh";
+  const role = answers.role as string | undefined;
+  const experience = answers.experience as string | undefined;
+  const usage = (answers.usage as string[]) || [];
+
+  const roleLabel = role
+    ? STEPS[0].options.find((o) => o.id === role)?.label[lang]
+    : null;
+  const expLabel = experience
+    ? STEPS[1].options.find((o) => o.id === experience)?.label[lang]
+    : null;
+  const usageLabels = usage
+    .map((id) => STEPS[2].options.find((o) => o.id === id)?.label[lang])
+    .filter(Boolean);
+
+  // Simulate dimension scores that grow with each step
+  const baseScores = [65, 58, 72, 50, 68, 55];
+  const stepBoost = step * 8;
+
+  return (
+    <div className="relative w-[380px]">
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-2xl backdrop-blur-sm">
+        {/* Window chrome */}
+        <div className="flex items-center gap-2 border-b border-white/[0.06] px-5 py-3">
+          <div className="h-3 w-3 rounded-full bg-red-400/60" />
+          <div className="h-3 w-3 rounded-full bg-yellow-400/60" />
+          <div className="h-3 w-3 rounded-full bg-green-400/60" />
+          <div className="ml-auto h-2.5 w-24 rounded-full bg-white/10" />
+        </div>
+
+        <div className="p-6">
+          {/* Header */}
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/25 to-violet-500/25 ring-1 ring-white/10">
+              <Sparkles className="h-6 w-6 text-indigo-300" />
             </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 ring-1 ring-white/10">
-                  <Sparkles className="h-7 w-7 text-indigo-300" />
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-white">{zh ? "AI 实力报告" : "AI Fluency Report"}</div>
-                  <div className="text-xs text-slate-500">{zh ? "即将为你生成" : "Coming up next"}</div>
-                </div>
+            <div>
+              <div className="text-sm font-bold text-white">
+                {zh ? "AI 实力报告" : "AI Fluency Report"}
               </div>
-
-              <div className="space-y-2">
-                {[
-                  { w: "w-[85%]", c: "bg-cyan-400/40" },
-                  { w: "w-[72%]", c: "bg-indigo-400/40" },
-                  { w: "w-[90%]", c: "bg-violet-400/40" },
-                  { w: "w-[65%]", c: "bg-fuchsia-400/40" },
-                  { w: "w-[78%]", c: "bg-blue-400/40" },
-                  { w: "w-[82%]", c: "bg-purple-400/40" },
-                ].map((bar, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="h-2 w-16 rounded-full bg-white/5" />
-                    <div className="flex-1">
-                      <div className={`h-2.5 rounded-full ${bar.c} ${bar.w}`} />
-                    </div>
-                    <div className="h-2 w-6 rounded-full bg-white/5" />
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-2 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
-                <div className="h-2 w-24 rounded-full bg-white/10" />
-                <div className="mt-2 h-2 w-full rounded-full bg-white/5" />
-                <div className="mt-1.5 h-2 w-[80%] rounded-full bg-white/5" />
+              <div className="text-xs text-slate-500">
+                {zh ? "正在为你定制…" : "Customizing for you…"}
               </div>
             </div>
           </div>
+
+          {/* Profile card — builds up with selections */}
+          <div className="mt-5 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
+              {zh ? "测评者档案" : "Your Profile"}
+            </div>
+
+            <div className="mt-3 space-y-2.5">
+              {/* Role */}
+              <div className="flex items-center gap-2">
+                <div className={`h-1.5 w-1.5 rounded-full ${roleLabel ? "bg-emerald-400" : "bg-white/15"}`} />
+                <span className="text-xs text-slate-500">{zh ? "身份" : "Role"}</span>
+                <AnimatePresence mode="wait">
+                  {roleLabel ? (
+                    <motion.span
+                      key={roleLabel}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="ml-auto rounded-md bg-indigo-500/15 px-2 py-0.5 text-xs font-medium text-indigo-300"
+                    >
+                      {roleLabel}
+                    </motion.span>
+                  ) : (
+                    <span className="ml-auto h-4 w-20 rounded bg-white/5" />
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Experience */}
+              <div className="flex items-center gap-2">
+                <div className={`h-1.5 w-1.5 rounded-full ${expLabel ? "bg-emerald-400" : "bg-white/15"}`} />
+                <span className="text-xs text-slate-500">{zh ? "经验" : "Experience"}</span>
+                <AnimatePresence mode="wait">
+                  {expLabel ? (
+                    <motion.span
+                      key={expLabel}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="ml-auto rounded-md bg-violet-500/15 px-2 py-0.5 text-xs font-medium text-violet-300"
+                    >
+                      {expLabel}
+                    </motion.span>
+                  ) : (
+                    <span className="ml-auto h-4 w-20 rounded bg-white/5" />
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Usage tags */}
+              <div className="flex items-start gap-2">
+                <div className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${usageLabels.length > 0 ? "bg-emerald-400" : "bg-white/15"}`} />
+                <span className="mt-0.5 shrink-0 text-xs text-slate-500">{zh ? "用途" : "Uses"}</span>
+                <div className="ml-auto flex flex-wrap justify-end gap-1">
+                  <AnimatePresence>
+                    {usageLabels.length > 0 ? usageLabels.map((label) => (
+                      <motion.span
+                        key={label}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="rounded-md bg-cyan-500/15 px-2 py-0.5 text-[10px] font-medium text-cyan-300"
+                      >
+                        {label}
+                      </motion.span>
+                    )) : (
+                      <span className="h-4 w-20 rounded bg-white/5" />
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Dimension bars — animate as steps progress */}
+          <div className="mt-5">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
+              {zh ? "能力预测" : "Skill Forecast"}
+            </div>
+            <div className="mt-3 space-y-2">
+              {DIM_NAMES.map((dim, i) => {
+                const score = Math.min(95, baseScores[i] + stepBoost + (i % 2 === 0 ? 5 : 0));
+                return (
+                  <div key={dim.en} className="flex items-center gap-2">
+                    <span className="w-14 text-right text-[10px] text-slate-500">{dim[lang]}</span>
+                    <div className="flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                      <motion.div
+                        className={`h-2 rounded-full bg-gradient-to-r ${DIM_COLORS[i]}`}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${score}%` }}
+                        transition={{ duration: 0.8, delay: i * 0.08, ease: "easeOut" }}
+                      />
+                    </div>
+                    <motion.span
+                      className="w-7 text-right text-[10px] tabular-nums text-slate-400"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 + i * 0.08 }}
+                    >
+                      {score}
+                    </motion.span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Plan badge — shows on step 4 */}
+          <AnimatePresence>
+            {step >= 3 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-5 flex items-center gap-3 rounded-xl border border-indigo-400/20 bg-indigo-500/10 p-3"
+              >
+                <ShieldCheck className="h-5 w-5 text-indigo-400" />
+                <div>
+                  <div className="text-xs font-bold text-white">
+                    {PLANS.find((p) => p.key === selectedPlan)?.name[lang]} {zh ? "套餐" : "Plan"}
+                  </div>
+                  <div className="text-[10px] text-slate-400">
+                    {zh ? "解锁完整测评 & 报告" : "Unlock full assessment & report"}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Bottom status bar */}
+        <div className="flex items-center justify-between border-t border-white/[0.06] px-5 py-2.5">
+          <div className="flex items-center gap-1.5">
+            <div className={`h-2 w-2 rounded-full ${step >= 3 ? "bg-emerald-400" : "animate-pulse bg-amber-400"}`} />
+            <span className="text-[10px] text-slate-500">
+              {step >= 3
+                ? (zh ? "准备就绪" : "Ready")
+                : (zh ? "正在配置…" : "Configuring…")}
+            </span>
+          </div>
+          <span className="text-[10px] font-medium tabular-nums text-slate-600">
+            {step + 1}/4
+          </span>
         </div>
       </div>
     </div>
