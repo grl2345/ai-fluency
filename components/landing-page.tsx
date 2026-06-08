@@ -14,7 +14,7 @@ import {
   Brain, ChevronRight, ArrowRight, MessageSquare,
   CheckCircle2, Shield, Check,
   ChevronDown, ChevronUp, Play, Sparkles, Star, Layers,
-  Globe, Zap, Wrench, Lightbulb, LayoutGrid, Crown,
+  Zap, Wrench, Lightbulb, LayoutGrid, Crown,
 } from "lucide-react";
 import { PaymentModal } from "@/components/payment-modal";
 import { useSubscription } from "@/components/subscription-provider";
@@ -311,7 +311,7 @@ export function LandingPage({
     { href: "#how", label: lang === "zh" ? "如何测评" : "How it works" },
     { href: "#dimensions", label: lang === "zh" ? "测评内容" : "What we measure" },
     { href: "#pricing", label: t(UI.nav.pricing, lang) },
-    { href: "#faq", label: lang === "zh" ? "资源" : "Resources" },
+    { href: "#faq", label: "FAQ" },
   ];
 
   return (
@@ -339,13 +339,12 @@ export function LandingPage({
             ))}
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setLang(lang === "zh" ? "en" : "zh")}
-              className="flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/[0.06] hover:text-white"
+              className="rounded-lg px-2.5 py-1.5 text-xs font-semibold tracking-wide text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white"
             >
-              <Globe className="h-4 w-4" />
-              {lang === "zh" ? "中文" : "EN"}
+              {lang === "zh" ? "EN" : "中文"}
             </button>
             {user && <NavAuthMenu variant="dark" />}
             <button
