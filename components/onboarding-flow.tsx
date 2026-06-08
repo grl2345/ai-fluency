@@ -429,15 +429,6 @@ export function OnboardingFlow({ onComplete, onBack }: OnboardingFlowProps) {
 
 /* ── Dynamic right-panel preview ── */
 
-const DIM_NAMES = [
-  { zh: "提示工程", en: "Prompting" },
-  { zh: "评估判断", en: "Evaluation" },
-  { zh: "自动化", en: "Automation" },
-  { zh: "推理能力", en: "Reasoning" },
-  { zh: "工具使用", en: "Tools" },
-  { zh: "风险意识", en: "Risk" },
-];
-
 const DIM_COLORS = [
   "from-cyan-400 to-cyan-500",
   "from-indigo-400 to-indigo-500",
@@ -474,7 +465,6 @@ function OnboardingPreview({
     .filter(Boolean);
 
   // Simulate dimension scores that grow with each step
-  const baseScores = [65, 58, 72, 50, 68, 55];
   const stepBoost = step * 8;
 
   return (
@@ -576,37 +566,27 @@ function OnboardingPreview({
             </div>
           </div>
 
-          {/* Dimension bars — animate as steps progress */}
-          <div className="mt-5">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
-              {zh ? "能力预测" : "Skill Forecast"}
-            </div>
-            <div className="mt-3 space-y-2">
-              {DIM_NAMES.map((dim, i) => {
-                const score = Math.min(95, baseScores[i] + stepBoost + (i % 2 === 0 ? 5 : 0));
-                return (
-                  <div key={dim.en} className="flex items-center gap-2">
-                    <span className="w-14 text-right text-[10px] text-slate-500">{dim[lang]}</span>
-                    <div className="flex-1 overflow-hidden rounded-full bg-white/[0.06]">
-                      <motion.div
-                        className={`h-2 rounded-full bg-gradient-to-r ${DIM_COLORS[i]}`}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${score}%` }}
-                        transition={{ duration: 0.8, delay: i * 0.08, ease: "easeOut" }}
-                      />
-                    </div>
-                    <motion.span
-                      className="w-7 text-right text-[10px] tabular-nums text-slate-400"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 + i * 0.08 }}
-                    >
-                      {score}
-                    </motion.span>
+          {/* Dimension bars — blurred/abstract, no labels or scores */}
+          <div className="mt-5 space-y-2.5">
+            {DIM_COLORS.map((color, i) => {
+              const widths = [82, 68, 88, 58, 76, 63];
+              const w = Math.min(95, widths[i] + stepBoost);
+              return (
+                <div key={i} className="flex items-center gap-2.5">
+                  <div className="h-2 w-12 rounded-full bg-white/[0.05]" />
+                  <div className="flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                    <motion.div
+                      className={`h-2.5 rounded-full bg-gradient-to-r ${color}`}
+                      style={{ opacity: 0.5 }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${w}%` }}
+                      transition={{ duration: 0.8, delay: i * 0.08, ease: "easeOut" }}
+                    />
                   </div>
-                );
-              })}
-            </div>
+                  <div className="h-2 w-5 rounded-full bg-white/[0.05]" />
+                </div>
+              );
+            })}
           </div>
 
           {/* Plan badge — shows on step 4 */}
