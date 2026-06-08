@@ -107,7 +107,11 @@ export function SignInCard({ next = "/" }: { next?: string }) {
       </div>
 
       <p className="mt-6 text-center text-xs leading-relaxed text-slate-400">
-        {t(UI.auth.privacy, lang)}
+        {lang === "zh" ? "登录即表示你同意我们的" : "By signing in, you agree to our "}
+        <a href="/terms" className="text-indigo-500 hover:underline">{lang === "zh" ? "服务条款" : "Terms of Service"}</a>
+        {lang === "zh" ? "与" : " and "}
+        <a href="/privacy" className="text-indigo-500 hover:underline">{lang === "zh" ? "隐私政策" : "Privacy Policy"}</a>
+        {lang === "zh" ? "。" : "."}
       </p>
 
       <div className="mt-6 border-t border-slate-100 pt-6 text-center">

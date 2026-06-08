@@ -942,8 +942,9 @@ export function LandingPage({
           </div>
           <div className="flex items-center gap-6 text-slate-400">
             <a href="mailto:support@aifluency.app" className="transition-colors hover:text-white">{lang === "zh" ? "帮助中心" : "Help Center"}</a>
-            <a href="#" className="transition-colors hover:text-white">{lang === "zh" ? "隐私政策" : "Privacy Policy"}</a>
-            <a href="#" className="transition-colors hover:text-white">{lang === "zh" ? "服务条款" : "Terms of Service"}</a>
+            <a href="/privacy" className="transition-colors hover:text-white">{lang === "zh" ? "隐私政策" : "Privacy Policy"}</a>
+            <a href="/terms" className="transition-colors hover:text-white">{lang === "zh" ? "服务条款" : "Terms of Service"}</a>
+            <a href="/refund" className="transition-colors hover:text-white">{lang === "zh" ? "退款政策" : "Refund Policy"}</a>
           </div>
           <p className="text-slate-600">
             © 2024 {t(UI.nav.brand, lang)}. {lang === "zh" ? "保留所有权利" : "All rights reserved"}
