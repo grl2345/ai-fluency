@@ -27,38 +27,6 @@ interface LandingPageProps {
   isAuthenticated?: boolean;
 }
 
-const TESTIMONIALS = [
-  {
-    quote: {
-      en: "The AI Fluency assessment revealed many blind spots I didn't know I had. The gains in evaluation and judgment alone were huge!",
-      zh: "AI 实力测评帮我发现了很多盲点，特别是在评估判断方面收获很大！",
-    },
-    name: "Sarah C.",
-    role: { en: "Product Manager", zh: "产品经理" },
-    avatarSeed: "SarahC",
-    avatarBg: "b6e3f4",
-  },
-  {
-    quote: {
-      en: "The report is incredibly detailed, and the suggestions are very practical. I've already improved my work efficiency noticeably by following them.",
-      zh: "报告非常详细，建议也很具体，已经按照建议提升了不少工作效率。",
-    },
-    name: "Marcus H.",
-    role: { en: "Data Analyst", zh: "数据分析师" },
-    avatarSeed: "MarcusH",
-    avatarBg: "c0aede",
-  },
-  {
-    quote: {
-      en: "This assessment framework is truly professional and covers all the core AI competencies our team needs.",
-      zh: "这个测评体系非常专业，覆盖了我们团队需要的所有 AI 核心能力。",
-    },
-    name: "Priya K.",
-    role: { en: "Technical Director", zh: "技术总监" },
-    avatarSeed: "PriyaK",
-    avatarBg: "c3f4c8",
-  },
-];
 
 const FAQS = [
   {
@@ -310,7 +278,7 @@ export function LandingPage({
       {/* ── Nav ── */}
       <nav className="fixed top-0 z-50 w-full border-b border-white/[0.06] bg-[#0a0a16]/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <a href="#" className="flex items-center gap-2.5">
+          <a href="/" className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/25">
               <Brain className="h-[18px] w-[18px] text-white" />
             </div>
@@ -379,27 +347,6 @@ export function LandingPage({
                   : "Discover your strengths, spot your AI blind spots, and turn AI into your real competitive edge."}
               </p>
 
-              {/* Social proof */}
-              <div className="mt-8 flex items-center gap-3.5">
-                <div className="flex -space-x-2.5">
-                  {["AvA", "BvB", "CvC", "DvD"].map((seed, i) => (
-                    <img
-                      key={seed}
-                      src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}&radius=50`}
-                      alt=""
-                      className="h-9 w-9 rounded-full border-2 border-[#0a0a16] bg-slate-700"
-                      style={{ zIndex: 10 - i }}
-                    />
-                  ))}
-                  <div className="z-0 flex h-9 items-center justify-center rounded-full border-2 border-[#0a0a16] bg-indigo-500/20 px-2.5 text-[11px] font-bold text-indigo-200">
-                    12K+
-                  </div>
-                </div>
-                <p className="text-sm leading-tight text-slate-400">
-                  {lang === "zh" ? <>超过 12,000+ 专业人士<br />已完成测评</> : <>12,000+ professionals<br />have taken the test</>}
-                </p>
-              </div>
-
               <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <button
                   onClick={onStartTest}
@@ -439,10 +386,10 @@ export function LandingPage({
               <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-6 shadow-2xl shadow-black/50 backdrop-blur-md md:p-8">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
-                    {lang === "zh" ? "你的 AI 实力报告" : "Your AI Fluency Report"}
+                    {lang === "zh" ? "示例报告预览" : "Sample Report Preview"}
                   </span>
-                  <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400 ring-1 ring-emerald-500/20">
-                    {lang === "zh" ? "优秀" : "EXCELLENT"}
+                  <span className="rounded-full bg-white/[0.06] px-2.5 py-0.5 text-[10px] font-medium text-slate-400 ring-1 ring-white/10">
+                    {lang === "zh" ? "仅供参考" : "DEMO"}
                   </span>
                 </div>
 
@@ -451,7 +398,7 @@ export function LandingPage({
                   <div className="flex flex-col items-center">
                     <ScoreRing />
                     <p className="mt-1 text-xs font-medium text-slate-400">{lang === "zh" ? "AI 实力得分" : "AI Fluency Score"}</p>
-                    <p className="text-[11px] text-indigo-300">{lang === "zh" ? "超过 92% 的用户" : "Top 8% of users"}</p>
+                    <p className="text-[11px] text-indigo-300/60">{lang === "zh" ? "示例报告" : "Sample report"}</p>
                   </div>
 
                   {/* Radar */}
@@ -654,45 +601,16 @@ export function LandingPage({
           )}
 
 
-          <div className="grid items-start gap-8 lg:grid-cols-[1fr_2.2fr]">
-            {/* Left: testimonial */}
-            <div>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
-                {t(UI.testimonials.sectionPill, lang)}
-              </span>
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white md:text-4xl">
-                {t(UI.testimonials.sectionTitle, lang)}
-              </h2>
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight text-white md:text-4xl">
+              {t(UI.pricing.title, lang)}
+            </h2>
+            <p className="mx-auto mt-3 max-w-lg text-[15px] text-slate-400">
+              {t(UI.pricing.subtitle, lang)}
+            </p>
+          </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4 }}
-                className="mt-8 flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6"
-              >
-                <div className="mb-2 text-2xl font-black leading-none text-white/15 select-none">&ldquo;</div>
-                <p className="text-[14px] leading-relaxed text-slate-300">{TESTIMONIALS[0].quote[lang]}</p>
-                <div className="mt-5 flex items-center gap-3 border-t border-white/[0.06] pt-4">
-                  <img
-                    src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${TESTIMONIALS[0].avatarSeed}&backgroundColor=${TESTIMONIALS[0].avatarBg}&radius=50`}
-                    alt=""
-                    className="h-9 w-9 shrink-0 rounded-full"
-                  />
-                  <div>
-                    <p className="text-sm font-semibold text-white">{TESTIMONIALS[0].name}</p>
-                    <p className="text-xs text-indigo-300">{TESTIMONIALS[0].role[lang]}</p>
-                  </div>
-                </div>
-                <div className="mt-3 flex gap-0.5">
-                  {Array.from({ length: 5 }).map((_, s) => (
-                    <Star key={s} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Right: pricing cards */}
+          <div>
             <div className="grid items-stretch gap-5 md:grid-cols-3">
               {(
                 [
@@ -922,13 +840,13 @@ export function LandingPage({
             <span className="font-bold text-white">{t(UI.nav.brand, lang)}</span>
           </div>
           <div className="flex items-center gap-6 text-slate-400">
-            <a href="mailto:support@aifluency.app" className="transition-colors hover:text-white">{lang === "zh" ? "帮助中心" : "Help Center"}</a>
+            <a href="mailto:support@aifluency.app" className="transition-colors hover:text-white">{lang === "zh" ? "联系我们" : "Contact Us"}</a>
             <a href="/privacy" className="transition-colors hover:text-white">{lang === "zh" ? "隐私政策" : "Privacy Policy"}</a>
             <a href="/terms" className="transition-colors hover:text-white">{lang === "zh" ? "服务条款" : "Terms of Service"}</a>
             <a href="/refund" className="transition-colors hover:text-white">{lang === "zh" ? "退款政策" : "Refund Policy"}</a>
           </div>
           <p className="text-slate-600">
-            © 2024 {t(UI.nav.brand, lang)}. {lang === "zh" ? "保留所有权利" : "All rights reserved"}
+            © {new Date().getFullYear()} {t(UI.nav.brand, lang)}. {lang === "zh" ? "保留所有权利" : "All rights reserved"}
           </p>
         </div>
       </footer>
