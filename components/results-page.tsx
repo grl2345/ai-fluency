@@ -11,7 +11,6 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   allQuestions,
   dimensions,
@@ -39,12 +38,14 @@ import {
   Lock,
   Zap,
   Star,
-  Home,
   ArrowRight,
   ChevronRight,
   Users,
   Crown,
   Clock,
+  Copy,
+  Eye,
+  Link2,
 } from "lucide-react";
 import { useSubscription } from "@/components/subscription-provider";
 
@@ -58,6 +59,8 @@ interface ResultsPageProps {
 const iconMap: Record<string, React.ElementType> = {
   Brain, Target, MessageSquare, CheckCircle, GitMerge, Shield,
 };
+
+const DIM_COLORS = ["#818cf8", "#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#a78bfa"];
 
 function AnimatedScore({ value, delay = 0.5 }: { value: number; delay?: number }) {
   const [displayed, setDisplayed] = useState(0);
@@ -84,6 +87,8 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
   const { isPro, isTeam } = useSubscription();
   const hasPro = isPro || isTeam;
   const [showPayment, setShowPayment] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const zh = lang === "zh";
 
   const dimensionScores = useMemo(() => {
     const scores: Record<string, { total: number; max: number }> = {};
@@ -105,12 +110,12 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
       scores[q.dimension!].total += prScore * q.weight;
       scores[q.dimension!].max += 5 * q.weight;
     });
-    return Object.entries(scores).map(([id, data]) => {
+    return Object.entries(scores).map(([id, data], i) => {
       const dimension = dimensions.find((d) => d.id === id)!;
       const percentage = data.max > 0 ? Math.round((data.total / data.max) * 100) : 0;
       const nameStr = dimension.name[lang];
       const shortName = lang === "zh" ? nameStr.slice(0, 4) : nameStr.slice(0, 8);
-      return { id, name: nameStr, shortName, score: Math.min(100, percentage), fullMark: 100 };
+      return { id, name: nameStr, shortName, score: Math.min(100, percentage), fullMark: 100, color: DIM_COLORS[i] };
     });
   }, [answers, practicalTexts, lang]);
 
@@ -142,576 +147,453 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
   const nextLevelGap = nextLevel ? nextLevel.minScore - totalScore : 0;
 
   const sortedDimensions = useMemo(() => [...dimensionScores].sort((a, b) => b.score - a.score), [dimensionScores]);
-  const strengths = sortedDimensions.slice(0, 2);
+  const topStrength = sortedDimensions[0];
+  const focusArea = sortedDimensions[sortedDimensions.length - 1];
   const weaknesses = sortedDimensions.slice(-3).reverse();
 
-  const gapMessage = useMemo(() => {
-    const p2 = profileData["P2"] as string | undefined;
-    const map: Record<string, number> = { never: 1, lt6m: 2, "6m2y": 3, gt2y: 4 };
-    if (!p2 || !(p2 in map)) return null;
-    const gap = map[p2] - mainTier;
-    if (gap > 0) return t(UI.results.gapPositive, lang);
-    if (gap < 0) return t(UI.results.gapNegative, lang);
-    return t(UI.results.gapNeutral, lang);
-  }, [profileData, mainTier, lang]);
-
   const percentile = useMemo(() => {
-    if (mainTier <= 1) return 62;
-    if (mainTier === 2) return 45;
-    if (mainTier === 3) return 28;
-    if (mainTier === 4) return 12;
-    return 5;
+    if (mainTier <= 1) return 38;
+    if (mainTier === 2) return 55;
+    if (mainTier === 3) return 72;
+    if (mainTier === 4) return 88;
+    return 95;
   }, [mainTier]);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.origin).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a1a]">
       {/* ── Nav ── */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a1a]/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
-          <a href="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/25">
-              <Brain className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-sm font-bold text-white">{lang === "zh" ? "AI 素养" : "AI Fluency"}</span>
-          </a>
-          <div className="flex items-center gap-1">
-            <a href="/" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white">
-              <Home className="h-3.5 w-3.5" />
-              {lang === "zh" ? "首页" : "Home"}
+      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a1a]/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 md:px-6">
+          <div className="flex items-center gap-6">
+            <a href="/" className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600">
+                <Brain className="h-4 w-4 text-white" />
+              </div>
+              <span className="text-sm font-bold text-white">{zh ? "AI 素养" : "AI Fluency"}</span>
             </a>
-            <button onClick={onRetake} className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white">
-              <RefreshCw className="h-3.5 w-3.5" />
-              {lang === "zh" ? "重新测评" : "Retake"}
+            <div className="hidden items-center gap-1 md:flex">
+              {(zh ? ["总览", "学习", "关于"] : ["Dashboard", "Learn", "About"]).map((item) => (
+                <span key={item} className="rounded-lg px-3 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-white/[0.04] hover:text-slate-300 cursor-default">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={onRetake} className="flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:bg-white/[0.06]">
+              <RefreshCw className="h-3 w-3" />
+              {zh ? "重新测评" : "Retake Test"}
+            </button>
+            <button onClick={handleCopyLink} className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-3 py-1.5 text-xs font-semibold text-white transition-all hover:from-indigo-400 hover:to-violet-400">
+              <Share2 className="h-3 w-3" />
+              {zh ? "分享结果" : "Share Result"}
             </button>
           </div>
         </div>
       </nav>
 
-      <div className="mx-auto max-w-5xl px-4 py-8 md:px-6 md:py-12">
-        {/* ── Greeting ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-8 text-center"
-        >
-          <h1 className="text-2xl font-bold text-white md:text-3xl">
-            Hi{lang === "zh" ? "，欢迎回来" : ", Welcome Back"} <span className="inline-block">&#x1F44B;</span>
-          </h1>
-          <p className="mt-2 text-sm text-slate-400">
-            {lang === "zh" ? "你的 AI 素养测评报告已生成" : "Your AI Fluency Assessment report is ready"}
-          </p>
-        </motion.div>
+      <div className="mx-auto max-w-6xl px-4 py-6 md:px-6 md:py-8">
+        {/* ── Row 1: Hero Identity + Next Level ── */}
+        <div className="grid gap-4 lg:grid-cols-3">
+          {/* Hero Identity Card — spans 2 cols */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#16163a] via-[#12122a] to-[#1a1240] p-6 lg:col-span-2"
+          >
+            <div className="absolute -left-16 -top-16 h-48 w-48 rounded-full bg-indigo-600/15 blur-[80px]" />
+            <div className="absolute -right-8 top-0 h-32 w-32 rounded-full bg-violet-500/10 blur-[60px]" />
 
-        {/* ── Hero Identity Card ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-br from-[#16163a] via-[#12122a] to-[#1a1240]"
-        >
-          <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-indigo-600/15 blur-[80px]" />
-          <div className="absolute -right-10 top-0 h-40 w-40 rounded-full bg-violet-500/10 blur-[60px]" />
-
-          <div className="relative flex flex-col gap-6 p-6 md:flex-row md:items-center md:gap-8 md:p-8">
-            {/* Left: Avatar area with floating icons */}
-            <div className="relative mx-auto flex h-52 w-52 shrink-0 items-center justify-center md:mx-0">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-600/20 via-violet-600/15 to-transparent" />
-              <div className="relative flex h-36 w-36 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/30 to-violet-600/20">
-                <Brain className="h-16 w-16 text-indigo-300/80" />
-              </div>
-              {/* Floating icons */}
-              <motion.div
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute left-2 top-6 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20 backdrop-blur-sm"
-              >
-                <MessageSquare className="h-4 w-4 text-indigo-300" />
-              </motion.div>
-              <motion.div
-                animate={{ y: [0, 6, 0] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="absolute bottom-8 left-0 flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/20 backdrop-blur-sm"
-              >
-                <Sparkles className="h-4 w-4 text-violet-300" />
-              </motion.div>
-              <motion.div
-                animate={{ y: [0, -5, 0] }}
-                transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute right-2 top-10 flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/20 backdrop-blur-sm"
-              >
-                <Target className="h-4 w-4 text-cyan-300" />
-              </motion.div>
-            </div>
-
-            {/* Center: Level identity */}
-            <div className="flex-1 text-center md:text-left">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-3 py-1 text-[11px] font-medium text-slate-400">
-                {lang === "zh" ? "你的 AI 身份" : "Your AI Identity"}
+            <div className="relative">
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">
+                {zh ? "你的 AI 身份" : "YOUR AI IDENTITY"}
               </span>
-              <h2 className="mt-3 text-3xl font-extrabold text-white md:text-4xl">
-                {currentLevel.name[lang]}
-              </h2>
-              <p className="mt-3 max-w-sm text-sm leading-relaxed text-slate-400">
-                {currentLevel.description[lang]}
-                {lang === "zh" ? "，但更多停留在工具层面。" : "."}
-              </p>
-              <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2">
-                <Users className="h-4 w-4 text-indigo-400" />
-                <span className="text-lg font-bold text-white">{percentile}%</span>
-                <span className="text-xs text-slate-400">
-                  {lang === "zh" ? "的用户处于此阶段" : "of users are at this stage"}
+              <div className="mt-2 flex items-center gap-3">
+                <h1 className="text-2xl font-extrabold text-white md:text-3xl">{currentLevel.name[lang]}</h1>
+                <span className="rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-2.5 py-1 text-[11px] font-bold text-white">
+                  LEVEL {mainTier}
                 </span>
               </div>
-            </div>
+              <p className="mt-3 max-w-lg text-sm leading-relaxed text-slate-400">
+                {currentLevel.description[lang]}
+                {zh ? "。继续加油——你已经超过了大多数人！" : ". Keep going — you're ahead of most people!"}
+              </p>
 
-            {/* Right: Score + Level badge */}
-            <div className="flex shrink-0 flex-col items-center gap-4 md:items-end">
-              {/* Level badge */}
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-2xl font-black text-white shadow-lg shadow-violet-500/25">
-                {currentLevel.badge}
-              </div>
-              {/* Score box */}
-              <div className="rounded-2xl border border-white/[0.08] bg-[#0d0d22] px-6 py-4 text-center">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-                  {lang === "zh" ? "AI 素养得分" : "AI Fluency Score"}
-                </p>
-                <div className="mt-1 flex items-baseline justify-center gap-1">
-                  <span className="bg-gradient-to-br from-white to-indigo-200 bg-clip-text text-4xl font-black leading-none text-transparent tabular-nums">
-                    <AnimatedScore value={totalScore} delay={0.5} />
-                  </span>
-                  <span className="text-sm text-slate-500">/100</span>
+              <div className="mt-5 flex flex-wrap items-center gap-6">
+                {/* Score */}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">{zh ? "AI 素养得分" : "AI SCORE"}</p>
+                  <p className="mt-1 flex items-baseline gap-1">
+                    <span className="text-4xl font-black text-white tabular-nums"><AnimatedScore value={totalScore} delay={0.3} /></span>
+                    <span className="text-sm text-slate-500">/100</span>
+                  </p>
                 </div>
-                {nextLevel && (
-                  <div className="mt-3 border-t border-white/[0.06] pt-3">
-                    <p className="text-[10px] text-slate-500">
-                      {lang === "zh" ? "距离下一等级还差" : "Points to next level"}
-                    </p>
-                    <p className="mt-0.5 flex items-baseline justify-center gap-1">
-                      <span className="text-2xl font-bold text-amber-400 tabular-nums">{nextLevelGap}</span>
-                      <span className="text-xs text-slate-500">{lang === "zh" ? "分" : "pts"}</span>
-                    </p>
+                {/* Percentile */}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">{zh ? "超过了" : "YOU SCORED HIGHER THAN"}</p>
+                  <p className="mt-1 flex items-baseline gap-1">
+                    <span className="text-4xl font-black text-emerald-400 tabular-nums">{percentile}%</span>
+                    <span className="text-sm text-slate-500">{zh ? "的用户" : "of people"}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Next Level Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="flex flex-col justify-between rounded-2xl border border-white/[0.08] bg-[#12122a] p-6"
+          >
+            {nextLevel ? (
+              <>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">{zh ? "下一等级" : "NEXT LEVEL"}</p>
+                  <h3 className="mt-2 text-lg font-bold text-white">{nextLevel.name[lang]} ({nextLevel.badge})</h3>
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-black text-amber-400 tabular-nums">{nextLevelGap}</span>
+                    <span className="text-sm text-slate-500">{zh ? "分即可升级" : "points to go"}</span>
                   </div>
+                  <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(totalScore / (nextLevel.minScore)) * 100}%` }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                      className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500"
+                    />
+                  </div>
+                  <p className="mt-2 text-right text-xs tabular-nums text-slate-500">{totalScore}/{nextLevel.minScore}</p>
+                </div>
+                <p className="mt-4 text-xs text-slate-500">
+                  {zh ? "提升以下关键能力即可升级！🚀" : "Keep improving in these key areas to level up! 🚀"}
+                </p>
+              </>
+            ) : (
+              <div className="flex flex-1 flex-col items-center justify-center text-center">
+                <Crown className="h-8 w-8 text-amber-400" />
+                <p className="mt-2 text-lg font-bold text-white">{zh ? "已达最高等级！" : "Max level reached!"}</p>
+              </div>
+            )}
+          </motion.div>
+        </div>
+
+        {/* ── CTA Buttons ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mt-4 flex flex-wrap gap-3"
+        >
+          <button className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 transition-all hover:from-indigo-400 hover:to-violet-400">
+            <Award className="h-4 w-4" />
+            {zh ? "生成 AI 身份卡" : "Create My AI Identity Card"}
+          </button>
+          <button
+            onClick={handleCopyLink}
+            className="flex items-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.03] px-5 py-3 text-sm font-medium text-slate-300 transition-all hover:bg-white/[0.06]"
+          >
+            {copied ? <CheckCircle className="h-4 w-4 text-emerald-400" /> : <Link2 className="h-4 w-4" />}
+            {copied ? (zh ? "已复制" : "Copied!") : (zh ? "复制测评链接" : "Copy My Test Link")}
+          </button>
+        </motion.div>
+
+        {/* ── Row 2: AI Powers + Growth Path ── */}
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          {/* AI Powers — Radar + insights */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="rounded-2xl border border-white/[0.08] bg-[#12122a] p-6"
+          >
+            <div className="mb-1 flex items-center gap-2">
+              <Zap className="h-4 w-4 text-amber-400" />
+              <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-slate-300">{zh ? "你的 AI 能力" : "YOUR AI POWERS"}</h3>
+            </div>
+            <p className="mb-4 text-xs text-slate-500">{zh ? "六大核心 AI 能力分析" : "Breakdown of your core AI skills"}</p>
+
+            <div className="flex flex-col gap-4 md:flex-row md:items-center">
+              {/* Radar */}
+              <div className="h-[220px] w-full md:h-[240px] md:w-[55%]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart cx="50%" cy="50%" outerRadius="72%" data={dimensionScores}>
+                    <PolarGrid stroke="rgba(255,255,255,0.06)" />
+                    <PolarAngleAxis dataKey="shortName" tick={{ fill: "#94a3b8", fontSize: 10, fontWeight: 600 }} />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                    <Radar name="Score" dataKey="score" stroke="#818cf8" fill="#818cf8" fillOpacity={0.12} strokeWidth={2} />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Insights */}
+              <div className="flex-1 space-y-4">
+                {/* Top Strength */}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-400">{zh ? "最强项" : "Top Strength"}</p>
+                  <p className="mt-1 text-sm font-bold text-white">{topStrength.name}</p>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    {dimensions.find((d) => d.id === topStrength.id)?.description[lang]}
+                  </p>
+                </div>
+                {/* Focus Area */}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-amber-400">{zh ? "重点提升" : "Focus Area"}</p>
+                  <p className="mt-1 text-sm font-bold text-white">{focusArea.name}</p>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    {dimensions.find((d) => d.id === focusArea.id)?.description[lang]}
+                  </p>
+                </div>
+                {hasPro ? (
+                  <button className="flex items-center gap-1.5 rounded-lg bg-indigo-500/10 px-3 py-2 text-xs font-semibold text-indigo-300 transition-colors hover:bg-indigo-500/20">
+                    <Sparkles className="h-3 w-3" />
+                    {zh ? "查看改进建议" : "View Tips"}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setShowPayment(true)}
+                    className="flex items-center gap-1.5 rounded-lg bg-indigo-500/10 px-3 py-2 text-xs font-semibold text-indigo-300 transition-colors hover:bg-indigo-500/20"
+                  >
+                    <Lock className="h-3 w-3" />
+                    {zh ? "升级查看建议" : "Unlock Tips"}
+                  </button>
                 )}
               </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* ── Strengths & Weaknesses ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-8 grid gap-5 md:grid-cols-2"
-        >
-          {/* Strengths */}
-          <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-5 md:p-6">
-            <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-slate-200">
-              <CheckCircle className="h-4 w-4 text-emerald-400" />
-              {lang === "zh" ? "你的优势" : "Your Strengths"}
-            </h3>
-            <div className="space-y-3">
-              {strengths.map((dim) => {
-                const fullDim = dimensions.find((d) => d.id === dim.id);
-                const Icon = iconMap[fullDim?.icon || "Brain"];
-                return (
-                  <div key={dim.id} className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3.5 transition-colors hover:bg-white/[0.04]">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
-                      <Icon className="h-5 w-5 text-emerald-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-200">{dim.name}</p>
-                      <p className="mt-0.5 text-xs text-slate-500 truncate">{fullDim?.description[lang]}</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-600" />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Weaknesses */}
-          <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-5 md:p-6">
-            <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-slate-200">
-              <TrendingUp className="h-4 w-4 text-amber-400" />
-              {lang === "zh" ? "待提升能力" : "Areas for Growth"}
-            </h3>
-            <div className="space-y-3">
-              {weaknesses.map((dim) => {
-                const fullDim = dimensions.find((d) => d.id === dim.id);
-                const Icon = iconMap[fullDim?.icon || "Brain"];
-                return (
-                  <div key={dim.id} className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3.5 transition-colors hover:bg-white/[0.04]">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
-                      <Icon className="h-5 w-5 text-amber-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-200">{dim.name}</p>
-                      <p className="mt-0.5 text-xs text-slate-500 truncate">{fullDim?.description[lang]}</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-600" />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* ── Growth Path & Recommendations ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-8 grid gap-5 md:grid-cols-2"
-        >
           {/* Growth Path */}
-          <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-6 md:p-8">
-            <h3 className="mb-8 flex items-center gap-2 text-sm font-bold text-slate-200">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="rounded-2xl border border-white/[0.08] bg-[#12122a] p-6"
+          >
+            <div className="mb-1 flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-indigo-400" />
-              {lang === "zh" ? "你的 AI 成长路径" : "Your AI Growth Path"}
-            </h3>
+              <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-slate-300">{zh ? "你的 AI 成长路径" : "YOUR AI GROWTH PATH"}</h3>
+            </div>
+            <p className="mb-5 text-xs text-slate-500">{zh ? "通往 AI 精通之路" : "Your journey to AI mastery"}</p>
 
-            {/* Level Timeline */}
-            <div className="mb-10">
-              {/* Icons row */}
-              <div className="relative flex items-center justify-between px-2">
-                {levels.map((lvl) => {
-                  const isActive = lvl.level === mainTier;
-                  const isPast = lvl.level < mainTier;
-                  return (
-                    <div key={lvl.badge} className="z-10 flex flex-col items-center">
-                      <div className={`relative flex h-12 w-12 items-center justify-center rounded-xl text-xs font-bold transition-all ${
-                        isActive
-                          ? "bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-lg shadow-violet-500/30"
-                          : isPast
-                            ? "bg-indigo-500/15 text-indigo-400"
-                            : "bg-white/[0.04] text-slate-600"
-                      }`}>
-                        <Brain className="h-5 w-5" />
-                        {isActive && (
-                          <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-[#12122a] bg-emerald-400" />
-                        )}
-                      </div>
+            {/* Timeline */}
+            <div className="relative mb-6 flex items-center justify-between">
+              {levels.map((lvl) => {
+                const isActive = lvl.level === mainTier;
+                const isPast = lvl.level < mainTier;
+                const isFuture = lvl.level > mainTier;
+                return (
+                  <div key={lvl.badge} className="z-10 flex flex-col items-center gap-1.5">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
+                      isActive
+                        ? "bg-gradient-to-br from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30"
+                        : isPast
+                          ? "bg-emerald-500/15 text-emerald-400"
+                          : "bg-white/[0.04] text-slate-600"
+                    }`}>
+                      {isPast ? <CheckCircle className="h-4 w-4" /> : isActive ? <Sparkles className="h-4 w-4" /> : <Lock className="h-3.5 w-3.5" />}
                     </div>
-                  );
-                })}
-                {/* Connection line behind icons */}
-                <div className="absolute inset-x-8 top-1/2 h-0.5 -translate-y-1/2">
-                  <div className="absolute inset-0 bg-white/[0.06]" />
-                  <div
-                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 to-violet-500"
-                    style={{ width: `${((mainTier - 1) / 4) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Labels row */}
-              <div className="mt-3 flex items-start justify-between px-2">
-                {levels.map((lvl) => {
-                  const isActive = lvl.level === mainTier;
-                  const isPast = lvl.level < mainTier;
-                  return (
-                    <div key={lvl.badge} className="flex flex-col items-center gap-1">
-                      <span className={`text-xs font-bold ${isActive ? "text-white" : isPast ? "text-indigo-400" : "text-slate-600"}`}>
-                        {lvl.badge}
-                      </span>
-                      <span className={`whitespace-nowrap text-[10px] leading-tight ${isActive ? "text-slate-300" : "text-slate-600"}`}>
-                        {lvl.name[lang]}
-                      </span>
-                      {isActive && (
-                        <span className="mt-1 whitespace-nowrap rounded-full bg-violet-500/20 px-2.5 py-1 text-[10px] font-bold text-violet-300">
-                          {lang === "zh" ? "当前阶段" : "Current"}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
+                    <span className={`text-[10px] font-bold ${isActive ? "text-white" : isPast ? "text-emerald-400" : "text-slate-600"}`}>
+                      {lvl.badge}
+                    </span>
+                    <span className={`whitespace-nowrap text-[9px] ${isActive ? "text-slate-300" : "text-slate-600"}`}>
+                      {lvl.name[lang]}
+                    </span>
+                  </div>
+                );
+              })}
+              {/* Connection line */}
+              <div className="absolute left-5 right-5 top-5 h-0.5">
+                <div className="absolute inset-0 bg-white/[0.06]" />
+                <div
+                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 to-indigo-500"
+                  style={{ width: `${((mainTier - 0.5) / 4.5) * 100}%` }}
+                />
               </div>
             </div>
 
-            {/* Next level info */}
+            {/* Points to next level */}
             {nextLevel && (
-              <div className="space-y-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
-                <div>
-                  <p className="text-sm text-slate-400">
-                    {lang === "zh" ? `距离下一等级：` : "Next level: "}
-                    <span className="font-bold text-white">{nextLevel.name[lang]} ({nextLevel.badge})</span>
-                    {lang === "zh" ? ` 还差 ` : " — "}
-                    <span className="font-bold text-amber-400">{nextLevelGap} {lang === "zh" ? "分" : "pts"}</span>
-                  </p>
-                </div>
-                <div className="space-y-3">
-                  {weaknesses.slice(0, 3).map((dim, i) => {
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                <p className="mb-3 text-sm text-slate-300">
+                  <span className="text-lg font-bold text-amber-400 tabular-nums">{nextLevelGap}</span>
+                  <span className="ml-1 text-slate-500">{zh ? `分即可到达 Level ${nextLevel.level}` : `points to reach Level ${nextLevel.level}`}</span>
+                </p>
+                <div className="space-y-2.5">
+                  {weaknesses.slice(0, 3).map((dim) => {
                     const fullDim = dimensions.find((d) => d.id === dim.id);
                     const Icon = iconMap[fullDim?.icon || "Brain"];
                     const boost = Math.max(3, Math.round((100 - dim.score) * 0.12));
                     return (
-                      <div key={dim.id} className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2.5 text-slate-300">
-                          <Icon className="h-4 w-4 text-slate-500" />
+                      <div key={dim.id} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-xs text-slate-400">
+                          <Icon className="h-3.5 w-3.5 text-slate-500" />
                           {dim.name}
                         </div>
-                        <span className="font-bold text-emerald-400">+{boost}</span>
+                        <span className="text-xs font-bold text-indigo-400">+{boost}</span>
                       </div>
                     );
                   })}
                 </div>
-                <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
-                  <span className="text-[10px] text-slate-500">{lang === "zh" ? "预计成长时间" : "Est. growth time"}</span>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5 text-indigo-400" />
-                    <span className="text-lg font-bold text-white">7</span>
-                    <span className="text-xs text-slate-400">{lang === "zh" ? "天" : "days"}</span>
-                  </div>
-                </div>
               </div>
             )}
-          </div>
 
-          {/* Recommendations */}
-          <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-6 md:p-8">
-            <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-slate-200">
-              <Star className="h-4 w-4 text-amber-400" />
-              {lang === "zh" ? "为你推荐的下一步" : "Recommended Next Steps"}
-            </h3>
-            <p className="mb-6 text-xs text-slate-500">
-              {lang === "zh" ? "未来 7 天优先提升" : "Priority for the next 7 days"}
-            </p>
-            <div className="space-y-4">
-              {weaknesses.slice(0, 3).map((dim, i) => {
-                const fullDim = dimensions.find((d) => d.id === dim.id);
-                const steps = {
-                  zh: [
-                    `学习${dim.name}方法`,
-                    `掌握 ${dim.name} 技巧`,
-                    `学会${dim.name}迭代`,
-                  ],
-                  en: [
-                    `Learn ${dim.name} methods`,
-                    `Master ${dim.name} techniques`,
-                    `Practice ${dim.name} iteration`,
-                  ],
-                };
-                const descs = {
-                  zh: [
-                    `让复杂任务变得清晰易执行`,
-                    `获得更准确、更优质的输出`,
-                    `持续优化 AI 输出结果`,
-                  ],
-                  en: [
-                    `Make complex tasks clear and actionable`,
-                    `Get more accurate, higher quality outputs`,
-                    `Continuously optimize AI outputs`,
-                  ],
-                };
-                return (
-                  <div key={dim.id} className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-4 transition-colors hover:bg-white/[0.04]">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500/20 to-indigo-500/20 text-sm font-bold text-violet-300">
-                      {String(i + 1).padStart(2, "0")}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-200">{steps[lang][i]}</p>
-                      <p className="mt-1 text-xs text-slate-500">{descs[lang][i]}</p>
-                    </div>
+            <button className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.03] py-2.5 text-xs font-semibold text-slate-300 transition-colors hover:bg-white/[0.06]">
+              {zh ? "查看完整成长计划" : "View Full Growth Plan"}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </motion.div>
+        </div>
+
+        {/* ── Row 3: Share + Leaderboard (Free) or Learning Resources (Pro) ── */}
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          {/* Share / Invite Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="rounded-2xl border border-white/[0.08] bg-[#12122a] p-6"
+          >
+            <div className="mb-1 flex items-center gap-2">
+              <Users className="h-4 w-4 text-violet-400" />
+              <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-slate-300">{zh ? "邀请好友，解锁奖励" : "INVITE FRIENDS, UNLOCK REWARDS"} 🎁</h3>
+            </div>
+            <p className="mb-5 text-xs text-slate-500">{zh ? "邀请更多好友来测试，解锁专属奖励" : "Invite more friends to unlock awesome rewards"}</p>
+
+            {/* Reward tiers */}
+            <div className="mb-5 flex items-center justify-between gap-2">
+              {[
+                { n: 1, label: zh ? "分享结果" : "Share result", icon: Share2, unlocked: true },
+                { n: 3, label: zh ? "完整雷达图" : "Full Skill Radar", icon: Star, unlocked: false },
+                { n: 5, label: zh ? "成长报告 PDF" : "Growth Report", icon: Award, unlocked: false },
+              ].map((tier) => (
+                <div key={tier.n} className="flex flex-col items-center gap-1.5">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-full ${tier.unlocked ? "bg-emerald-500/15 text-emerald-400" : "bg-white/[0.04] text-slate-600"}`}>
+                    {tier.unlocked ? <CheckCircle className="h-5 w-5" /> : <Lock className="h-4 w-4" />}
                   </div>
-                );
-              })}
+                  <p className="text-[10px] font-bold text-slate-400">{tier.n} {zh ? "人" : "Friends"}</p>
+                  <p className="max-w-[80px] text-center text-[9px] text-slate-600">{tier.label}</p>
+                </div>
+              ))}
             </div>
 
-            {hasPro ? (
-              <a href="#learning" className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-500 py-3 text-sm font-bold text-white transition-all hover:from-fuchsia-400 hover:to-violet-400">
-                {lang === "zh" ? "查看学习资源" : "View Learning Resources"}
-                <ArrowRight className="h-4 w-4" />
-              </a>
-            ) : (
+            {/* Copy link */}
+            <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2">
+              <div className="flex-1 truncate rounded-lg bg-white/[0.03] px-3 py-2 text-xs text-slate-500">
+                {typeof window !== "undefined" ? window.location.origin : "aifluencycheck.com"}
+              </div>
               <button
-                onClick={() => setShowPayment(true)}
-                className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-500 py-3 text-sm font-bold text-white transition-all hover:from-fuchsia-400 hover:to-violet-400"
+                onClick={handleCopyLink}
+                className="shrink-0 rounded-lg bg-gradient-to-r from-fuchsia-500 to-violet-500 px-4 py-2 text-xs font-bold text-white transition-all hover:from-fuchsia-400 hover:to-violet-400"
               >
-                {lang === "zh" ? "查看学习资源" : "View Learning Resources"}
-                <ArrowRight className="h-4 w-4" />
+                {copied ? (zh ? "已复制" : "Copied") : (zh ? "复制链接" : "Copy Link")}
               </button>
-            )}
-          </div>
-        </motion.div>
+            </div>
+          </motion.div>
 
-        {/* ── Pro Unlock CTA (free users only) ── */}
+          {/* Leaderboard preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="rounded-2xl border border-white/[0.08] bg-[#12122a] p-6"
+          >
+            <div className="mb-1 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-emerald-400" />
+                <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-slate-300">{zh ? "AI 素养排行榜" : "AI FLUENCY LEADERBOARD"}</h3>
+              </div>
+            </div>
+            <p className="mb-4 text-xs text-slate-500">{zh ? "看看你在同行中的排名" : "See how you rank among others"}</p>
+
+            {/* Leaderboard rows */}
+            <div className="space-y-2">
+              {(zh
+                ? [{ role: "开发者", score: 62 }, { role: "产品经理", score: 58 }, { role: "数据分析师", score: 51 }, { role: "市场营销", score: 44 }, { role: "设计师", score: 39 }]
+                : [{ role: "Developers", score: 62 }, { role: "Product Managers", score: 58 }, { role: "Data Analysts", score: 51 }, { role: "Marketers", score: 44 }, { role: "Designers", score: 39 }]
+              ).map((item, i) => (
+                <div key={item.role} className="flex items-center gap-3">
+                  <span className={`flex h-5 w-5 items-center justify-center rounded text-[10px] font-bold ${i < 3 ? "bg-amber-400/15 text-amber-400" : "text-slate-600"}`}>
+                    {i + 1}
+                  </span>
+                  <span className="flex-1 text-xs text-slate-300">{item.role}</span>
+                  <div className="w-24 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+                    <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500" style={{ width: `${item.score}%` }} />
+                  </div>
+                  <span className="w-6 text-right text-xs font-bold tabular-nums text-slate-400">{item.score}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+              <span className="text-xs font-bold text-slate-300">{zh ? "你的排名" : "Your Rank"}</span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-slate-500">Top {100 - percentile}%</span>
+                <span className="text-lg font-black text-white tabular-nums">{totalScore}</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* ── Pro CTA Banner ── */}
         {!hasPro && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mt-6 overflow-hidden rounded-3xl border border-violet-400/20 bg-gradient-to-r from-[#1e1048] via-[#18103a] to-[#1e1048]"
+            className="mt-6 overflow-hidden rounded-2xl bg-gradient-to-r from-[#1e1048] via-[#18103a] to-[#1e1048] border border-violet-500/20"
           >
-            <div className="flex items-center justify-between gap-6 px-6 py-5 md:px-8">
+            <div className="flex flex-col items-center justify-between gap-4 px-6 py-6 sm:flex-row md:px-8">
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/20">
                   <Crown className="h-6 w-6 text-amber-400" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white md:text-lg">
-                    {lang === "zh" ? "解锁完整潜力，迈向 AI 高阶玩家" : "Unlock your full potential"}
+                  <h3 className="text-base font-bold text-white">
+                    {zh ? "想解锁你的完整潜力？" : "Want to unlock your full potential?"}
                   </h3>
                   <p className="mt-0.5 text-xs text-slate-400">
-                    {lang === "zh" ? "升级 Pro 获取完整报告、深度分析与个性化学习计划" : "Upgrade to Pro for full report, deep analysis, and personalized learning plan"}
+                    {zh ? "升级 Pro 获取深度分析、个性化学习路径和高级 AI 工具" : "Upgrade to Pro and get detailed insights, personalized learning paths, and advanced AI tools."}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowPayment(true)}
-                className="shrink-0 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-fuchsia-500/20 transition-all hover:from-fuchsia-400 hover:to-violet-400 active:scale-[0.98]"
+                className="flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-fuchsia-500/20 transition-all hover:from-fuchsia-400 hover:to-violet-400"
               >
+                <Sparkles className="h-4 w-4" />
                 {t(UI.results.unlockCta, lang)}
-                <ArrowRight className="ml-2 inline h-4 w-4" />
               </button>
             </div>
           </motion.div>
         )}
-
-        {/* ── Pro full content ── */}
-        {hasPro && (
-          <div id="learning" className="mt-6 grid gap-4 md:grid-cols-2">
-            {/* Radar Chart */}
-            <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-5 md:p-6">
-              <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-slate-200">
-                <Award className="h-4 w-4 text-indigo-400" />
-                {t(UI.results.radar, lang)}
-              </h3>
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart cx="50%" cy="50%" outerRadius="70%" data={dimensionScores}>
-                    <PolarGrid stroke="rgba(255,255,255,0.08)" />
-                    <PolarAngleAxis dataKey="shortName" tick={{ fill: "#94a3b8", fontSize: 11, fontWeight: 600 }} />
-                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} />
-                    <Radar name="Score" dataKey="score" stroke="#818cf8" fill="#818cf8" fillOpacity={0.15} strokeWidth={2} />
-                  </RadarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Learning Resources */}
-            <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-5 md:p-6">
-              <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-slate-200">
-                <BookOpen className="h-4 w-4 text-violet-400" />
-                {t(UI.results.learningPath, lang)}
-              </h3>
-              <div className="space-y-3">
-                {sortedDimensions.slice(0, 4).map((dim) => {
-                  const resources = learningResources.find((r) => r.dimension === dim.id);
-                  const firstRes = resources?.resources[0];
-                  if (!firstRes) return null;
-                  const fullDim = dimensions.find((d) => d.id === dim.id);
-                  const Icon = iconMap[fullDim?.icon || "Brain"];
-                  const resTitle = typeof firstRes.title === "object" ? firstRes.title[lang] : firstRes.title;
-                  const resUrl = (firstRes as { url?: string }).url;
-                  return (
-                    <a
-                      key={dim.id}
-                      href={resUrl || "#"}
-                      target={resUrl ? "_blank" : undefined}
-                      rel="noopener noreferrer"
-                      className="group flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-3.5 transition-all hover:border-indigo-400/20 hover:bg-indigo-500/5"
-                    >
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-500/10">
-                        <Icon className="h-4 w-4 text-violet-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-200 truncate group-hover:text-indigo-300">{dim.name}</p>
-                        <p className="mt-0.5 text-xs text-slate-500 truncate">{resTitle}</p>
-                      </div>
-                      <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-600 transition-all group-hover:text-indigo-400" />
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── Locked preview for free users ── */}
-        {!hasPro && (
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-5">
-              <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-slate-200">
-                <Award className="h-4 w-4 text-indigo-400" />
-                {t(UI.results.radar, lang)}
-              </h3>
-              <div className="relative h-[280px] w-full">
-                <div className="blur-md opacity-50">
-                  <ResponsiveContainer width="100%" height={280}>
-                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={dimensionScores}>
-                      <PolarGrid stroke="rgba(255,255,255,0.08)" />
-                      <PolarAngleAxis dataKey="shortName" tick={{ fill: "#94a3b8", fontSize: 11, fontWeight: 600 }} />
-                      <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                      <Radar name="Score" dataKey="score" stroke="#818cf8" fill="#818cf8" fillOpacity={0.15} strokeWidth={2} />
-                    </RadarChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <Lock className="h-6 w-6 text-slate-500" />
-                  <button
-                    onClick={() => setShowPayment(true)}
-                    className="mt-3 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-semibold text-slate-300 transition-all hover:bg-white/[0.08]"
-                  >
-                    <Lock className="h-3 w-3" />
-                    {lang === "zh" ? "升级 Pro 查看完整雷达图" : "Upgrade to Pro for full chart"}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-5">
-              <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-slate-200">
-                <TrendingUp className="h-4 w-4 text-emerald-400" />
-                {t(UI.results.strengths, lang)}
-              </h3>
-              <div className="relative">
-                <div className="space-y-3 blur-sm opacity-50">
-                  {strengths.map((dim) => {
-                    const fullDim = dimensions.find((d) => d.id === dim.id);
-                    const Icon = iconMap[fullDim?.icon || "Brain"];
-                    return (
-                      <div key={dim.id} className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3.5">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
-                          <Icon className="h-5 w-5 text-emerald-400" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-slate-200">{dim.name}</p>
-                          <p className="text-xs text-slate-500">{fullDim?.description[lang]}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <button
-                    onClick={() => setShowPayment(true)}
-                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-violet-400"
-                  >
-                    <Lock className="h-4 w-4" />
-                    {lang === "zh" ? "升级 Pro 解锁更多优势" : "Upgrade Pro to unlock"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-white/[0.06] px-6 py-8">
-        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-3 text-xs text-slate-600 sm:flex-row">
+      <footer className="mt-8 border-t border-white/[0.06] px-6 py-6">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
           <a href="/" className="flex items-center gap-2 text-slate-400 transition-colors hover:text-white">
             <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600">
               <Brain className="h-3 w-3 text-white" />
             </div>
-            <span className="font-semibold">{lang === "zh" ? "AI 素养" : "AI Fluency"}</span>
+            <span className="text-xs font-semibold">{zh ? "AI 素养" : "AI Fluency"}</span>
           </a>
-          <p className="text-slate-500">
-            {lang === "zh" ? "让每个人的 AI 之旅更简单" : "Making AI accessible for everyone"}
+          <p className="text-xs text-slate-600">
+            {zh ? "让每个人的 AI 之旅更简单" : "Making AI simple for everyone."}
           </p>
-          <p>&copy; {new Date().getFullYear()} AI Fluency</p>
+          <div className="flex items-center gap-4 text-xs text-slate-600">
+            <a href="/privacy" className="transition-colors hover:text-slate-400">{zh ? "隐私政策" : "Privacy Policy"}</a>
+            <a href="/terms" className="transition-colors hover:text-slate-400">{zh ? "服务条款" : "Terms of Service"}</a>
+          </div>
         </div>
       </footer>
 
