@@ -108,34 +108,8 @@ function HexBadge({ level, size = 120 }: { level: number; size?: number }) {
   );
 }
 
-function Avatar3D() {
-  return (
-    <div className="relative h-[110px] w-[90px]">
-      {/* Stylized character placeholder */}
-      <div className="absolute inset-0 flex flex-col items-center justify-end">
-        {/* Head */}
-        <div className="relative z-10 h-12 w-12 rounded-full bg-gradient-to-br from-amber-200 to-amber-300 shadow-lg">
-          {/* Hair */}
-          <div className="absolute -top-1 left-1 right-1 h-6 rounded-t-full bg-gradient-to-br from-amber-800 to-amber-900" />
-          {/* Eyes */}
-          <div className="absolute top-5 left-2.5 h-1.5 w-2 rounded-full bg-[#2d1b00]" />
-          <div className="absolute top-5 right-2.5 h-1.5 w-2 rounded-full bg-[#2d1b00]" />
-          {/* Smile */}
-          <div className="absolute bottom-2.5 left-1/2 h-1 w-4 -translate-x-1/2 rounded-b-full border-b-2 border-[#c97a50]" />
-        </div>
-        {/* Body */}
-        <div className="relative z-0 -mt-2 h-14 w-16 rounded-t-2xl bg-gradient-to-b from-indigo-500 to-indigo-600 shadow-lg">
-          {/* Collar */}
-          <div className="absolute top-1 left-1/2 h-3 w-4 -translate-x-1/2 rounded-b-lg bg-white/90" />
-          {/* Arms */}
-          <div className="absolute -left-2 top-3 h-10 w-4 rounded-full bg-gradient-to-b from-indigo-400 to-indigo-500 rotate-[15deg]" />
-          <div className="absolute -right-2 top-3 h-10 w-4 rounded-full bg-gradient-to-b from-indigo-400 to-indigo-500 -rotate-[15deg]" />
-          {/* Right hand waving */}
-          <div className="absolute -right-3 top-0 h-4 w-4 rounded-full bg-gradient-to-br from-amber-200 to-amber-300" />
-        </div>
-      </div>
-    </div>
-  );
+function AvatarEmoji() {
+  return <span className="text-6xl leading-none select-none">🧑‍💻</span>;
 }
 
 function QRCodePlaceholder() {
@@ -393,10 +367,8 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                   </p>
                 </div>
 
-                {/* 3D Avatar */}
-                <div className="flex flex-col items-center">
-                  <Avatar3D />
-                </div>
+                {/* Avatar */}
+                <AvatarEmoji />
               </div>
 
               {/* QR Code area */}
