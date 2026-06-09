@@ -134,7 +134,7 @@ export const UI = {
     team: {
       name: { zh: '企业版', en: 'Enterprise' },
       price: { zh: '¥199.9', en: '$199.9' },
-      period: { zh: '起', en: 'starting' },
+      period: { zh: '/月', en: '/mo' },
       desc: { zh: '适合团队和组织使用', en: 'For teams and organizations' },
       features: {
         zh: ['团队能力测评', '团队报告与对标分析', '定制化培训建议', '专属客户成功经理'],

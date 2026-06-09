@@ -18,8 +18,8 @@ const PLAN_DETAILS = {
     price: { en: "$9.9", zh: "¥9.9" },
     period: { en: "/month", zh: "/月" },
     features: {
-      en: ["Unlimited assessments & retakes", "Six-dimension radar chart", "Overall score & level report", "2 dimension learning tips"],
-      zh: ["无限次测评与重测", "六维能力雷达图", "总分与等级报告", "2个维度学习建议"],
+      en: ["AI Fluency assessment", "Basic report summary", "Core recommendations", "7-day email support"],
+      zh: ["AI 实力测评", "基础报告解读", "核心建议", "7 天邮件支持"],
     },
   },
   pro: {
@@ -27,17 +27,17 @@ const PLAN_DETAILS = {
     price: { en: "$19.9", zh: "¥19.9" },
     period: { en: "/month", zh: "/月" },
     features: {
-      en: ["All Starter features", "Full learning path for all 6 dimensions", "Detailed dimension scores & analysis", "Email support"],
-      zh: ["包含入门版全部功能", "全部六维度完整学习路径", "详细维度得分与分析", "邮件支持"],
+      en: ["Detailed report analysis", "Personalized improvement plan", "Peer benchmark comparison", "30-day email support"],
+      zh: ["详细报告解读", "个性化提升建议", "能力对标分析", "30 天邮件支持"],
     },
   },
   team: {
-    name: { en: "Team", zh: "团队版" },
-    price: { en: "Custom", zh: "定制" },
-    period: { en: "Contact us", zh: "按需报价" },
+    name: { en: "Enterprise", zh: "企业版" },
+    price: { en: "$199.9", zh: "¥199.9" },
+    period: { en: "/mo", zh: "/月" },
     features: {
-      en: ["All Pro features", "Team capability dashboard (coming soon)", "Member management (coming soon)", "Bulk report export (coming soon)", "Dedicated support contact"],
-      zh: ["包含专业版全部功能", "团队整体能力看板（开发中）", "成员管理（开发中）", "批量导出报告（开发中）", "专属对接支持"],
+      en: ["Team capability assessment", "Team report & benchmarks", "Custom training recommendations", "Dedicated customer success manager"],
+      zh: ["团队能力测评", "团队报告与对标分析", "定制化培训建议", "专属客户成功经理"],
     },
   },
 } as const;
