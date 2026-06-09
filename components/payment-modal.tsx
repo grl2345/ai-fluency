@@ -4,30 +4,61 @@ import React, { useEffect, useRef } from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { X, Check, Loader2, ShieldCheck } from "lucide-react";
 import { useLang } from "@/contexts/language-context";
+import type { PlanKey } from "@/lib/plans";
+
 interface PaymentModalProps {
+  plan: PlanKey;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (plan: PlanKey) => void;
 }
 
-const REPORT_DETAILS = {
-  name: { en: "Full Report", zh: "完整报告" },
-  price: { en: "$49.9", zh: "¥49.9" },
-  features: {
-    en: ["Detailed 6-dimension report", "Personalized improvement plan", "Peer benchmark comparison", "Shareable professional certificate", "Full learning path", "Email support"],
-    zh: ["六维度详细报告", "个性化提升建议", "能力对标分析", "可分享专业证书", "完整学习路径", "邮件支持"],
+const PLAN_DETAILS = {
+  starter: {
+    name: { en: "Starter", zh: "入门版" },
+    price: { en: "$9.9", zh: "¥9.9" },
+    period: { en: "/month", zh: "/月" },
+    features: {
+      en: ["AI Fluency assessment", "Basic report summary", "Core recommendations", "7-day email support"],
+      zh: ["AI 实力测评", "基础报告解读", "核心建议", "7 天邮件支持"],
+    },
+  },
+  pro: {
+    name: { en: "Pro", zh: "专业版" },
+    price: { en: "$19.9", zh: "¥19.9" },
+    period: { en: "/month", zh: "/月" },
+    features: {
+      en: ["Detailed report analysis", "Personalized improvement plan", "Peer benchmark comparison", "30-day email support"],
+      zh: ["详细报告解读", "个性化提升建议", "能力对标分析", "30 天邮件支持"],
+    },
+  },
+  team: {
+    name: { en: "Enterprise", zh: "企业版" },
+    price: { en: "$199.9", zh: "¥199.9" },
+    period: { en: "/mo", zh: "/月" },
+    features: {
+      en: ["Team capability assessment", "Team report & benchmarks", "Custom training recommendations", "Dedicated customer success manager"],
+      zh: ["团队能力测评", "团队报告与对标分析", "定制化培训建议", "专属客户成功经理"],
+    },
   },
 } as const;
 
+const PUBLIC_PLAN_IDS: Record<PlanKey, string> = {
+  starter: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER ?? "",
+  pro: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO ?? "",
+  team: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_TEAM ?? "",
+};
+
 type ModalState = "idle" | "processing" | "success" | "error";
 
-export function PaymentModal({ onClose, onSuccess }: PaymentModalProps) {
+export function PaymentModal({ plan, onClose, onSuccess }: PaymentModalProps) {
   const { lang } = useLang();
   const overlayRef = useRef<HTMLDivElement>(null);
   const [state, setState] = React.useState<ModalState>("idle");
   const [errorMsg, setErrorMsg] = React.useState("");
 
+  const details = PLAN_DETAILS[plan];
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ?? "";
-  const planId = process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_REPORT ?? "";
+  const planId = PUBLIC_PLAN_IDS[plan];
 
   // Close on Escape
   useEffect(() => {
@@ -48,14 +79,14 @@ export function PaymentModal({ onClose, onSuccess }: PaymentModalProps) {
       const res = await fetch("/api/paypal/verify-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscriptionId, planKey: "pro" }),
+        body: JSON.stringify({ subscriptionId, planKey: plan }),
       });
       if (!res.ok) throw new Error("Verification failed");
       setState("success");
-      setTimeout(() => { onSuccess(); onClose(); }, 2000);
+      setTimeout(() => { onSuccess(plan); onClose(); }, 2000);
     } catch {
       setState("error");
-      setErrorMsg(lang === "zh" ? "支付验证失败，请联系客服。" : "Payment verification failed. Please contact support.");
+      setErrorMsg(lang === "zh" ? "订阅验证失败，请联系客服。" : "Subscription verification failed. Please contact support.");
     }
   };
 
@@ -79,20 +110,21 @@ export function PaymentModal({ onClose, onSuccess }: PaymentModalProps) {
           <ShieldCheck className="h-5 w-5 text-indigo-500" />
           <div>
             <h2 className="text-lg font-bold text-slate-900">
-              {lang === "zh" ? "解锁完整报告" : "Unlock Full Report"}
+              {lang === "zh" ? `升级至${details.name.zh}` : `Upgrade to ${details.name.en}`}
             </h2>
             <p className="text-xs text-slate-500">
-              {lang === "zh" ? "一次付费 · 通过 PayPal 安全支付" : "One-time payment · Secure payment via PayPal"}
+              {lang === "zh" ? "通过 PayPal 安全支付" : "Secure payment via PayPal"}
             </p>
           </div>
         </div>
 
         <div className="mb-5 flex items-end gap-1">
-          <span className="text-4xl font-black text-slate-900">{REPORT_DETAILS.price[lang]}</span>
+          <span className="text-4xl font-black text-slate-900">{details.price[lang]}</span>
+          <span className="mb-1 text-sm text-slate-400">{details.period[lang]}</span>
         </div>
 
         <ul className="mb-5 space-y-2">
-          {REPORT_DETAILS.features[lang].map((f) => (
+          {details.features[lang].map((f) => (
             <li key={f} className="flex items-start gap-2 text-sm text-slate-600">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
               {f}

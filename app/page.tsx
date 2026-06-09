@@ -6,6 +6,7 @@ import { OnboardingFlow } from "@/components/onboarding-flow";
 import { TestFlow } from "@/components/test-flow";
 import { ResultsPage } from "@/components/results-page";
 import { useAuth } from "@/components/auth-provider";
+import { useSubscription } from "@/components/subscription-provider";
 import { redirectToSignIn } from "@/components/auth-ui";
 
 type AppState = "landing" | "onboarding" | "testing" | "results";
@@ -14,6 +15,7 @@ const START_TEST_PATH = "/?start=test";
 
 export default function Page() {
   const { user, loading } = useAuth();
+  const { hasActiveSubscription, loading: subLoading, refresh } = useSubscription();
   const [appState, setAppState] = useState<AppState>("landing");
   const [testAnswers, setTestAnswers] = useState<Record<number, string>>({});
   const [practicalTexts, setPracticalTexts] = useState<Record<string, string>>({});
@@ -26,19 +28,30 @@ export default function Page() {
       redirectToSignIn(START_TEST_PATH);
       return;
     }
-    setAppState("onboarding");
-  }, [user, loading]);
-
-  // Resolve deferred start once auth loads
-  useEffect(() => {
-    if (!pendingStart || loading) return;
-    setPendingStart(false);
-    if (!user) {
-      redirectToSignIn(START_TEST_PATH);
+    // If already subscribed, go straight to testing; otherwise onboarding
+    if (subLoading) {
+      setPendingStart(true);
+      return;
+    }
+    if (hasActiveSubscription) {
+      setAppState("testing");
     } else {
       setAppState("onboarding");
     }
-  }, [pendingStart, loading, user]);
+  }, [user, loading, subLoading, hasActiveSubscription]);
+
+  // Resolve deferred start once subscription state loads
+  useEffect(() => {
+    if (!pendingStart || loading || subLoading) return;
+    setPendingStart(false);
+    if (!user) {
+      redirectToSignIn(START_TEST_PATH);
+    } else if (hasActiveSubscription) {
+      setAppState("testing");
+    } else {
+      setAppState("onboarding");
+    }
+  }, [pendingStart, loading, subLoading, user, hasActiveSubscription]);
 
   // Handle ?start=test after login redirect
   useEffect(() => {
@@ -63,6 +76,7 @@ export default function Page() {
 
   const handleOnboardingComplete = async (profile: Record<string, string | string[]>) => {
     setProfileData(profile);
+    await refresh();
     setAppState("testing");
   };
 

@@ -2,13 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import {
   Brain, Code2, Palette, Megaphone, Briefcase, GraduationCap, User2,
   Timer, Clock, CalendarDays, Hourglass,
   Search, PenLine, Lightbulb, Wrench, Workflow, BookOpen,
-  ArrowLeft, ArrowRight, Check, Sparkles,
+  ArrowLeft, ArrowRight, Check, Loader2, ShieldCheck, Sparkles,
 } from "lucide-react";
 import { useLang } from "@/contexts/language-context";
+import type { PlanKey } from "@/lib/plans";
 
 interface OnboardingFlowProps {
   onComplete: (profile: Record<string, string | string[]>) => void;
@@ -58,14 +60,65 @@ const STEPS = [
   },
 ];
 
+const PLANS: { key: PlanKey; name: { zh: string; en: string }; price: string; period: { zh: string; en: string }; desc: { zh: string; en: string }; features: { zh: string[]; en: string[] }; highlighted: boolean; badge?: { zh: string; en: string } }[] = [
+  {
+    key: "starter",
+    name: { zh: "入门版", en: "Starter" },
+    price: "$9.9",
+    period: { zh: "/月", en: "/month" },
+    desc: { zh: "适合个人初步了解 AI 实力", en: "For individuals exploring their AI fluency level" },
+    features: {
+      zh: ["AI 实力测评", "基础报告解读", "核心建议", "7 天邮件支持"],
+      en: ["AI Fluency assessment", "Basic report summary", "Core recommendations", "7-day email support"],
+    },
+    highlighted: false,
+  },
+  {
+    key: "pro",
+    name: { zh: "专业版", en: "Pro" },
+    price: "$19.9",
+    period: { zh: "/月", en: "/month" },
+    desc: { zh: "适合希望深入提升的专业人士", en: "For professionals seeking deeper AI skill growth" },
+    features: {
+      zh: ["详细报告解读", "个性化提升建议", "能力对标分析", "30 天邮件支持"],
+      en: ["Detailed report analysis", "Personalized improvement plan", "Peer benchmark comparison", "30-day email support"],
+    },
+    highlighted: true,
+    badge: { zh: "推荐", en: "Popular" },
+  },
+  {
+    key: "team",
+    name: { zh: "企业版", en: "Enterprise" },
+    price: "$199.9",
+    period: { zh: "/月", en: "/mo" },
+    desc: { zh: "适合团队和组织使用", en: "For teams and organizations" },
+    features: {
+      zh: ["团队能力测评", "团队报告与对标分析", "定制化培训建议", "专属客户成功经理"],
+      en: ["Team capability assessment", "Team report & benchmarks", "Custom training recommendations", "Dedicated customer success manager"],
+    },
+    highlighted: false,
+  },
+];
+
+const PUBLIC_PLAN_IDS: Record<PlanKey, string> = {
+  starter: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_STARTER ?? "",
+  pro: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_PRO ?? "",
+  team: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID_TEAM ?? "",
+};
 
 export function OnboardingFlow({ onComplete, onBack }: OnboardingFlowProps) {
   const { lang } = useLang();
   const zh = lang === "zh";
-  const totalSteps = STEPS.length;
+  const totalSteps = STEPS.length + 1; // profile steps + payment step
 
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [selectedPlan, setSelectedPlan] = useState<PlanKey>("pro");
+  const [payState, setPayState] = useState<"idle" | "processing" | "success" | "error">("idle");
+  const [payError, setPayError] = useState("");
+
+  const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ?? "";
+  const planId = PUBLIC_PLAN_IDS[selectedPlan];
 
   // Lock scroll
   useEffect(() => {
@@ -73,11 +126,15 @@ export function OnboardingFlow({ onComplete, onBack }: OnboardingFlowProps) {
     return () => { document.body.style.overflow = ""; };
   }, []);
 
-  const currentStep = STEPS[step];
-  const currentAnswer = answers[currentStep.key] ?? null;
-  const canNext = currentStep.multi
-    ? Array.isArray(currentAnswer) && currentAnswer.length > 0
-    : !!currentAnswer;
+  const isProfileStep = step < STEPS.length;
+  const currentStep = isProfileStep ? STEPS[step] : null;
+
+  const currentAnswer = currentStep ? answers[currentStep.key] : null;
+  const canNext = isProfileStep
+    ? currentStep!.multi
+      ? Array.isArray(currentAnswer) && currentAnswer.length > 0
+      : !!currentAnswer
+    : false;
 
   const handleSelect = (optionId: string) => {
     if (!currentStep) return;
@@ -93,11 +150,7 @@ export function OnboardingFlow({ onComplete, onBack }: OnboardingFlowProps) {
   };
 
   const handleNext = () => {
-    if (step < totalSteps - 1) {
-      setStep(step + 1);
-    } else {
-      completeOnboarding(answers);
-    }
+    if (step < totalSteps - 1) setStep(step + 1);
   };
 
   const handleBack = () => {
@@ -105,25 +158,34 @@ export function OnboardingFlow({ onComplete, onBack }: OnboardingFlowProps) {
     else onBack();
   };
 
-  // Auto-advance after selecting single-choice option
-  const completeOnboarding = (finalAnswers: Record<string, string | string[]>) => {
-    const profile: Record<string, string | string[]> = {
-      P1: finalAnswers.role ?? "",
-      P2: finalAnswers.experience ?? "",
-      P3: finalAnswers.usage ?? [],
-    };
-    onComplete(profile);
+  const handleApprove = async (subscriptionId: string) => {
+    setPayState("processing");
+    try {
+      const res = await fetch("/api/paypal/verify-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscriptionId, planKey: selectedPlan }),
+      });
+      if (!res.ok) throw new Error("Verification failed");
+      setPayState("success");
+      // Build profile data matching the test-data profile question IDs
+      const profile: Record<string, string | string[]> = {
+        P1: answers.role ?? "",
+        P2: answers.experience ?? "",
+        P3: answers.usage ?? [],
+      };
+      setTimeout(() => onComplete(profile), 1500);
+    } catch {
+      setPayState("error");
+      setPayError(zh ? "订阅验证失败，请重试或联系客服。" : "Verification failed. Please retry or contact support.");
+    }
   };
 
+  // Auto-advance after selecting single-choice option
   const handleSingleSelect = (optionId: string) => {
     if (!currentStep || currentStep.multi) return;
-    const updated = { ...answers, [currentStep.key]: optionId };
-    setAnswers(updated);
-    if (step < totalSteps - 1) {
-      setTimeout(() => setStep(step + 1), 300);
-    } else {
-      setTimeout(() => completeOnboarding(updated), 300);
-    }
+    setAnswers({ ...answers, [currentStep.key]: optionId });
+    setTimeout(() => setStep(step + 1), 300);
   };
 
   return (
@@ -160,7 +222,7 @@ export function OnboardingFlow({ onComplete, onBack }: OnboardingFlowProps) {
         {/* Content */}
         <div className="flex flex-1 flex-col justify-center px-6 py-8 lg:px-12">
           <AnimatePresence mode="wait">
-            {currentStep && (
+            {isProfileStep && currentStep && (
               <motion.div
                 key={currentStep.key}
                 initial={{ opacity: 0, x: 20 }}
@@ -216,6 +278,127 @@ export function OnboardingFlow({ onComplete, onBack }: OnboardingFlowProps) {
               </motion.div>
             )}
 
+            {!isProfileStep && (
+              <motion.div
+                key="payment"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.25 }}
+              >
+                <h2 className="text-2xl font-extrabold tracking-tight text-white md:text-3xl">
+                  {zh ? "选择你的套餐" : "Choose your plan"}
+                </h2>
+                <p className="mt-2 text-sm text-slate-400">
+                  {zh ? "订阅后即可开始 AI 实力测评" : "Subscribe to start your AI assessment"}
+                </p>
+
+                <div className="mt-8 space-y-3">
+                  {PLANS.map((plan) => (
+                    <button
+                      key={plan.key}
+                      onClick={() => setSelectedPlan(plan.key)}
+                      className={`relative flex w-full items-start gap-4 rounded-xl border px-5 py-4 text-left transition-all ${
+                        selectedPlan === plan.key
+                          ? "border-indigo-400/60 bg-indigo-500/10"
+                          : "border-white/[0.08] bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.05]"
+                      }`}
+                    >
+                      <div
+                        className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                          selectedPlan === plan.key
+                            ? "border-indigo-400 bg-indigo-500"
+                            : "border-slate-600"
+                        }`}
+                      >
+                        {selectedPlan === plan.key && (
+                          <div className="h-2 w-2 rounded-full bg-white" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[15px] font-bold text-white">{plan.name[lang]}</span>
+                          {plan.badge && (
+                            <span className="rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-bold text-indigo-300">
+                              {plan.badge[lang]}
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-0.5 text-xs text-slate-400">{plan.desc[lang]}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-lg font-bold text-white">{plan.price}</span>
+                        <span className="text-xs text-slate-400">{plan.period[lang]}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Features of selected plan */}
+                <ul className="mt-6 space-y-2">
+                  {PLANS.find((p) => p.key === selectedPlan)!.features[lang].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-slate-300">
+                      <Check className="h-3.5 w-3.5 shrink-0 text-indigo-400" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* PayPal button */}
+                <div className="mt-8">
+                  {payState === "success" && (
+                    <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-300">
+                      <Check className="h-4 w-4" />
+                      {zh ? "订阅成功！正在进入测评…" : "Subscribed! Starting assessment…"}
+                    </div>
+                  )}
+
+                  {payState === "processing" && (
+                    <div className="flex items-center justify-center gap-2 py-4 text-slate-400">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span className="text-sm">{zh ? "验证中…" : "Verifying…"}</span>
+                    </div>
+                  )}
+
+                  {payState === "error" && (
+                    <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                      {payError}
+                    </div>
+                  )}
+
+                  {(payState === "idle" || payState === "error") && clientId && planId && (
+                    <PayPalScriptProvider
+                      options={{ clientId, vault: true, intent: "subscription", currency: "USD" }}
+                    >
+                      <PayPalButtons
+                        style={{ layout: "vertical", shape: "rect", label: "subscribe", color: "blue" }}
+                        createSubscription={(_data, actions) =>
+                          actions.subscription.create({ plan_id: planId })
+                        }
+                        onApprove={async (data) => {
+                          if (data.subscriptionID) handleApprove(data.subscriptionID);
+                        }}
+                        onError={() => {
+                          setPayState("error");
+                          setPayError(zh ? "支付失败，请重试。" : "Payment failed. Please try again.");
+                        }}
+                      />
+                    </PayPalScriptProvider>
+                  )}
+
+                  {(payState === "idle" || payState === "error") && (!clientId || !planId) && (
+                    <p className="text-center text-sm text-red-400">
+                      {zh ? "支付配置未完成，请联系管理员。" : "Payment not configured. Contact support."}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-500">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  {zh ? "通过 PayPal 安全支付 · 随时取消" : "Secure PayPal payment · Cancel anytime"}
+                </div>
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
 
@@ -238,7 +421,7 @@ export function OnboardingFlow({ onComplete, onBack }: OnboardingFlowProps) {
       <div className="hidden items-center justify-center bg-gradient-to-br from-indigo-950 via-[#0d0b1a] to-violet-950 lg:flex lg:w-1/2">
         <div className="pointer-events-none absolute right-[8%] top-[12%] h-[300px] w-[300px] rounded-full bg-indigo-600/15 blur-[120px]" />
         <div className="pointer-events-none absolute bottom-[15%] right-[25%] h-[250px] w-[250px] rounded-full bg-violet-600/15 blur-[100px]" />
-        <OnboardingPreview step={step} answers={answers} lang={lang} />
+        <OnboardingPreview step={step} answers={answers} selectedPlan={selectedPlan} lang={lang} />
       </div>
     </div>
   );
@@ -258,10 +441,12 @@ const DIM_COLORS = [
 function OnboardingPreview({
   step,
   answers,
+  selectedPlan,
   lang,
 }: {
   step: number;
   answers: Record<string, string | string[]>;
+  selectedPlan: PlanKey;
   lang: "zh" | "en";
 }) {
   const zh = lang === "zh";
@@ -433,7 +618,7 @@ function OnboardingPreview({
                   <Sparkles className="h-5 w-5 text-indigo-300" />
                 </div>
                 <p className="text-xs font-bold text-white">
-                  {zh ? "完成测评后解锁完整报告" : "Complete the test to unlock full report"}
+                  {zh ? "订阅后解锁完整报告" : "Subscribe to unlock full report"}
                 </p>
                 <p className="text-[10px] text-slate-400">
                   {zh ? "6 大维度详细分析 · 个性化提升建议" : "Detailed analysis across 6 dimensions"}
@@ -442,20 +627,41 @@ function OnboardingPreview({
             </div>
           </div>
 
+          {/* Plan badge — shows on step 4 */}
+          <AnimatePresence>
+            {step >= 3 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-5 flex items-center gap-3 rounded-xl border border-indigo-400/20 bg-indigo-500/10 p-3"
+              >
+                <ShieldCheck className="h-5 w-5 text-indigo-400" />
+                <div>
+                  <div className="text-xs font-bold text-white">
+                    {PLANS.find((p) => p.key === selectedPlan)?.name[lang]} {zh ? "套餐" : "Plan"}
+                  </div>
+                  <div className="text-[10px] text-slate-400">
+                    {zh ? "解锁完整测评 & 报告" : "Unlock full assessment & report"}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Bottom status bar */}
         <div className="flex items-center justify-between border-t border-white/[0.06] px-5 py-2.5">
           <div className="flex items-center gap-1.5">
-            <div className={`h-2 w-2 rounded-full ${step >= 2 ? "bg-emerald-400" : "animate-pulse bg-amber-400"}`} />
+            <div className={`h-2 w-2 rounded-full ${step >= 3 ? "bg-emerald-400" : "animate-pulse bg-amber-400"}`} />
             <span className="text-[10px] text-slate-500">
-              {step >= 2
+              {step >= 3
                 ? (zh ? "准备就绪" : "Ready")
                 : (zh ? "正在配置…" : "Configuring…")}
             </span>
           </div>
           <span className="text-[10px] font-medium tabular-nums text-slate-600">
-            {step + 1}/{totalSteps}
+            {step + 1}/4
           </span>
         </div>
       </div>

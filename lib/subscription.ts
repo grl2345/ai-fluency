@@ -23,12 +23,22 @@ export function isActiveSubscription(sub: UserSubscription | null | undefined): 
   return sub?.status === "active";
 }
 
-export function planDisplayName(_plan: PlanKey, lang: "zh" | "en"): string {
-  return lang === "zh" ? "完整报告" : "Full Report";
+export function planDisplayName(plan: PlanKey, lang: "zh" | "en"): string {
+  const names: Record<PlanKey, { zh: string; en: string }> = {
+    starter: { zh: "入门版", en: "Starter" },
+    pro: { zh: "专业版", en: "Pro" },
+    team: { zh: "团队版", en: "Team" },
+  };
+  return names[plan][lang];
 }
 
-export function planPrice(_plan: PlanKey, lang: "zh" | "en"): string {
-  return lang === "zh" ? "¥49.9" : "$49.9";
+export function planPrice(plan: PlanKey, lang: "zh" | "en"): string {
+  const prices: Record<PlanKey, { zh: string; en: string }> = {
+    starter: { zh: "¥9.9/月", en: "$9.9/month" },
+    pro: { zh: "¥19.9/月", en: "$19.9/month" },
+    team: { zh: "¥49.9/月", en: "$49.9/month" },
+  };
+  return prices[plan][lang];
 }
 
 export function statusDisplayName(status: SubscriptionStatus, lang: "zh" | "en"): string {

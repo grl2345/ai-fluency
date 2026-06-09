@@ -239,7 +239,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
             </div>
           </motion.div>
 
-          {/* Level Stars */}
+          {/* Percentile Banner */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -252,7 +252,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
               ))}
             </div>
             <p className="text-sm font-semibold text-indigo-700">
-              {lang === "zh" ? `等级 ${mainTier} / 5` : `Level ${mainTier} of 5`}
+              {t(UI.results.percentile, lang)} <span className="text-indigo-900">{percentile}%</span> {t(UI.results.percentileSuffix, lang)}
             </p>
           </motion.div>
 
@@ -600,7 +600,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                   onClick={() => setShowPayment(true)}
                   className="shrink-0 rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
                 >
-                  {lang === "zh" ? "解锁完整报告" : "Unlock Full Report"}
+                  {lang === "zh" ? "升级 Pro" : "Upgrade to Pro"}
                 </button>
               </div>
             )}
@@ -617,8 +617,8 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                   <p className="mt-2 text-indigo-100">{t(UI.results.unlockDesc, lang)}</p>
                   <ul className="mt-5 space-y-2.5">
                     {(lang === "zh"
-                      ? ["六维度详细报告", "个性化提升建议", "能力对标分析", "可分享专业证书", "完整学习路径"]
-                      : ["Detailed 6-dimension report", "Personalized improvement plan", "Peer benchmark comparison", "Shareable professional certificate", "Full learning path"]
+                      ? ["无限次测评与重测", "全部六维度完整学习路径", "详细维度得分与分析", "邮件支持"]
+                      : ["Unlimited assessments & retakes", "Full learning path for all 6 dimensions", "Detailed dimension scores & analysis", "Email support"]
                     ).map((f) => (
                       <li key={f} className="flex items-center gap-2.5 text-sm text-indigo-100">
                         <CheckCircle className="h-4 w-4 shrink-0 text-emerald-300" />
@@ -662,10 +662,11 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
       </section>
       {showPayment && (
         <PaymentModal
+          plan="pro"
           onClose={() => setShowPayment(false)}
           onSuccess={() => {
             setShowPayment(false);
-            window.location.reload();
+            window.location.href = "/account";
           }}
         />
       )}
