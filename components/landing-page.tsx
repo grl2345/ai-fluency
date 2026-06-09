@@ -18,8 +18,6 @@ import {
 } from "lucide-react";
 import { PaymentModal } from "@/components/payment-modal";
 import { useSubscription } from "@/components/subscription-provider";
-import { isHigherPlan, type PlanKey } from "@/lib/plans";
-import { planDisplayName } from "@/lib/subscription";
 
 interface LandingPageProps {
   onStartTest: () => void;
@@ -286,11 +284,11 @@ export function LandingPage({
   isAuthenticated = false,
 }: LandingPageProps) {
   const { user } = useAuth();
-  const { subscription, hasActiveSubscription, refresh } = useSubscription();
+  const { hasActiveSubscription, refresh } = useSubscription();
   const { lang, setLang } = useLang();
   const [openFaq, setOpenFaq] = React.useState<number | null>(null);
-  const [paymentPlan, setPaymentPlan] = React.useState<PlanKey | null>(null);
-  const [subscribeToast, setSubscribeToast] = React.useState<PlanKey | null>(null);
+  const [showPayment, setShowPayment] = React.useState(false);
+  const [subscribeToast, setSubscribeToast] = React.useState(false);
 
   const startLabel = isAuthenticated ? t(UI.nav.startTest, lang) : t(UI.nav.startTestGuest, lang);
   const startDisabled = authLoading;
@@ -634,205 +632,117 @@ export function LandingPage({
         </div>
       </section>
 
-      {/* ── Testimonials + Pricing ── */}
+      {/* ── Pricing ── */}
       <section id="pricing" className="relative overflow-hidden border-t border-white/[0.06] bg-white/[0.015] px-6 py-24 md:py-28">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-4xl">
           {subscribeToast && (
             <div className="mx-auto mb-8 flex w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-medium text-emerald-300">
               <span className="inline-flex items-center gap-2">
                 <Check className="h-4 w-4 shrink-0" />
-                {t(UI.billing.subscribeSuccess, lang)} {planDisplayName(subscribeToast, lang)}!
+                {lang === "zh" ? "报告已解锁！" : "Report unlocked!"}
               </span>
               <button
                 onClick={onStartTest}
                 className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3.5 py-1 font-semibold text-emerald-100 transition-colors hover:bg-emerald-500/30"
               >
-                {lang === "zh" ? "开始测评" : "Start the assessment"}
+                {lang === "zh" ? "查看报告" : "View report"}
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
           )}
 
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-extrabold tracking-tight text-white md:text-4xl">
+              {t(UI.pricing.title, lang)}
+            </h2>
+            <p className="mx-auto mt-3 max-w-lg text-[15px] text-slate-400">
+              {t(UI.pricing.subtitle, lang)}
+            </p>
+          </div>
 
-          <div className="grid items-start gap-8 lg:grid-cols-[1fr_2.2fr]">
-            {/* Left: testimonial */}
-            <div>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-400">
-                {t(UI.testimonials.sectionPill, lang)}
-              </span>
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white md:text-4xl">
-                {t(UI.testimonials.sectionTitle, lang)}
-              </h2>
-
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4 }}
-                className="mt-8 flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6"
+          <div className="grid items-stretch gap-6 md:grid-cols-2">
+            {/* Free card */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col rounded-[1.2rem] border border-white/[0.08] bg-white/[0.03] p-6 md:p-8"
+            >
+              <div className="mb-5">
+                <h3 className="text-lg font-semibold text-white">{t(UI.pricing.free.title, lang)}</h3>
+                <p className="mt-1 text-sm text-slate-400">{t(UI.pricing.free.desc, lang)}</p>
+              </div>
+              <div className="mb-6 border-b border-white/[0.06] pb-6">
+                <div className="flex items-end gap-0.5">
+                  <span className="text-[2.5rem] font-semibold leading-none text-white">
+                    {lang === "zh" ? "免费" : "Free"}
+                  </span>
+                </div>
+              </div>
+              <ul className="flex-1 space-y-2.5">
+                {UI.pricing.free.features[lang].map((f) => (
+                  <li key={f} className="flex items-start gap-2.5">
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 stroke-[3] text-slate-500" />
+                    <span className="text-sm leading-snug text-slate-400">{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={onStartTest}
+                disabled={startDisabled}
+                className="mt-6 w-full rounded-lg border border-white/15 bg-white/[0.04] py-2.5 text-sm font-semibold text-white transition-all hover:border-white/30 hover:bg-white/10 active:scale-[0.98] disabled:opacity-40"
               >
-                <div className="mb-2 text-2xl font-black leading-none text-white/15 select-none">&ldquo;</div>
-                <p className="text-[14px] leading-relaxed text-slate-300">{TESTIMONIALS[0].quote[lang]}</p>
-                <div className="mt-5 flex items-center gap-3 border-t border-white/[0.06] pt-4">
-                  <img
-                    src={`https://api.dicebear.com/9.x/avataaars/svg?seed=${TESTIMONIALS[0].avatarSeed}&backgroundColor=${TESTIMONIALS[0].avatarBg}&radius=50`}
-                    alt=""
-                    className="h-9 w-9 shrink-0 rounded-full"
-                  />
-                  <div>
-                    <p className="text-sm font-semibold text-white">{TESTIMONIALS[0].name}</p>
-                    <p className="text-xs text-indigo-300">{TESTIMONIALS[0].role[lang]}</p>
+                {lang === "zh" ? "免费开始测评" : "Start Free Assessment"}
+              </button>
+            </motion.div>
+
+            {/* Paid card */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.08 }}
+              className="relative flex flex-col"
+            >
+              <div className="pointer-events-none absolute -inset-px -z-10 rounded-[1.3rem] bg-gradient-to-b from-indigo-400/50 via-violet-500/20 to-transparent blur-sm" />
+              <div className="relative flex h-full flex-col overflow-hidden rounded-[1.2rem] bg-gradient-to-br from-[#15122b] via-[#120f24] to-[#0c0a18] p-6 shadow-[0_16px_60px_-8px_rgba(99,70,229,0.45)] ring-1 ring-indigo-400/30 md:p-8">
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-300/60 to-transparent" />
+                <div className="mb-5">
+                  <h3 className="text-lg font-semibold text-white">{t(UI.pricing.title, lang)}</h3>
+                  <p className="mt-1 text-sm text-slate-400">{t(UI.pricing.desc, lang)}</p>
+                </div>
+                <div className="mb-6 border-b border-white/[0.06] pb-6">
+                  <div className="flex items-end gap-1">
+                    <span className="mb-1 text-base font-medium text-slate-400">{lang === "zh" ? "¥" : "$"}</span>
+                    <span className="bg-gradient-to-br from-white to-indigo-200 bg-clip-text text-[2.5rem] font-semibold leading-none tracking-tight tabular-nums text-transparent">
+                      49.9
+                    </span>
                   </div>
+                  <p className="mt-2 text-xs text-slate-500">{lang === "zh" ? "一次性付费" : "One-time payment"}</p>
                 </div>
-                <div className="mt-3 flex gap-0.5">
-                  {Array.from({ length: 5 }).map((_, s) => (
-                    <Star key={s} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                <ul className="flex-1 space-y-2.5">
+                  {UI.pricing.features[lang].map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 stroke-[3] text-indigo-400" />
+                      <span className="text-sm leading-snug text-slate-300">{f}</span>
+                    </li>
                   ))}
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Right: pricing cards */}
-            <div className="grid items-stretch gap-5 md:grid-cols-3">
-              {(
-                [
-                  {
-                    key: "starter" as const,
-                    name: t(UI.pricing.starter.name, lang),
-                    price: t(UI.pricing.starter.price, lang),
-                    period: t(UI.pricing.starter.period, lang),
-                    desc: t(UI.pricing.starter.desc, lang),
-                    features: UI.pricing.starter.features[lang] as readonly string[],
-                    highlighted: false,
-                    isCurrent: hasActiveSubscription && subscription?.plan === "starter",
-                    disabled: hasActiveSubscription && subscription ? isHigherPlan(subscription.plan, "starter") : false,
-                    action: () => {
-                      if (!user) redirectToSignIn("/#pricing");
-                      else if (hasActiveSubscription && subscription?.plan === "starter") window.location.href = "/account";
-                      else setPaymentPlan("starter");
-                    },
-                  },
-                  {
-                    key: "pro" as const,
-                    name: t(UI.pricing.pro.name, lang),
-                    price: t(UI.pricing.pro.price, lang),
-                    period: t(UI.pricing.pro.period, lang),
-                    desc: t(UI.pricing.pro.desc, lang),
-                    features: UI.pricing.pro.features[lang] as readonly string[],
-                    highlighted: true,
-                    isCurrent: hasActiveSubscription && subscription?.plan === "pro",
-                    disabled: hasActiveSubscription && subscription ? isHigherPlan(subscription.plan, "pro") : false,
-                    action: () => {
-                      if (!user) redirectToSignIn("/#pricing");
-                      else if (hasActiveSubscription && subscription?.plan === "pro") window.location.href = "/account";
-                      else setPaymentPlan("pro");
-                    },
-                  },
-                  {
-                    key: "team" as const,
-                    name: t(UI.pricing.team.name, lang),
-                    price: t(UI.pricing.team.price, lang),
-                    period: t(UI.pricing.team.period, lang),
-                    desc: t(UI.pricing.team.desc, lang),
-                    features: UI.pricing.team.features[lang] as readonly string[],
-                    highlighted: false,
-                    isCurrent: hasActiveSubscription && subscription?.plan === "team",
-                    disabled: false,
-                    action: () => {
-                      if (hasActiveSubscription && subscription?.plan === "team") {
-                        window.location.href = "/account";
-                      } else {
-                        window.location.href = "mailto:support@aifluency.app?subject=Team%20Plan%20Inquiry";
-                      }
-                    },
-                  },
-                ] as const
-              ).map((plan, i) => {
-                const priceMatch = plan.price.match(/^([¥$])([\d.]+)$/);
-                const currency = priceMatch?.[1] ?? "";
-                const amount = priceMatch?.[2] ?? plan.price;
-                const ctaLabel = plan.isCurrent
-                  ? t(UI.billing.manageSubscription, lang)
-                  : plan.disabled
-                    ? t(UI.billing.includedInHigher, lang)
-                    : plan.key === "team"
-                      ? (lang === "zh" ? "联系我们" : "Contact Us")
-                      : (lang === "zh" ? "立即测评" : "Start Now");
-
-                return (
-                  <motion.div
-                    key={plan.key}
-                    initial={{ opacity: 0, y: 14 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: i * 0.08 }}
-                    className="relative flex flex-col"
-                  >
-                    {plan.highlighted && (
-                      <div className="pointer-events-none absolute -inset-px -z-10 rounded-[1.3rem] bg-gradient-to-b from-indigo-400/50 via-violet-500/20 to-transparent blur-sm" />
-                    )}
-
-                    <div
-                      className={`relative flex h-full flex-col overflow-hidden rounded-[1.2rem] p-5 md:p-6 ${
-                        plan.highlighted
-                          ? "bg-gradient-to-br from-[#15122b] via-[#120f24] to-[#0c0a18] shadow-[0_16px_60px_-8px_rgba(99,70,229,0.45)] ring-1 ring-indigo-400/30"
-                          : "border border-white/[0.08] bg-white/[0.03]"
-                      }`}
-                    >
-                      {plan.highlighted && (
-                        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-300/60 to-transparent" />
-                      )}
-
-                      <div className="mb-5">
-                        <h3 className="text-base font-semibold text-white">{plan.name}</h3>
-                        <p className="mt-1 text-[12px] leading-snug text-slate-400">{plan.desc}</p>
-                      </div>
-
-                      <div className="mb-5 border-b border-white/[0.06] pb-5">
-                        <div className="flex items-end gap-0.5">
-                          {currency && (
-                            <span className="mb-1.5 text-base font-medium text-slate-400">{currency}</span>
-                          )}
-                          <span className={`text-[2.5rem] font-semibold leading-none tracking-tight tabular-nums ${
-                            plan.highlighted ? "bg-gradient-to-br from-white to-indigo-200 bg-clip-text text-transparent" : "text-white"
-                          }`}>
-                            {amount}
-                          </span>
-                          {plan.key === "team" && (
-                            <span className="mb-1.5 ml-0.5 text-sm text-slate-400">{lang === "zh" ? "/起" : "/mo"}</span>
-                          )}
-                        </div>
-                      </div>
-
-                      <ul className="flex-1 space-y-2.5">
-                        {plan.features.map((f) => (
-                          <li key={f} className="flex items-start gap-2.5">
-                            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 stroke-[3] text-indigo-400" />
-                            <span className="text-[12px] leading-snug text-slate-300">{f}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      <button
-                        onClick={plan.action}
-                        disabled={plan.disabled}
-                        className={`mt-6 w-full rounded-lg py-2.5 text-[12px] font-semibold tracking-wide transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 ${
-                          plan.isCurrent
-                            ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                            : plan.disabled
-                              ? "border border-white/10 bg-white/[0.03] text-slate-500"
-                              : plan.highlighted
-                                ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-indigo-500/25 hover:from-indigo-400 hover:to-violet-400"
-                                : "border border-white/15 bg-white/[0.04] text-white hover:border-white/30 hover:bg-white/10"
-                        }`}
-                      >
-                        {ctaLabel}
-                      </button>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
+                </ul>
+                <button
+                  onClick={() => {
+                    if (!user) { redirectToSignIn("/#pricing"); return; }
+                    if (hasActiveSubscription) { window.location.href = "/account"; return; }
+                    setShowPayment(true);
+                  }}
+                  className="mt-6 w-full rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-violet-400 active:scale-[0.98]"
+                >
+                  {hasActiveSubscription
+                    ? (lang === "zh" ? "已解锁" : "Unlocked")
+                    : t(UI.pricing.cta, lang)}
+                </button>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -899,13 +809,12 @@ export function LandingPage({
       </section>
 
       {/* ── Payment Modal ── */}
-      {paymentPlan && (
+      {showPayment && (
         <PaymentModal
-          plan={paymentPlan}
-          onClose={() => setPaymentPlan(null)}
-          onSuccess={async (plan) => {
-            setPaymentPlan(null);
-            setSubscribeToast(plan);
+          onClose={() => setShowPayment(false)}
+          onSuccess={async () => {
+            setShowPayment(false);
+            setSubscribeToast(true);
             await refresh();
             document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
           }}

@@ -202,22 +202,6 @@ export default function AccountPage() {
             <p className="mt-1 text-sm text-slate-500">{t(UI.billing.manageDesc, lang)}</p>
 
             <div className="mt-5 flex flex-wrap gap-3">
-              {subscription?.plan === "starter" && (
-                <Link
-                  href="/#pricing"
-                  className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                >
-                  {lang === "zh" ? "升级专业版" : "Upgrade to Pro"}
-                </Link>
-              )}
-              {subscription?.plan === "pro" && (
-                <Link
-                  href="/#pricing"
-                  className="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                >
-                  {t(UI.billing.upgradeToTeam, lang)}
-                </Link>
-              )}
               {!showCancelConfirm ? (
                 <button
                   type="button"
