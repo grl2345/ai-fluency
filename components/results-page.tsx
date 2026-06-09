@@ -330,8 +330,8 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
             transition={{ delay: 0.1 }}
             className="flex flex-col rounded-2xl border border-white/[0.08] bg-[#12122a] p-5 lg:col-span-2"
           >
-            <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-slate-300">
-              {zh ? "分享你的 AI 身份" : "SHARE YOUR AI IDENTITY"}
+            <h3 className="text-sm font-bold text-slate-200">
+              {zh ? "分享你的 AI 身份" : "Share Your AI Identity"}
             </h3>
             <p className="mt-1 text-[11px] text-slate-500">
               {zh ? "展示你的得分，邀请好友来挑战！" : "Show off your score and challenge your friends to beat it!"}
@@ -347,33 +347,39 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                 <span className="text-[9px] font-bold text-slate-400">{zh ? "AI 素养" : "AI Fluency"}</span>
               </div>
 
-              {/* User name */}
-              <p className="mt-2 text-sm font-extrabold text-white">{userName}</p>
-
-              <div className="mt-1 flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-bold text-slate-300">{currentLevel.name[lang]}</p>
+              <div className="mt-2 flex items-start justify-between gap-3">
+                {/* Left: user info */}
+                <div className="flex-1">
+                  <p className="text-base font-extrabold text-white">{userName}</p>
                   <span className="mt-1 inline-block rounded bg-gradient-to-r from-indigo-500 to-violet-500 px-1.5 py-0.5 text-[8px] font-bold text-white">
                     LEVEL {mainTier}
                   </span>
-                  <div className="mt-2.5">
+                  <div className="mt-3">
                     <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">{zh ? "AI 得分" : "AI SCORE"}</p>
                     <p className="flex items-baseline gap-0.5">
                       <span className="text-2xl font-black text-white tabular-nums">{totalScore}</span>
                       <span className="text-[10px] text-slate-500">/100</span>
                     </p>
                   </div>
-                  <p className="mt-1 text-[10px] text-slate-400">
+                  <p className="mt-1.5 text-[10px] text-slate-400">
                     {zh ? "超过了" : "You're ahead of"}{" "}
                     <span className="font-bold text-emerald-400">{percentile}%</span>{" "}
                     {zh ? "的用户" : "of people"}
                   </p>
                 </div>
+
+                {/* Right: character image placeholder */}
+                <div className="flex flex-col items-center gap-2">
+                  {/* Image placeholder — replace src with actual 3D character image */}
+                  <div className="h-24 w-20 rounded-lg bg-white/[0.04] border border-dashed border-white/[0.1] flex items-center justify-center">
+                    <User className="h-8 w-8 text-slate-600" />
+                  </div>
+                </div>
               </div>
 
-              {/* QR Code area */}
-              <div className="mt-2 flex items-end justify-between">
-                <p className="text-[9px] text-slate-500 max-w-[100px] leading-tight">
+              {/* Bottom: QR + scan text */}
+              <div className="mt-3 flex items-end justify-between">
+                <p className="text-[9px] text-slate-500 max-w-[110px] leading-tight">
                   {zh ? "扫码发现你的 AI 等级" : "Scan to discover your AI level"} ↗
                 </p>
                 <QRCodePlaceholder />
