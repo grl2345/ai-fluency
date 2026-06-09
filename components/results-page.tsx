@@ -239,7 +239,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
             </div>
           </motion.div>
 
-          {/* Percentile Banner */}
+          {/* Level Stars */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -252,7 +252,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
               ))}
             </div>
             <p className="text-sm font-semibold text-indigo-700">
-              {t(UI.results.percentile, lang)} <span className="text-indigo-900">{percentile}%</span> {t(UI.results.percentileSuffix, lang)}
+              {lang === "zh" ? `等级 ${mainTier} / 5` : `Level ${mainTier} of 5`}
             </p>
           </motion.div>
 

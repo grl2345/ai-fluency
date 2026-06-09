@@ -33,20 +33,11 @@ export default function RefundPage() {
 
         <div className="mt-10 space-y-8 text-[15px] leading-relaxed text-slate-300">
           <section>
-            <h2 className="mb-3 text-lg font-bold text-white">{zh ? "订阅取消" : "Subscription Cancellation"}</h2>
-            <p>
-              {zh
-                ? "您可以随时从账户设置页面取消订阅，无需联系客服。取消后，您的服务将持续到当前计费周期结束。计费周期结束后，将不再扣费，且付费功能将停止使用。"
-                : "You can cancel your subscription at any time from your account settings — no need to contact support. After cancellation, your service continues until the end of the current billing period. No further charges will be made, and paid features will stop at the end of the cycle."}
-            </p>
-          </section>
-
-          <section>
             <h2 className="mb-3 text-lg font-bold text-white">{zh ? "退款申请" : "Refund Requests"}</h2>
             <p>
               {zh
-                ? "如果您在订阅后 7 天内且尚未使用测评服务（未开始任何测评），您可以申请全额退款。请发送邮件至 support@aifluency.app，附上您的注册邮箱和 PayPal 交易 ID。"
-                : "If you request a refund within 7 days of subscribing and have not used the assessment service (no assessment started), you are eligible for a full refund. Email support@aifluency.app with your registered email and PayPal transaction ID."}
+                ? "如果您在付费后 14 天内且尚未查看完整报告，您可以申请全额退款。请发送邮件至 support@aifluency.app，附上您的注册邮箱和 PayPal 交易 ID。"
+                : "If you request a refund within 14 days of payment and have not viewed the full report, you are eligible for a full refund. Email support@aifluency.app with your registered email and PayPal transaction ID."}
             </p>
           </section>
 
@@ -54,8 +45,8 @@ export default function RefundPage() {
             <h2 className="mb-3 text-lg font-bold text-white">{zh ? "不予退款的情况" : "Non-Refundable Scenarios"}</h2>
             <p>
               {zh
-                ? "以下情况不予退款：已完成或开始测评后；订阅超过 7 天后；因违反服务条款被终止的账户。"
-                : "Refunds are not available: after an assessment has been started or completed; more than 7 days after subscribing; or for accounts terminated due to Terms of Service violations."}
+                ? "以下情况不予退款：已查看完整报告后；付费超过 14 天后；因违反服务条款被终止的账户。"
+                : "Refunds are not available: after the full report has been viewed; more than 14 days after payment; or for accounts terminated due to Terms of Service violations."}
             </p>
           </section>
 
@@ -64,7 +55,16 @@ export default function RefundPage() {
             <p>
               {zh
                 ? "退款将通过 PayPal 原路返回，通常在 5-10 个工作日内处理完毕。退款金额为原始支付金额，不含 PayPal 交易手续费（如有）。"
-                : "Refunds are processed back to your PayPal account, typically within 5–10 business days. The refund amount is the original payment minus any PayPal transaction fees (if applicable)."}
+                : "Refunds are processed back to your PayPal account, typically within 5-10 business days. The refund amount is the original payment minus any PayPal transaction fees (if applicable)."}
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-bold text-white">{zh ? "欧盟消费者权利" : "EU Consumer Rights"}</h2>
+            <p>
+              {zh
+                ? "根据欧盟消费者权利指令，您有 14 天的冷静期可以无理由退款。如果您在冷静期内已查看完整报告（即开始使用数字内容），您确认放弃冷静期退款权利。"
+                : "Under the EU Consumer Rights Directive, you have a 14-day cooling-off period during which you may request a refund without reason. If you have viewed the full report (i.e., started using the digital content) within the cooling-off period, you acknowledge that you waive your right to withdraw."}
             </p>
           </section>
 

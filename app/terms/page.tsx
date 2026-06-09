@@ -36,8 +36,8 @@ export default function TermsPage() {
             <h2 className="mb-3 text-lg font-bold text-white">{zh ? "1. 服务概述" : "1. Service Overview"}</h2>
             <p>
               {zh
-                ? "AI Fluency Check（以下简称「本平台」）是由 aifluencycheck.com 运营的在线 AI 素养测评服务。用户可以通过完成测评获取个性化的 AI 能力报告和提升建议。"
-                : 'AI Fluency Check ("the Platform") is an online AI literacy assessment service operated at aifluencycheck.com. Users complete assessments to receive personalized AI competency reports and improvement recommendations.'}
+                ? "AI Fluency Check（以下简称「本平台」）是由 AI Fluency 运营的在线 AI 素养测评服务，网站地址为 aifluencycheck.com。如有任何疑问，请通过 support@aifluency.app 联系我们。用户可以通过完成测评获取个性化的 AI 能力报告和提升建议。"
+                : "AI Fluency Check (\"the Platform\") is an online AI literacy assessment service operated by AI Fluency at aifluencycheck.com. For inquiries, contact us at support@aifluency.app. Users complete assessments to receive personalized AI competency reports and improvement recommendations."}
             </p>
           </section>
 
@@ -51,11 +51,11 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-bold text-white">{zh ? "3. 订阅与付费" : "3. Subscriptions & Payment"}</h2>
+            <h2 className="mb-3 text-lg font-bold text-white">{zh ? "3. 服务与付费" : "3. Services & Payment"}</h2>
             <p>
               {zh
-                ? "本平台提供付费订阅服务，包括 Starter、Pro 和 Team 套餐。所有费用通过 PayPal 处理。订阅为周期性自动续费，您可随时在账户页面取消。取消后，当前计费周期结束前您仍可使用服务。详情请参阅我们的退款政策。"
-                : "The Platform offers paid subscription plans including Starter, Pro, and Team tiers. All payments are processed through PayPal. Subscriptions renew automatically; you may cancel at any time from your account page. After cancellation, access continues until the end of the current billing period. See our Refund Policy for details."}
+                ? "本平台提供免费 AI 素养测评。完成测评后，您可以通过一次性付费（$49.9 / ¥49.9）解锁完整报告，包括六维度详细分析、个性化建议和可分享证书。所有费用通过 PayPal 处理。详情请参阅我们的退款政策。"
+                : "The Platform offers a free AI literacy assessment. After completing the assessment, you can unlock the full report through a one-time payment ($49.9) that includes detailed six-dimension analysis, personalized recommendations, and a shareable certificate. All payments are processed through PayPal. See our Refund Policy for details."}
             </p>
           </section>
 
