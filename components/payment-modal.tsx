@@ -27,8 +27,8 @@ const PLAN_DETAILS = {
     price: { en: "$19.9", zh: "$19.9" },
     period: { en: "", zh: "" },
     features: {
-      en: ["Detailed 6-Dimension Report", "Personalized 90-Day Learning Plan", "Benchmark Against Similar Professionals", "Downloadable PDF Report", "30-day Email Support"],
-      zh: ["六维度详细分析报告", "个性化 90 天学习计划", "同行能力对标排名", "可下载 PDF 报告", "30 天邮件支持"],
+      en: ["Detailed 6-Dimension Report", "Full Competency Radar Chart", "Learning Resources for All Dimensions", "Email Support"],
+      zh: ["六维度详细分析报告", "完整能力雷达图", "全维度学习资源推荐", "邮件支持"],
     },
   },
   team: {

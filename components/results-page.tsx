@@ -304,8 +304,8 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                 <p className="mt-2 max-w-md text-indigo-100">{t(UI.results.unlockDesc, lang)}</p>
                 <ul className="mt-5 grid gap-2 text-left sm:grid-cols-2">
                   {(lang === "zh"
-                    ? ["六维度详细分析报告", "个性化 90 天学习计划", "同行能力对标排名", "可下载 PDF 报告", "全维度学习路径", "30 天邮件支持"]
-                    : ["Detailed 6-Dimension Report", "Personalized 90-Day Learning Plan", "Benchmark Against Peers", "Downloadable PDF Report", "Full Learning Paths", "30-day Email Support"]
+                    ? ["六维度详细分析报告", "完整能力雷达图", "全维度学习资源推荐", "邮件支持"]
+                    : ["Detailed 6-Dimension Report", "Full Competency Radar Chart", "Learning Resources for All Dimensions", "Email Support"]
                   ).map((f) => (
                     <li key={f} className="flex items-center gap-2.5 text-sm text-indigo-100">
                       <CheckCircle className="h-4 w-4 shrink-0 text-emerald-300" />
