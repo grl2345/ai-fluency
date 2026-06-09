@@ -41,9 +41,10 @@ import {
   Lock,
   Zap,
   Star,
-  AlertTriangle,
   Home,
   ArrowRight,
+  Eye,
+  ClipboardCheck,
 } from "lucide-react";
 import { useSubscription } from "@/components/subscription-provider";
 
@@ -58,19 +59,19 @@ const iconMap: Record<string, React.ElementType> = {
   Brain, Target, MessageSquare, CheckCircle, GitMerge, Shield,
 };
 
+const DIM_COLORS = ["#6366f1", "#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6"];
+
 function AnimatedScore({ value, delay = 0.5 }: { value: number; delay?: number }) {
   const [displayed, setDisplayed] = useState(0);
   useEffect(() => {
     const timer = setTimeout(() => {
-      let start = 0;
       const duration = 1200;
       const startTime = performance.now();
       const animate = (now: number) => {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
-        start = Math.round(eased * value);
-        setDisplayed(start);
+        setDisplayed(Math.round(eased * value));
         if (progress < 1) requestAnimationFrame(animate);
       };
       requestAnimationFrame(animate);
@@ -151,22 +152,15 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
   }, [profileData, mainTier, lang]);
 
   const sortedDimensions = useMemo(() => [...dimensionScores].sort((a, b) => b.score - a.score), [dimensionScores]);
-  const strengths = sortedDimensions.slice(0, 2);
+  const strengths = sortedDimensions.slice(0, 3);
   const weaknesses = sortedDimensions.slice(-3).reverse();
 
-  const TIER_GRADIENT = [
-    "from-slate-500 to-slate-600",
-    "from-emerald-500 to-teal-600",
-    "from-blue-500 to-indigo-600",
-    "from-violet-500 to-purple-600",
-    "from-amber-400 to-orange-500",
-  ];
-  const tierGrad = TIER_GRADIENT[Math.max(0, Math.min(4, mainTier - 1))];
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <div className="min-h-screen bg-[#07070d]">
+    <div className="min-h-screen bg-[#0a0a1a]">
       {/* ── Nav ── */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a16]/80 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a1a]/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <a href="/" className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/25">
@@ -174,327 +168,394 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
             </div>
             <span className="text-sm font-bold text-white">{lang === "zh" ? "AI 素养" : "AI Fluency"}</span>
           </a>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <a href="/" className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white">
               <Home className="h-3.5 w-3.5" />
               {lang === "zh" ? "首页" : "Home"}
             </a>
             <button onClick={onRetake} className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white">
               <RefreshCw className="h-3.5 w-3.5" />
-              {lang === "zh" ? "重测" : "Retake"}
+              {lang === "zh" ? "测评" : "Retake"}
             </button>
           </div>
         </div>
       </nav>
 
-      {/* ── Dark Hero ── */}
-      <section className="relative overflow-hidden px-6 pb-16 pt-12 md:pb-24 md:pt-16">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-indigo-600/20 blur-[160px]" />
-          <div className="absolute -right-24 top-10 h-[420px] w-[420px] rounded-full bg-violet-600/15 blur-[140px]" />
-          <div className="absolute bottom-0 left-1/2 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[120px]" />
-        </div>
+      <div className="mx-auto max-w-5xl px-4 py-8 md:px-6 md:py-12">
+        {/* ── Hero Card ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-6 md:p-8"
+        >
+          {/* Greeting */}
+          <div className="mb-6">
+            <h1 className="text-xl font-bold text-white md:text-2xl">
+              Hi{lang === "zh" ? "，欢迎回来" : ", Welcome back"} <span className="inline-block">&#x1F44B;</span>
+            </h1>
+            <p className="mt-1 text-sm text-slate-400">
+              {lang === "zh" ? "你的 AI 素养水平" : "Your AI Fluency Level"}
+            </p>
+          </div>
 
-        <div className="relative mx-auto max-w-4xl text-center">
-          {/* Badge */}
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/10 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-200 backdrop-blur-sm">
-              <Sparkles className="h-3.5 w-3.5 text-indigo-300" />
-              {t(UI.results.badge, lang)}
-            </span>
-          </motion.div>
-
-          {/* Score Ring */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2, type: "spring", bounce: 0.3 }}
-            className="mt-10"
-          >
-            <div className="relative mx-auto h-48 w-48 md:h-56 md:w-56">
-              <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90">
-                <defs>
-                  <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#818cf8" />
-                    <stop offset="50%" stopColor="#a78bfa" />
-                    <stop offset="100%" stopColor="#22d3ee" />
-                  </linearGradient>
-                </defs>
-                <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
-                <motion.circle
-                  cx="100" cy="100" r="82" fill="none"
-                  stroke="url(#scoreGrad)" strokeWidth="10" strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: totalScore / 100 }}
-                  transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="bg-gradient-to-br from-white to-indigo-200 bg-clip-text text-[56px] font-black leading-none text-transparent tabular-nums md:text-[64px]">
-                  <AnimatedScore value={totalScore} delay={0.5} />
+          {/* Main content: 3-column layout */}
+          <div className="flex flex-col items-center gap-6 md:flex-row md:items-start md:gap-8">
+            {/* Left column: badge + description */}
+            <div className="flex-1 space-y-4 text-center md:text-left">
+              <div className="flex flex-wrap items-center justify-center gap-3 md:justify-start">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-400">
+                  <CheckCircle className="h-3 w-3" />
+                  {t(UI.results.badge, lang)}
                 </span>
-                <span className="mt-1 text-xs font-semibold text-slate-500">/ 100</span>
+                <span className="text-xs text-slate-500">{today}</span>
               </div>
+              <p className="text-sm leading-relaxed text-slate-400">
+                {lang === "zh"
+                  ? "你已完成 AI 素养测评，系统已根据你的表现生成专属报告。"
+                  : "You’ve completed the AI Fluency Assessment. Your personalized report is ready."}
+              </p>
             </div>
-          </motion.div>
 
-          {/* Level */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            className="mt-6"
-          >
-            <div className={`mx-auto inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r ${tierGrad} px-6 py-3 shadow-lg`}>
-              <span className="text-2xl font-black text-white">{currentLevel.badge}</span>
-              <div className="text-left">
-                <p className="text-sm font-bold text-white">{currentLevel.name[lang]}</p>
-                <div className="flex items-center gap-0.5">
-                  {[0,1,2,3,4].map((i) => (
-                    <Star key={i} className={`h-3 w-3 ${i < mainTier ? "fill-white/90 text-white/90" : "fill-white/20 text-white/20"}`} />
-                  ))}
+            {/* Center: Score Ring */}
+            <div className="flex flex-col items-center">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-slate-500">
+                {lang === "zh" ? "AI 素养得分" : "AI Fluency Score"}
+              </p>
+              <div className="relative h-40 w-40 md:h-48 md:w-48">
+                <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90">
+                  <defs>
+                    <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#818cf8" />
+                      <stop offset="50%" stopColor="#a78bfa" />
+                      <stop offset="100%" stopColor="#22d3ee" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="100" cy="100" r="82" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
+                  <motion.circle
+                    cx="100" cy="100" r="82" fill="none"
+                    stroke="url(#scoreGrad)" strokeWidth="10" strokeLinecap="round"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: totalScore / 100 }}
+                    transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="bg-gradient-to-br from-white to-indigo-200 bg-clip-text text-5xl font-black leading-none text-transparent tabular-nums md:text-6xl">
+                    <AnimatedScore value={totalScore} delay={0.5} />
+                  </span>
+                  <span className="mt-1 text-xs font-semibold text-slate-500">/ 100</span>
                 </div>
               </div>
             </div>
-            <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-slate-400">
-              {currentLevel.description[lang]}
-            </p>
-          </motion.div>
 
-          {/* Top 3 Weaknesses */}
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1.0 }}
-            className="mx-auto mt-10 max-w-md"
-          >
-            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 backdrop-blur-sm">
-              <h3 className="mb-3 flex items-center justify-center gap-2 text-sm font-bold text-amber-300">
-                <AlertTriangle className="h-4 w-4" />
-                {lang === "zh" ? "你的 Top 3 弱项" : "Your Top 3 Weaknesses"}
-              </h3>
-              <div className="space-y-2">
-                {weaknesses.map((dim, i) => {
-                  const fullDim = dimensions.find((d) => d.id === dim.id);
-                  const Icon = iconMap[fullDim?.icon || "Brain"];
-                  return (
-                    <motion.div
-                      key={dim.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 1.2 + i * 0.1 }}
-                      className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-2.5"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Icon className="h-4 w-4 text-amber-400" />
-                        <span className="text-sm font-medium text-slate-200">{dim.name}</span>
-                      </div>
-                      <span className="text-sm font-bold text-amber-400">{dim.score}%</span>
-                    </motion.div>
-                  );
-                })}
+            {/* Right: Level badge */}
+            <div className="flex flex-1 flex-col items-center gap-3 md:items-start">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-lg font-black text-emerald-400">
+                  {currentLevel.badge}
+                </div>
+                <div>
+                  <p className="text-base font-bold text-white">{currentLevel.name[lang]}</p>
+                  <div className="flex items-center gap-0.5">
+                    {[0,1,2,3,4].map((i) => (
+                      <Star key={i} className={`h-3.5 w-3.5 ${i < mainTier ? "fill-amber-400 text-amber-400" : "fill-slate-700 text-slate-700"}`} />
+                    ))}
+                  </div>
+                </div>
               </div>
+              <p className="max-w-[220px] text-center text-xs leading-relaxed text-slate-400 md:text-left">
+                {currentLevel.description[lang]}
+              </p>
             </div>
-          </motion.div>
+          </div>
+        </motion.div>
 
-          {/* Gap analysis */}
-          {gapMessage && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.5 }}
-              className="mx-auto mt-6 max-w-md rounded-2xl border border-indigo-400/15 bg-indigo-500/5 px-6 py-4 text-sm text-slate-300 backdrop-blur-sm"
-            >
-              {gapMessage}
-            </motion.div>
-          )}
+        {/* ── Top 3 Strengths ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-8"
+        >
+          <h3 className="mb-4 flex items-center justify-center gap-2 text-sm font-bold text-slate-300">
+            <ClipboardCheck className="h-4 w-4 text-indigo-400" />
+            {lang === "zh" ? "你的 Top 3 强项" : "Your Top 3 Strengths"}
+          </h3>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {strengths.map((dim, i) => {
+              const fullDim = dimensions.find((d) => d.id === dim.id);
+              const Icon = iconMap[fullDim?.icon || "Brain"];
+              const color = DIM_COLORS[i % DIM_COLORS.length];
+              return (
+                <motion.div
+                  key={dim.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + i * 0.1 }}
+                  className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-[#12122a] px-4 py-4"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}20` }}>
+                    <Icon className="h-5 w-5" style={{ color }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-200 truncate">{dim.name}</p>
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${dim.score}%` }}
+                          transition={{ duration: 0.8, delay: 0.6 + i * 0.1 }}
+                          className="h-full rounded-full"
+                          style={{ backgroundColor: color }}
+                        />
+                      </div>
+                      <span className="text-xs font-bold tabular-nums text-slate-300">{dim.score}%</span>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
 
-          {/* Action Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.6 }}
-            className="mt-8 flex flex-wrap justify-center gap-3"
+        {/* ── Gap analysis ── */}
+        {gapMessage && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="mt-6 text-center text-sm text-slate-400"
           >
-            <button className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-violet-400">
-              <Share2 className="h-4 w-4" />
-              {t(UI.results.share, lang)}
-            </button>
-            <button onClick={onRetake} className="flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-6 py-2.5 text-sm font-medium text-white/80 transition-all hover:border-white/30 hover:bg-white/10 hover:text-white">
-              <RefreshCw className="h-4 w-4" />
-              {t(UI.results.retake, lang)}
-            </button>
-          </motion.div>
-        </div>
-      </section>
+            {gapMessage}
+          </motion.p>
+        )}
 
-      {/* ── Unlock CTA for free users ── */}
-      {!hasPro && (
-        <section className="border-t border-white/[0.06] px-6 py-12">
+        {/* ── Action Buttons ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0 }}
+          className="mt-6 flex flex-wrap justify-center gap-3"
+        >
+          <button className="flex items-center gap-2 rounded-full border border-indigo-500/40 bg-indigo-500/10 px-6 py-2.5 text-sm font-semibold text-indigo-300 transition-all hover:bg-indigo-500/20">
+            <Share2 className="h-4 w-4" />
+            {t(UI.results.share, lang)}
+          </button>
+          <button onClick={onRetake} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-6 py-2.5 text-sm font-medium text-slate-400 transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white">
+            <RefreshCw className="h-4 w-4" />
+            {t(UI.results.retake, lang)}
+          </button>
+        </motion.div>
+
+        {/* ── Pro Unlock CTA ── */}
+        {!hasPro && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mx-auto max-w-2xl overflow-hidden rounded-3xl border border-indigo-400/20 bg-gradient-to-br from-indigo-600/20 to-violet-600/10 p-8 text-center backdrop-blur-sm md:p-10"
+            className="mt-10 overflow-hidden rounded-3xl border border-white/[0.08] bg-[#12122a]"
           >
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-bold text-indigo-300">
-              <Zap className="h-3.5 w-3.5" />
-              {t(UI.results.proOnly, lang)}
-            </span>
-            <h3 className="mt-4 text-2xl font-extrabold text-white">{t(UI.results.unlockTitle, lang)}</h3>
-            <p className="mt-2 text-sm text-slate-300">{t(UI.results.unlockDesc, lang)}</p>
-            <ul className="mx-auto mt-5 grid max-w-sm gap-2 text-left">
-              {(lang === "zh"
-                ? ["六维度详细分析报告", "完整能力雷达图", "全维度学习资源推荐", "邮件支持"]
-                : ["Detailed 6-Dimension Report", "Full Competency Radar Chart", "Learning Resources for All Dimensions", "Email Support"]
-              ).map((f) => (
-                <li key={f} className="flex items-center gap-2.5 text-sm text-slate-200">
-                  <CheckCircle className="h-4 w-4 shrink-0 text-emerald-400" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() => setShowPayment(true)}
-              className="mt-7 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/30 transition-all hover:from-indigo-400 hover:to-violet-400 active:scale-[0.98]"
-            >
-              {t(UI.results.unlockCta, lang)}
-              <ArrowRight className="h-4 w-4" />
-            </button>
-            <p className="mt-3 text-xs text-slate-500">{t(UI.results.unlockNote, lang)}</p>
-          </motion.div>
-        </section>
-      )}
-
-      {/* ── Locked preview for free / Full report for Pro ── */}
-      <section className="border-t border-white/[0.06] bg-white px-6 py-12">
-        <div className="mx-auto max-w-6xl">
-          {hasPro ? (
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="mx-auto mb-10 grid w-full max-w-sm grid-cols-3 rounded-lg border border-slate-200 bg-slate-100 p-1">
-                <TabsTrigger value="overview" className="gap-1.5 rounded-md text-sm font-medium">
-                  <Award className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t(UI.results.overview, lang)}</span>
-                </TabsTrigger>
-                <TabsTrigger value="details" className="gap-1.5 rounded-md text-sm font-medium">
-                  <BarChart3 className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t(UI.results.breakdown, lang)}</span>
-                </TabsTrigger>
-                <TabsTrigger value="learning" className="gap-1.5 rounded-md text-sm font-medium">
-                  <BookOpen className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{t(UI.results.learn, lang)}</span>
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview">
-                <div className="grid gap-8 lg:grid-cols-2">
-                  <Card className="border-border/40">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-lg">
-                        <Award className="h-5 w-5 text-primary" />
-                        {t(UI.results.radar, lang)}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-[320px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <RadarChart cx="50%" cy="50%" outerRadius="70%" data={dimensionScores}>
-                            <PolarGrid stroke="#e2e8f0" strokeOpacity={0.8} />
-                            <PolarAngleAxis dataKey="shortName" tick={{ fill: "#64748b", fontSize: 11, fontWeight: 600 }} />
-                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: "#94a3b8", fontSize: 10 }} axisLine={false} />
-                            <Radar name="Score" dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.18} strokeWidth={2.5} />
-                          </RadarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <div className="space-y-6">
-                    <Card className="border-border/40">
-                      <CardHeader className="pb-4">
-                        <CardTitle className="flex items-center gap-2 text-lg text-teal-600">
-                          <TrendingUp className="h-5 w-5" />
-                          {t(UI.results.strengths, lang)}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        {strengths.map((dim) => {
-                          const fullDim = dimensions.find((d) => d.id === dim.id);
-                          const Icon = iconMap[fullDim?.icon || "Brain"];
-                          return (
-                            <div key={dim.id} className="flex items-center justify-between rounded-xl bg-teal-50 p-4">
-                              <div className="flex items-center gap-4">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-100">
-                                  <Icon className="h-5 w-5 text-teal-600" />
-                                </div>
-                                <div>
-                                  <p className="font-medium text-foreground">{dim.name}</p>
-                                  <p className="text-sm text-muted-foreground">{fullDim?.description[lang]}</p>
-                                </div>
-                              </div>
-                              <Badge className="bg-teal-500 text-white hover:bg-teal-500">{dim.score}%</Badge>
-                            </div>
-                          );
-                        })}
-                      </CardContent>
-                    </Card>
-                    <Card className="border-border/40">
-                      <CardHeader className="pb-4">
-                        <CardTitle className="flex items-center gap-2 text-lg text-amber-600">
-                          <BookOpen className="h-5 w-5" />
-                          {t(UI.results.growth, lang)}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        {weaknesses.map((dim) => {
-                          const fullDim = dimensions.find((d) => d.id === dim.id);
-                          const Icon = iconMap[fullDim?.icon || "Brain"];
-                          return (
-                            <div key={dim.id} className="flex items-center justify-between rounded-xl bg-amber-50 p-4">
-                              <div className="flex items-center gap-4">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-100">
-                                  <Icon className="h-5 w-5 text-amber-600" />
-                                </div>
-                                <div>
-                                  <p className="font-medium text-foreground">{dim.name}</p>
-                                  <p className="text-sm text-muted-foreground">{fullDim?.description[lang]}</p>
-                                </div>
-                              </div>
-                              <Badge variant="outline" className="border-amber-300 text-amber-600">{dim.score}%</Badge>
-                            </div>
-                          );
-                        })}
-                      </CardContent>
-                    </Card>
+            <div className="flex flex-col md:flex-row">
+              <div className="flex-1 p-6 md:p-8">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/15 px-3 py-1 text-xs font-bold text-indigo-300">
+                  <Zap className="h-3.5 w-3.5" />
+                  {t(UI.results.proOnly, lang)}
+                </span>
+                <h3 className="mt-4 text-2xl font-extrabold text-white">{t(UI.results.unlockTitle, lang)}</h3>
+                <p className="mt-2 text-sm text-slate-400">{t(UI.results.unlockDesc, lang)}</p>
+                <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
+                  {(lang === "zh"
+                    ? ["六维度详细分析报告", "完整能力雷达图", "全维度学习资源推荐", "邮件支持"]
+                    : ["Detailed 6-Dimension Report", "Full Competency Radar Chart", "Learning Resources for All Dimensions", "Email Support"]
+                  ).map((f) => (
+                    <span key={f} className="flex items-center gap-1.5 text-sm text-slate-300">
+                      <CheckCircle className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                      {f}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setShowPayment(true)}
+                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-violet-400 active:scale-[0.98]"
+                >
+                  {t(UI.results.unlockCta, lang)}
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+                <p className="mt-3 text-xs text-slate-500">{t(UI.results.unlockNote, lang)}</p>
+              </div>
+              {/* Illustration placeholder */}
+              <div className="hidden items-center justify-center p-8 md:flex">
+                <div className="relative flex h-48 w-48 items-center justify-center">
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10" />
+                  <div className="relative flex flex-col items-center gap-3">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-indigo-400/20 bg-indigo-500/10">
+                      <ClipboardCheck className="h-10 w-10 text-indigo-400" />
+                    </div>
+                    <Lock className="h-8 w-8 text-violet-400" />
                   </div>
                 </div>
-              </TabsContent>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── Radar + Strengths (locked for free, full for Pro) ── */}
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          {/* Radar Chart Card */}
+          <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-5">
+            <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-slate-200">
+              <Award className="h-4 w-4 text-indigo-400" />
+              {t(UI.results.radar, lang)}
+            </h3>
+            {hasPro ? (
+              <div className="h-[280px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart cx="50%" cy="50%" outerRadius="70%" data={dimensionScores}>
+                    <PolarGrid stroke="rgba(255,255,255,0.08)" />
+                    <PolarAngleAxis dataKey="shortName" tick={{ fill: "#94a3b8", fontSize: 11, fontWeight: 600 }} />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} />
+                    <Radar name="Score" dataKey="score" stroke="#818cf8" fill="#818cf8" fillOpacity={0.15} strokeWidth={2} />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="relative h-[280px] w-full">
+                <div className="blur-md opacity-60">
+                  <ResponsiveContainer width="100%" height={280}>
+                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={dimensionScores}>
+                      <PolarGrid stroke="rgba(255,255,255,0.08)" />
+                      <PolarAngleAxis dataKey="shortName" tick={{ fill: "#94a3b8", fontSize: 11, fontWeight: 600 }} />
+                      <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                      <Radar name="Score" dataKey="score" stroke="#818cf8" fill="#818cf8" fillOpacity={0.15} strokeWidth={2} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <Lock className="h-6 w-6 text-slate-500" />
+                  <button
+                    onClick={() => setShowPayment(true)}
+                    className="mt-3 flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-semibold text-slate-300 transition-all hover:bg-white/[0.08]"
+                  >
+                    <Lock className="h-3 w-3" />
+                    {lang === "zh" ? "升级 Pro 查看完整雷达图" : "Upgrade to Pro for full radar chart"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Strengths Card */}
+          <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-5">
+            <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-slate-200">
+              <TrendingUp className="h-4 w-4 text-emerald-400" />
+              {t(UI.results.strengths, lang)}
+            </h3>
+            {hasPro ? (
+              <div className="space-y-3">
+                {strengths.map((dim) => {
+                  const fullDim = dimensions.find((d) => d.id === dim.id);
+                  const Icon = iconMap[fullDim?.icon || "Brain"];
+                  return (
+                    <div key={dim.id} className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10">
+                          <Icon className="h-4 w-4 text-emerald-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-slate-200">{dim.name}</p>
+                          <p className="text-xs text-slate-500">{fullDim?.description[lang]}</p>
+                        </div>
+                      </div>
+                      <button className="rounded-lg border border-white/10 px-3 py-1 text-xs font-medium text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white">
+                        {lang === "zh" ? "查看" : "View"}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="relative">
+                <div className="space-y-3 blur-sm opacity-60">
+                  {strengths.map((dim) => {
+                    const fullDim = dimensions.find((d) => d.id === dim.id);
+                    const Icon = iconMap[fullDim?.icon || "Brain"];
+                    return (
+                      <div key={dim.id} className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10">
+                            <Icon className="h-4 w-4 text-emerald-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-slate-200">{dim.name}</p>
+                            <p className="text-xs text-slate-500">{fullDim?.description[lang]}</p>
+                          </div>
+                        </div>
+                        <span className="rounded-lg border border-white/10 px-3 py-1 text-xs font-medium text-slate-400">{lang === "zh" ? "查看" : "View"}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <button
+                    onClick={() => setShowPayment(true)}
+                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-violet-400"
+                  >
+                    <Lock className="h-4 w-4" />
+                    {lang === "zh" ? "升级 Pro 解锁更多优势" : "Upgrade to Pro for more"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── Pro full report content (tabs) ── */}
+        {hasPro && (
+          <div className="mt-8 rounded-3xl border border-white/[0.08] bg-[#12122a] p-5 md:p-8">
+            <Tabs defaultValue="details" className="w-full">
+              <TabsList className="mb-8 grid w-full max-w-sm grid-cols-2 rounded-xl border border-white/[0.08] bg-white/[0.04] p-1">
+                <TabsTrigger value="details" className="gap-1.5 rounded-lg text-sm font-medium text-slate-300 data-[state=active]:bg-white/[0.08] data-[state=active]:text-white">
+                  <BarChart3 className="h-3.5 w-3.5" />
+                  {t(UI.results.breakdown, lang)}
+                </TabsTrigger>
+                <TabsTrigger value="learning" className="gap-1.5 rounded-lg text-sm font-medium text-slate-300 data-[state=active]:bg-white/[0.08] data-[state=active]:text-white">
+                  <BookOpen className="h-3.5 w-3.5" />
+                  {t(UI.results.learn, lang)}
+                </TabsTrigger>
+              </TabsList>
 
               <TabsContent value="details">
                 <div className="grid gap-4 md:grid-cols-2">
                   {dimensionScores.map((dim, index) => {
                     const fullDim = dimensions.find((d) => d.id === dim.id);
                     const Icon = iconMap[fullDim?.icon || "Brain"];
+                    const color = DIM_COLORS[index % DIM_COLORS.length];
                     return (
                       <motion.div key={dim.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
-                        <Card className="border-border/40">
-                          <CardContent className="p-5">
-                            <div className="flex items-start gap-4">
-                              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                                <Icon className="h-6 w-6 text-foreground" />
+                        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
+                          <div className="flex items-start gap-4">
+                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}15` }}>
+                              <Icon className="h-5 w-5" style={{ color }} />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-semibold text-slate-200">{dim.name}</h4>
+                                <span className="text-lg font-bold tabular-nums" style={{ color }}>{dim.score}%</span>
                               </div>
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                  <h3 className="font-semibold text-foreground">{dim.name}</h3>
-                                  <span className="text-lg font-bold text-primary">{dim.score}%</span>
-                                </div>
-                                <p className="mt-1 text-sm text-muted-foreground">{fullDim?.description[lang]}</p>
-                                <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary">
-                                  <motion.div initial={{ width: 0 }} animate={{ width: `${dim.score}%` }} transition={{ duration: 0.8, delay: 0.2 + index * 0.05 }} className="h-full rounded-full bg-primary" />
-                                </div>
+                              <p className="mt-1 text-xs text-slate-500">{fullDim?.description[lang]}</p>
+                              <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${dim.score}%` }}
+                                  transition={{ duration: 0.8, delay: 0.2 + index * 0.05 }}
+                                  className="h-full rounded-full"
+                                  style={{ backgroundColor: color }}
+                                />
                               </div>
                             </div>
-                          </CardContent>
-                        </Card>
+                          </div>
+                        </div>
                       </motion.div>
                     );
                   })}
@@ -502,134 +563,69 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
               </TabsContent>
 
               <TabsContent value="learning">
-                <div className="mb-8 rounded-2xl bg-gradient-to-r from-primary/5 via-transparent to-accent/5 p-6 md:p-8">
-                  <h3 className="mb-2 text-xl font-semibold text-foreground">{t(UI.results.learningPath, lang)}</h3>
-                  <p className="text-muted-foreground">{t(UI.results.learningDesc, lang)}</p>
+                <div className="mb-6 rounded-2xl border border-indigo-400/10 bg-indigo-500/5 p-5">
+                  <h3 className="text-lg font-semibold text-white">{t(UI.results.learningPath, lang)}</h3>
+                  <p className="mt-1 text-sm text-slate-400">{t(UI.results.learningDesc, lang)}</p>
                 </div>
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-2">
                   {sortedDimensions.map((dim) => {
                     const resources = learningResources.find((r) => r.dimension === dim.id);
                     const fullDim = dimensions.find((d) => d.id === dim.id);
                     const Icon = iconMap[fullDim?.icon || "Brain"];
                     return (
-                      <Card key={dim.id} className="border-border/40">
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary"><Icon className="h-5 w-5 text-foreground" /></div>
-                            <div>
-                              <span className="text-lg">{dim.name}</span>
-                              <Badge variant="outline" className="ml-3 text-xs">{t(UI.results.priority, lang)}</Badge>
-                            </div>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
+                      <div key={dim.id} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
+                        <div className="mb-4 flex items-center gap-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/10">
+                            <Icon className="h-4 w-4 text-indigo-400" />
+                          </div>
+                          <span className="font-semibold text-slate-200">{dim.name}</span>
+                        </div>
+                        <div className="space-y-2">
                           {resources?.resources.map((res, idx) => {
                             const resTitle = typeof res.title === "object" ? res.title[lang] : res.title;
                             const resDuration = typeof res.duration === "object" ? res.duration[lang] : res.duration;
                             const resUrl = (res as { url?: string }).url;
                             const typeLabel = res.type === "article" ? t(UI.results.article, lang) : res.type === "video" ? t(UI.results.video, lang) : res.type === "course" ? t(UI.results.course, lang) : res.type === "template" ? t(UI.results.template, lang) : t(UI.results.newsletter, lang);
-                            const TYPE_COLORS: Record<string, string> = { article: "bg-sky-50 text-sky-700", video: "bg-rose-50 text-rose-700", course: "bg-violet-50 text-violet-700", template: "bg-emerald-50 text-emerald-700", newsletter: "bg-amber-50 text-amber-700" };
+                            const TYPE_COLORS: Record<string, string> = { article: "bg-sky-500/15 text-sky-400", video: "bg-rose-500/15 text-rose-400", course: "bg-violet-500/15 text-violet-400", template: "bg-emerald-500/15 text-emerald-400", newsletter: "bg-amber-500/15 text-amber-400" };
                             const inner = (
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium text-slate-800 group-hover:text-indigo-600 leading-snug">{resTitle}</p>
-                                <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-500">
-                                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${TYPE_COLORS[res.type] ?? "bg-slate-100 text-slate-600"}`}>{typeLabel}</span>
+                                <p className="text-sm font-medium text-slate-200 group-hover:text-indigo-300 leading-snug">{resTitle}</p>
+                                <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
+                                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${TYPE_COLORS[res.type] ?? "bg-slate-500/15 text-slate-400"}`}>{typeLabel}</span>
                                   <span>{resDuration}</span>
                                 </div>
                               </div>
                             );
                             return resUrl ? (
-                              <a key={idx} href={resUrl} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 rounded-xl border border-slate-100 p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/40 hover:shadow-sm">
+                              <a key={idx} href={resUrl} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 rounded-xl border border-white/[0.06] p-3 transition-all hover:border-indigo-400/20 hover:bg-indigo-500/5">
                                 {inner}
-                                <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-300 transition-all group-hover:text-indigo-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                                <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-600 transition-all group-hover:text-indigo-400" />
                               </a>
                             ) : (
-                              <div key={idx} className="group flex items-center gap-3 rounded-xl border border-slate-100 p-4">{inner}<ArrowUpRight className="h-4 w-4 shrink-0 text-slate-200" /></div>
+                              <div key={idx} className="group flex items-center gap-3 rounded-xl border border-white/[0.06] p-3">{inner}</div>
                             );
                           })}
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </div>
                     );
                   })}
                 </div>
               </TabsContent>
             </Tabs>
-          ) : (
-            <div className="relative">
-              <div className="grid gap-8 lg:grid-cols-2">
-                <Card className="border-border/40">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Award className="h-5 w-5 text-primary" />
-                      {t(UI.results.radar, lang)}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="relative h-[320px] w-full">
-                      <div className="blur-md">
-                        <ResponsiveContainer width="100%" height={320}>
-                          <RadarChart cx="50%" cy="50%" outerRadius="70%" data={dimensionScores}>
-                            <PolarGrid stroke="#e2e8f0" strokeOpacity={0.8} />
-                            <PolarAngleAxis dataKey="shortName" tick={{ fill: "#64748b", fontSize: 11, fontWeight: 600 }} />
-                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: "#94a3b8", fontSize: 10 }} axisLine={false} />
-                            <Radar name="Score" dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.18} strokeWidth={2.5} />
-                          </RadarChart>
-                        </ResponsiveContainer>
-                      </div>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-white/60 backdrop-blur-[1px]">
-                        <Lock className="h-8 w-8 text-slate-400" />
-                        <p className="mt-2 text-sm font-semibold text-slate-600">
-                          {lang === "zh" ? "升级 Pro 查看完整雷达图" : "Upgrade to Pro for full radar chart"}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <div className="space-y-6">
-                  <Card className="border-border/40">
-                    <CardHeader className="pb-4">
-                      <CardTitle className="flex items-center gap-2 text-lg text-slate-400">
-                        <TrendingUp className="h-5 w-5" />
-                        {t(UI.results.strengths, lang)}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="relative">
-                        <div className="space-y-3 blur-sm">
-                          {strengths.map((dim) => (
-                            <div key={dim.id} className="flex items-center justify-between rounded-xl bg-teal-50 p-4">
-                              <div className="flex items-center gap-4">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-100"><Brain className="h-5 w-5 text-teal-600" /></div>
-                                <p className="font-medium text-foreground">{dim.name}</p>
-                              </div>
-                              <Badge className="bg-teal-500 text-white hover:bg-teal-500">{dim.score}%</Badge>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <button onClick={() => setShowPayment(true)} className="flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition-all hover:bg-indigo-500">
-                            <Lock className="h-4 w-4" />
-                            {lang === "zh" ? "升级 Pro 解锁" : "Unlock with Pro"}
-                          </button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
+          </div>
+        )}
+      </div>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-white/[0.06] bg-[#07070d] px-6 py-8">
-        <div className="mx-auto flex max-w-6xl items-center justify-between text-xs text-slate-600">
+      <footer className="border-t border-white/[0.06] px-6 py-8">
+        <div className="mx-auto flex max-w-5xl items-center justify-between text-xs text-slate-600">
           <a href="/" className="flex items-center gap-2 text-slate-400 transition-colors hover:text-white">
-            <Brain className="h-4 w-4" />
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600">
+              <Brain className="h-3 w-3 text-white" />
+            </div>
             <span className="font-semibold">{lang === "zh" ? "AI 素养" : "AI Fluency"}</span>
           </a>
-          <p>© {new Date().getFullYear()} AI Fluency</p>
+          <p>&copy; {new Date().getFullYear()} AI Fluency &middot; {lang === "zh" ? "保留所有权利" : "All rights reserved"}</p>
         </div>
       </footer>
 
