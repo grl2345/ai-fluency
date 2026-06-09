@@ -374,12 +374,13 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
 
             {/* Level Timeline */}
             <div className="mb-10">
-              <div className="flex items-center justify-between">
-                {levels.map((lvl, i) => {
+              {/* Icons row */}
+              <div className="relative flex items-center justify-between px-2">
+                {levels.map((lvl) => {
                   const isActive = lvl.level === mainTier;
                   const isPast = lvl.level < mainTier;
                   return (
-                    <div key={lvl.badge} className="flex flex-col items-center gap-2">
+                    <div key={lvl.badge} className="z-10 flex flex-col items-center">
                       <div className={`relative flex h-12 w-12 items-center justify-center rounded-xl text-xs font-bold transition-all ${
                         isActive
                           ? "bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-lg shadow-violet-500/30"
@@ -392,6 +393,26 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                           <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-[#12122a] bg-emerald-400" />
                         )}
                       </div>
+                    </div>
+                  );
+                })}
+                {/* Connection line behind icons */}
+                <div className="absolute inset-x-8 top-1/2 h-0.5 -translate-y-1/2">
+                  <div className="absolute inset-0 bg-white/[0.06]" />
+                  <div
+                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 to-violet-500"
+                    style={{ width: `${((mainTier - 1) / 4) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Labels row */}
+              <div className="mt-3 flex items-start justify-between px-2">
+                {levels.map((lvl) => {
+                  const isActive = lvl.level === mainTier;
+                  const isPast = lvl.level < mainTier;
+                  return (
+                    <div key={lvl.badge} className="flex w-12 flex-col items-center gap-1">
                       <span className={`text-xs font-bold ${isActive ? "text-white" : isPast ? "text-indigo-400" : "text-slate-600"}`}>
                         {lvl.badge}
                       </span>
@@ -406,14 +427,6 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                     </div>
                   );
                 })}
-              </div>
-              {/* Connection line */}
-              <div className="relative mx-6 mt-[-62px] mb-10 h-0.5">
-                <div className="absolute inset-0 bg-white/[0.06]" />
-                <div
-                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 to-violet-500"
-                  style={{ width: `${((mainTier - 1) / 4) * 100}%` }}
-                />
               </div>
             </div>
 
