@@ -412,15 +412,15 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                   const isActive = lvl.level === mainTier;
                   const isPast = lvl.level < mainTier;
                   return (
-                    <div key={lvl.badge} className="flex w-12 flex-col items-center gap-1">
+                    <div key={lvl.badge} className="flex flex-col items-center gap-1">
                       <span className={`text-xs font-bold ${isActive ? "text-white" : isPast ? "text-indigo-400" : "text-slate-600"}`}>
                         {lvl.badge}
                       </span>
-                      <span className={`max-w-[64px] text-center text-[10px] leading-tight ${isActive ? "text-slate-300" : "text-slate-600"}`}>
+                      <span className={`whitespace-nowrap text-[10px] leading-tight ${isActive ? "text-slate-300" : "text-slate-600"}`}>
                         {lvl.name[lang]}
                       </span>
                       {isActive && (
-                        <span className="mt-1 rounded-full bg-violet-500/20 px-2.5 py-1 text-[10px] font-bold text-violet-300">
+                        <span className="mt-1 whitespace-nowrap rounded-full bg-violet-500/20 px-2.5 py-1 text-[10px] font-bold text-violet-300">
                           {lang === "zh" ? "当前阶段" : "Current"}
                         </span>
                       )}
