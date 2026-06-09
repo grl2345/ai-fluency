@@ -303,7 +303,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-6 grid gap-4 md:grid-cols-2"
+          className="mt-8 grid gap-5 md:grid-cols-2"
         >
           {/* Strengths */}
           <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-5 md:p-6">
@@ -363,43 +363,43 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-6 grid gap-4 md:grid-cols-2"
+          className="mt-8 grid gap-5 md:grid-cols-2"
         >
           {/* Growth Path */}
-          <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-5 md:p-6">
-            <h3 className="mb-6 flex items-center gap-2 text-sm font-bold text-slate-200">
+          <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-6 md:p-8">
+            <h3 className="mb-8 flex items-center gap-2 text-sm font-bold text-slate-200">
               <BarChart3 className="h-4 w-4 text-indigo-400" />
               {lang === "zh" ? "你的 AI 成长路径" : "Your AI Growth Path"}
             </h3>
 
             {/* Level Timeline */}
-            <div className="mb-6">
+            <div className="mb-10">
               <div className="flex items-center justify-between">
                 {levels.map((lvl, i) => {
                   const isActive = lvl.level === mainTier;
                   const isPast = lvl.level < mainTier;
                   return (
-                    <div key={lvl.badge} className="flex flex-col items-center gap-1.5">
-                      <div className={`relative flex h-10 w-10 items-center justify-center rounded-xl text-xs font-bold transition-all ${
+                    <div key={lvl.badge} className="flex flex-col items-center gap-2">
+                      <div className={`relative flex h-12 w-12 items-center justify-center rounded-xl text-xs font-bold transition-all ${
                         isActive
                           ? "bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-lg shadow-violet-500/30"
                           : isPast
                             ? "bg-indigo-500/15 text-indigo-400"
                             : "bg-white/[0.04] text-slate-600"
                       }`}>
-                        <Brain className="h-4 w-4" />
+                        <Brain className="h-5 w-5" />
                         {isActive && (
-                          <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-[#12122a] bg-emerald-400" />
+                          <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-[#12122a] bg-emerald-400" />
                         )}
                       </div>
-                      <span className={`text-[10px] font-bold ${isActive ? "text-white" : isPast ? "text-indigo-400" : "text-slate-600"}`}>
+                      <span className={`text-xs font-bold ${isActive ? "text-white" : isPast ? "text-indigo-400" : "text-slate-600"}`}>
                         {lvl.badge}
                       </span>
-                      <span className={`max-w-[56px] text-center text-[9px] leading-tight ${isActive ? "text-slate-300" : "text-slate-600"}`}>
+                      <span className={`max-w-[64px] text-center text-[10px] leading-tight ${isActive ? "text-slate-300" : "text-slate-600"}`}>
                         {lvl.name[lang]}
                       </span>
                       {isActive && (
-                        <span className="mt-0.5 rounded-full bg-violet-500/20 px-2 py-0.5 text-[9px] font-bold text-violet-300">
+                        <span className="mt-1 rounded-full bg-violet-500/20 px-2.5 py-1 text-[10px] font-bold text-violet-300">
                           {lang === "zh" ? "当前阶段" : "Current"}
                         </span>
                       )}
@@ -408,7 +408,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                 })}
               </div>
               {/* Connection line */}
-              <div className="relative mx-5 mt-[-52px] mb-8 h-0.5">
+              <div className="relative mx-6 mt-[-62px] mb-10 h-0.5">
                 <div className="absolute inset-0 bg-white/[0.06]" />
                 <div
                   className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 to-violet-500"
@@ -419,24 +419,24 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
 
             {/* Next level info */}
             {nextLevel && (
-              <div className="space-y-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-slate-400">
+              <div className="space-y-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
+                <div>
+                  <p className="text-sm text-slate-400">
                     {lang === "zh" ? `距离下一等级：` : "Next level: "}
                     <span className="font-bold text-white">{nextLevel.name[lang]} ({nextLevel.badge})</span>
                     {lang === "zh" ? ` 还差 ` : " — "}
                     <span className="font-bold text-amber-400">{nextLevelGap} {lang === "zh" ? "分" : "pts"}</span>
                   </p>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {weaknesses.slice(0, 3).map((dim, i) => {
                     const fullDim = dimensions.find((d) => d.id === dim.id);
                     const Icon = iconMap[fullDim?.icon || "Brain"];
                     const boost = Math.max(3, Math.round((100 - dim.score) * 0.12));
                     return (
-                      <div key={dim.id} className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2 text-slate-300">
-                          <Icon className="h-3.5 w-3.5 text-slate-500" />
+                      <div key={dim.id} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2.5 text-slate-300">
+                          <Icon className="h-4 w-4 text-slate-500" />
                           {dim.name}
                         </div>
                         <span className="font-bold text-emerald-400">+{boost}</span>
@@ -444,7 +444,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                     );
                   })}
                 </div>
-                <div className="flex items-center justify-between border-t border-white/[0.06] pt-3">
+                <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
                   <span className="text-[10px] text-slate-500">{lang === "zh" ? "预计成长时间" : "Est. growth time"}</span>
                   <div className="flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5 text-indigo-400" />
@@ -457,15 +457,15 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
           </div>
 
           {/* Recommendations */}
-          <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-5 md:p-6">
+          <div className="rounded-3xl border border-white/[0.08] bg-[#12122a] p-6 md:p-8">
             <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-slate-200">
               <Star className="h-4 w-4 text-amber-400" />
               {lang === "zh" ? "为你推荐的下一步" : "Recommended Next Steps"}
             </h3>
-            <p className="mb-5 text-xs text-slate-500">
+            <p className="mb-6 text-xs text-slate-500">
               {lang === "zh" ? "未来 7 天优先提升" : "Priority for the next 7 days"}
             </p>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {weaknesses.slice(0, 3).map((dim, i) => {
                 const fullDim = dimensions.find((d) => d.id === dim.id);
                 const steps = {
@@ -493,13 +493,13 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                   ],
                 };
                 return (
-                  <div key={dim.id} className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3.5 transition-colors hover:bg-white/[0.04]">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500/20 to-indigo-500/20 text-sm font-bold text-violet-300">
+                  <div key={dim.id} className="flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-4 transition-colors hover:bg-white/[0.04]">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500/20 to-indigo-500/20 text-sm font-bold text-violet-300">
                       {String(i + 1).padStart(2, "0")}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-slate-200">{steps[lang][i]}</p>
-                      <p className="mt-0.5 text-xs text-slate-500">{descs[lang][i]}</p>
+                      <p className="mt-1 text-xs text-slate-500">{descs[lang][i]}</p>
                     </div>
                   </div>
                 );
@@ -507,14 +507,14 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
             </div>
 
             {hasPro ? (
-              <a href="#learning" className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-500 py-3 text-sm font-bold text-white transition-all hover:from-fuchsia-400 hover:to-violet-400">
+              <a href="#learning" className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-500 py-3 text-sm font-bold text-white transition-all hover:from-fuchsia-400 hover:to-violet-400">
                 {lang === "zh" ? "查看学习资源" : "View Learning Resources"}
                 <ArrowRight className="h-4 w-4" />
               </a>
             ) : (
               <button
                 onClick={() => setShowPayment(true)}
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-500 py-3 text-sm font-bold text-white transition-all hover:from-fuchsia-400 hover:to-violet-400"
+                className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-500 py-3 text-sm font-bold text-white transition-all hover:from-fuchsia-400 hover:to-violet-400"
               >
                 {lang === "zh" ? "查看学习资源" : "View Learning Resources"}
                 <ArrowRight className="h-4 w-4" />
