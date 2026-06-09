@@ -172,12 +172,6 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
     return t(UI.results.gapNeutral, lang);
   }, [profileData, mainTier, lang]);
 
-  // Percentile: tier 1→10, 2→30, 3→55, 4→78, 5→95
-  const percentile = useMemo(() => {
-    const map: Record<number, number> = { 1: 10, 2: 30, 3: 55, 4: 78, 5: 95 };
-    return map[mainTier] ?? 50;
-  }, [mainTier]);
-
   const sortedDimensions = useMemo(
     () => [...dimensionScores].sort((a, b) => b.score - a.score),
     [dimensionScores]
@@ -239,7 +233,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
             </div>
           </motion.div>
 
-          {/* Percentile Banner */}
+          {/* Level Banner */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -252,7 +246,7 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
               ))}
             </div>
             <p className="text-sm font-semibold text-indigo-700">
-              {t(UI.results.percentile, lang)} <span className="text-indigo-900">{percentile}%</span> {t(UI.results.percentileSuffix, lang)}
+              {lang === "zh" ? "能力等级：" : "Level: "}<span className="text-indigo-900">{currentLevel.name[lang]}</span>
             </p>
           </motion.div>
 

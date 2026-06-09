@@ -36,8 +36,8 @@ export default function TermsPage() {
             <h2 className="mb-3 text-lg font-bold text-white">{zh ? "1. 服务概述" : "1. Service Overview"}</h2>
             <p>
               {zh
-                ? "AI Fluency Check（以下简称「本平台」）是由 aifluencycheck.com 运营的在线 AI 素养测评服务。用户可以通过完成测评获取个性化的 AI 能力报告和提升建议。"
-                : 'AI Fluency Check ("the Platform") is an online AI literacy assessment service operated at aifluencycheck.com. Users complete assessments to receive personalized AI competency reports and improvement recommendations.'}
+                ? "AI Fluency Check（以下简称「本平台」）是由 AI Fluency（以下简称「我们」）运营的在线 AI 素养测评服务。运营方联系方式：support@aifluency.app。用户可以通过完成测评获取个性化的 AI 能力报告和提升建议。"
+                : 'AI Fluency Check ("the Platform") is an online AI literacy assessment service operated by AI Fluency ("we", "us"). Operator contact: support@aifluency.app. Users complete assessments to receive personalized AI competency reports and improvement recommendations.'}
             </p>
           </section>
 

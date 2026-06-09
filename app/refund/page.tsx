@@ -45,8 +45,8 @@ export default function RefundPage() {
             <h2 className="mb-3 text-lg font-bold text-white">{zh ? "退款申请" : "Refund Requests"}</h2>
             <p>
               {zh
-                ? "如果您在订阅后 7 天内且尚未使用测评服务（未开始任何测评），您可以申请全额退款。请发送邮件至 support@aifluency.app，附上您的注册邮箱和 PayPal 交易 ID。"
-                : "If you request a refund within 7 days of subscribing and have not used the assessment service (no assessment started), you are eligible for a full refund. Email support@aifluency.app with your registered email and PayPal transaction ID."}
+                ? "如果您在订阅后 14 天内且尚未使用测评服务（未开始任何测评），您可以申请全额退款。请发送邮件至 support@aifluency.app，附上您的注册邮箱和 PayPal 交易 ID。"
+                : "If you request a refund within 14 days of subscribing and have not used the assessment service (no assessment started), you are eligible for a full refund. Email support@aifluency.app with your registered email and PayPal transaction ID."}
             </p>
           </section>
 
@@ -54,8 +54,8 @@ export default function RefundPage() {
             <h2 className="mb-3 text-lg font-bold text-white">{zh ? "不予退款的情况" : "Non-Refundable Scenarios"}</h2>
             <p>
               {zh
-                ? "以下情况不予退款：已完成或开始测评后；订阅超过 7 天后；因违反服务条款被终止的账户。"
-                : "Refunds are not available: after an assessment has been started or completed; more than 7 days after subscribing; or for accounts terminated due to Terms of Service violations."}
+                ? "以下情况不予退款：已完成或开始测评后；订阅超过 14 天后；因违反服务条款被终止的账户。"
+                : "Refunds are not available: after an assessment has been started or completed; more than 14 days after subscribing; or for accounts terminated due to Terms of Service violations."}
             </p>
           </section>
 
@@ -65,6 +65,15 @@ export default function RefundPage() {
               {zh
                 ? "退款将通过 PayPal 原路返回，通常在 5-10 个工作日内处理完毕。退款金额为原始支付金额，不含 PayPal 交易手续费（如有）。"
                 : "Refunds are processed back to your PayPal account, typically within 5–10 business days. The refund amount is the original payment minus any PayPal transaction fees (if applicable)."}
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-bold text-white">{zh ? "欧盟消费者权益" : "EU Consumer Rights"}</h2>
+            <p>
+              {zh
+                ? "如果您是欧盟消费者，根据欧盟消费者权益指令，您有权在购买后 14 天内无理由取消订阅并获得全额退款。此权利不受上述条件限制。请通过 support@aifluency.app 联系我们行使此权利。"
+                : "If you are an EU consumer, under the EU Consumer Rights Directive you have the right to cancel your subscription within 14 days of purchase for any reason and receive a full refund. This right applies regardless of the conditions above. Contact support@aifluency.app to exercise this right."}
             </p>
           </section>
 
