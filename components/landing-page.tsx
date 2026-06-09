@@ -18,8 +18,7 @@ import {
 } from "lucide-react";
 import { PaymentModal } from "@/components/payment-modal";
 import { useSubscription } from "@/components/subscription-provider";
-import { isHigherPlan, type PlanKey } from "@/lib/plans";
-import { planDisplayName } from "@/lib/subscription";
+import type { PlanKey } from "@/lib/plans";
 
 interface LandingPageProps {
   onStartTest: () => void;
@@ -258,7 +257,6 @@ export function LandingPage({
   const { lang, setLang } = useLang();
   const [openFaq, setOpenFaq] = React.useState<number | null>(null);
   const [paymentPlan, setPaymentPlan] = React.useState<PlanKey | null>(null);
-  const [subscribeToast, setSubscribeToast] = React.useState<PlanKey | null>(null);
 
   const startLabel = isAuthenticated ? t(UI.nav.startTest, lang) : t(UI.nav.startTestGuest, lang);
   const startDisabled = authLoading;
@@ -581,26 +579,9 @@ export function LandingPage({
         </div>
       </section>
 
-      {/* ── Testimonials + Pricing ── */}
+      {/* ── Pricing ── */}
       <section id="pricing" className="relative overflow-hidden border-t border-white/[0.06] bg-white/[0.015] px-6 py-24 md:py-28">
         <div className="mx-auto max-w-6xl">
-          {subscribeToast && (
-            <div className="mx-auto mb-8 flex w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-medium text-emerald-300">
-              <span className="inline-flex items-center gap-2">
-                <Check className="h-4 w-4 shrink-0" />
-                {t(UI.billing.subscribeSuccess, lang)} {planDisplayName(subscribeToast, lang)}!
-              </span>
-              <button
-                onClick={onStartTest}
-                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3.5 py-1 font-semibold text-emerald-100 transition-colors hover:bg-emerald-500/30"
-              >
-                {lang === "zh" ? "开始测评" : "Start the assessment"}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          )}
-
-
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-extrabold tracking-tight text-white md:text-4xl">
               {t(UI.pricing.title, lang)}
@@ -610,147 +591,118 @@ export function LandingPage({
             </p>
           </div>
 
-          <div>
-            <div className="grid items-stretch gap-5 md:grid-cols-3">
-              {(
-                [
-                  {
-                    key: "starter" as const,
-                    name: t(UI.pricing.starter.name, lang),
-                    price: t(UI.pricing.starter.price, lang),
-                    period: t(UI.pricing.starter.period, lang),
-                    desc: t(UI.pricing.starter.desc, lang),
-                    features: UI.pricing.starter.features[lang] as readonly string[],
-                    highlighted: false,
-                    isCurrent: hasActiveSubscription && subscription?.plan === "starter",
-                    disabled: hasActiveSubscription && subscription ? isHigherPlan(subscription.plan, "starter") : false,
-                    action: () => {
-                      if (!user) redirectToSignIn("/#pricing");
-                      else if (hasActiveSubscription && subscription?.plan === "starter") window.location.href = "/account";
-                      else setPaymentPlan("starter");
-                    },
-                  },
-                  {
-                    key: "pro" as const,
-                    name: t(UI.pricing.pro.name, lang),
-                    price: t(UI.pricing.pro.price, lang),
-                    period: t(UI.pricing.pro.period, lang),
-                    desc: t(UI.pricing.pro.desc, lang),
-                    features: UI.pricing.pro.features[lang] as readonly string[],
-                    highlighted: true,
-                    isCurrent: hasActiveSubscription && subscription?.plan === "pro",
-                    disabled: hasActiveSubscription && subscription ? isHigherPlan(subscription.plan, "pro") : false,
-                    action: () => {
-                      if (!user) redirectToSignIn("/#pricing");
-                      else if (hasActiveSubscription && subscription?.plan === "pro") window.location.href = "/account";
-                      else setPaymentPlan("pro");
-                    },
-                  },
-                  {
-                    key: "team" as const,
-                    name: t(UI.pricing.team.name, lang),
-                    price: t(UI.pricing.team.price, lang),
-                    period: t(UI.pricing.team.period, lang),
-                    desc: t(UI.pricing.team.desc, lang),
-                    features: UI.pricing.team.features[lang] as readonly string[],
-                    highlighted: false,
-                    isCurrent: hasActiveSubscription && subscription?.plan === "team",
-                    disabled: false,
-                    action: () => {
-                      if (hasActiveSubscription && subscription?.plan === "team") {
-                        window.location.href = "/account";
-                      } else {
-                        window.location.href = "mailto:support@aifluency.app?subject=Team%20Plan%20Inquiry";
-                      }
-                    },
-                  },
-                ] as const
-              ).map((plan, i) => {
-                const priceMatch = plan.price.match(/^([¥$])([\d.]+)$/);
-                const currency = priceMatch?.[1] ?? "";
-                const amount = priceMatch?.[2] ?? plan.price;
-                const ctaLabel = plan.isCurrent
+          <div className="grid items-stretch gap-5 md:grid-cols-3">
+            {([
+              {
+                key: "free",
+                name: t(UI.pricing.free.name, lang),
+                desc: t(UI.pricing.free.desc, lang),
+                price: lang === "zh" ? "免费" : "Free",
+                features: UI.pricing.free.features[lang] as readonly string[],
+                highlighted: false,
+                action: onStartTest,
+                ctaLabel: t(UI.pricing.free.cta, lang),
+              },
+              {
+                key: "pro",
+                name: t(UI.pricing.pro.name, lang),
+                desc: t(UI.pricing.pro.desc, lang),
+                price: "$19.9",
+                features: UI.pricing.pro.features[lang] as readonly string[],
+                highlighted: true,
+                action: () => {
+                  if (!user) redirectToSignIn("/#pricing");
+                  else if (hasActiveSubscription && subscription?.plan === "pro") window.location.href = "/account";
+                  else setPaymentPlan("pro");
+                },
+                ctaLabel: hasActiveSubscription && subscription?.plan === "pro"
                   ? t(UI.billing.manageSubscription, lang)
-                  : plan.disabled
-                    ? t(UI.billing.includedInHigher, lang)
-                    : plan.key === "team"
-                      ? (lang === "zh" ? "联系我们" : "Contact Us")
-                      : (lang === "zh" ? "立即测评" : "Start Now");
+                  : t(UI.pricing.pro.cta, lang),
+              },
+              {
+                key: "team",
+                name: t(UI.pricing.team.name, lang),
+                desc: t(UI.pricing.team.desc, lang),
+                price: lang === "zh" ? "联系我们" : "Contact Us",
+                features: UI.pricing.team.features[lang] as readonly string[],
+                highlighted: false,
+                action: () => {
+                  window.location.href = "mailto:support@aifluency.app?subject=Team%20Plan%20Inquiry";
+                },
+                ctaLabel: t(UI.pricing.team.cta, lang),
+              },
+            ]).map((plan, i) => {
+              const isProPrice = plan.key === "pro";
+              return (
+                <motion.div
+                  key={plan.key}
+                  initial={{ opacity: 0, y: 14 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.08 }}
+                  className="relative flex flex-col"
+                >
+                  {plan.highlighted && (
+                    <div className="pointer-events-none absolute -inset-px -z-10 rounded-[1.3rem] bg-gradient-to-b from-indigo-400/50 via-violet-500/20 to-transparent blur-sm" />
+                  )}
 
-                return (
-                  <motion.div
-                    key={plan.key}
-                    initial={{ opacity: 0, y: 14 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: i * 0.08 }}
-                    className="relative flex flex-col"
+                  <div
+                    className={`relative flex h-full flex-col overflow-hidden rounded-[1.2rem] p-5 md:p-6 ${
+                      plan.highlighted
+                        ? "bg-gradient-to-br from-[#15122b] via-[#120f24] to-[#0c0a18] shadow-[0_16px_60px_-8px_rgba(99,70,229,0.45)] ring-1 ring-indigo-400/30"
+                        : "border border-white/[0.08] bg-white/[0.03]"
+                    }`}
                   >
                     {plan.highlighted && (
-                      <div className="pointer-events-none absolute -inset-px -z-10 rounded-[1.3rem] bg-gradient-to-b from-indigo-400/50 via-violet-500/20 to-transparent blur-sm" />
+                      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-300/60 to-transparent" />
                     )}
 
-                    <div
-                      className={`relative flex h-full flex-col overflow-hidden rounded-[1.2rem] p-5 md:p-6 ${
+                    <div className="mb-5">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-semibold text-white">{plan.name}</h3>
+                        {plan.highlighted && (
+                          <span className="rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-bold text-indigo-300">
+                            {t(UI.pricing.popular, lang)}
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1 text-[12px] leading-snug text-slate-400">{plan.desc}</p>
+                    </div>
+
+                    <div className="mb-5 border-b border-white/[0.06] pb-5">
+                      <div className="flex items-end gap-0.5">
+                        {isProPrice && <span className="mb-1.5 text-base font-medium text-slate-400">$</span>}
+                        <span className={`text-[2.5rem] font-semibold leading-none tracking-tight ${
+                          plan.highlighted ? "bg-gradient-to-br from-white to-indigo-200 bg-clip-text text-transparent" : "text-white"
+                        } ${isProPrice ? "tabular-nums" : ""}`}>
+                          {isProPrice ? "19.9" : plan.price}
+                        </span>
+                      </div>
+                    </div>
+
+                    <ul className="flex-1 space-y-2.5">
+                      {plan.features.map((f) => (
+                        <li key={f} className="flex items-start gap-2.5">
+                          <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 stroke-[3] text-indigo-400" />
+                          <span className="text-[12px] leading-snug text-slate-300">{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      onClick={plan.action}
+                      className={`mt-6 w-full rounded-lg py-2.5 text-[12px] font-semibold tracking-wide transition-all active:scale-[0.98] ${
                         plan.highlighted
-                          ? "bg-gradient-to-br from-[#15122b] via-[#120f24] to-[#0c0a18] shadow-[0_16px_60px_-8px_rgba(99,70,229,0.45)] ring-1 ring-indigo-400/30"
-                          : "border border-white/[0.08] bg-white/[0.03]"
+                          ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-indigo-500/25 hover:from-indigo-400 hover:to-violet-400"
+                          : "border border-white/15 bg-white/[0.04] text-white hover:border-white/30 hover:bg-white/10"
                       }`}
                     >
-                      {plan.highlighted && (
-                        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-300/60 to-transparent" />
-                      )}
-
-                      <div className="mb-5">
-                        <h3 className="text-base font-semibold text-white">{plan.name}</h3>
-                        <p className="mt-1 text-[12px] leading-snug text-slate-400">{plan.desc}</p>
-                      </div>
-
-                      <div className="mb-5 border-b border-white/[0.06] pb-5">
-                        <div className="flex items-end gap-0.5">
-                          {currency && (
-                            <span className="mb-1.5 text-base font-medium text-slate-400">{currency}</span>
-                          )}
-                          <span className={`text-[2.5rem] font-semibold leading-none tracking-tight tabular-nums ${
-                            plan.highlighted ? "bg-gradient-to-br from-white to-indigo-200 bg-clip-text text-transparent" : "text-white"
-                          }`}>
-                            {amount}
-                          </span>
-                          {plan.key === "team" && (
-                            <span className="mb-1.5 ml-0.5 text-sm text-slate-400">{lang === "zh" ? "/起" : "/mo"}</span>
-                          )}
-                        </div>
-                      </div>
-
-                      <ul className="flex-1 space-y-2.5">
-                        {plan.features.map((f) => (
-                          <li key={f} className="flex items-start gap-2.5">
-                            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 stroke-[3] text-indigo-400" />
-                            <span className="text-[12px] leading-snug text-slate-300">{f}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      <button
-                        onClick={plan.action}
-                        disabled={plan.disabled}
-                        className={`mt-6 w-full rounded-lg py-2.5 text-[12px] font-semibold tracking-wide transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 ${
-                          plan.isCurrent
-                            ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                            : plan.disabled
-                              ? "border border-white/10 bg-white/[0.03] text-slate-500"
-                              : plan.highlighted
-                                ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-md shadow-indigo-500/25 hover:from-indigo-400 hover:to-violet-400"
-                                : "border border-white/15 bg-white/[0.04] text-white hover:border-white/30 hover:bg-white/10"
-                        }`}
-                      >
-                        {ctaLabel}
-                      </button>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
+                      {plan.ctaLabel}
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -821,11 +773,10 @@ export function LandingPage({
         <PaymentModal
           plan={paymentPlan}
           onClose={() => setPaymentPlan(null)}
-          onSuccess={async (plan) => {
+          onSuccess={async () => {
             setPaymentPlan(null);
-            setSubscribeToast(plan);
             await refresh();
-            document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
+            window.location.href = "/account";
           }}
         />
       )}

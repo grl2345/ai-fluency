@@ -15,12 +15,11 @@ const START_TEST_PATH = "/?start=test";
 
 export default function Page() {
   const { user, loading } = useAuth();
-  const { hasActiveSubscription, loading: subLoading, refresh } = useSubscription();
+  const { refresh } = useSubscription();
   const [appState, setAppState] = useState<AppState>("landing");
   const [testAnswers, setTestAnswers] = useState<Record<number, string>>({});
   const [practicalTexts, setPracticalTexts] = useState<Record<string, string>>({});
   const [profileData, setProfileData] = useState<Record<string, string | string[]>>({});
-  const [pendingStart, setPendingStart] = useState(false);
 
   const handleStartTest = useCallback(() => {
     if (loading) return;
@@ -28,30 +27,8 @@ export default function Page() {
       redirectToSignIn(START_TEST_PATH);
       return;
     }
-    // If already subscribed, go straight to testing; otherwise onboarding
-    if (subLoading) {
-      setPendingStart(true);
-      return;
-    }
-    if (hasActiveSubscription) {
-      setAppState("testing");
-    } else {
-      setAppState("onboarding");
-    }
-  }, [user, loading, subLoading, hasActiveSubscription]);
-
-  // Resolve deferred start once subscription state loads
-  useEffect(() => {
-    if (!pendingStart || loading || subLoading) return;
-    setPendingStart(false);
-    if (!user) {
-      redirectToSignIn(START_TEST_PATH);
-    } else if (hasActiveSubscription) {
-      setAppState("testing");
-    } else {
-      setAppState("onboarding");
-    }
-  }, [pendingStart, loading, subLoading, user, hasActiveSubscription]);
+    setAppState("onboarding");
+  }, [user, loading]);
 
   // Handle ?start=test after login redirect
   useEffect(() => {
@@ -60,7 +37,7 @@ export default function Page() {
     if (params.get("start") !== "test") return;
     window.history.replaceState({}, "", "/");
     if (user) {
-      setPendingStart(true);
+      setAppState("onboarding");
     } else {
       redirectToSignIn(START_TEST_PATH);
     }
@@ -76,7 +53,6 @@ export default function Page() {
 
   const handleOnboardingComplete = async (profile: Record<string, string | string[]>) => {
     setProfileData(profile);
-    await refresh();
     setAppState("testing");
   };
 

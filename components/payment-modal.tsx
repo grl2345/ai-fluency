@@ -15,29 +15,29 @@ interface PaymentModalProps {
 const PLAN_DETAILS = {
   starter: {
     name: { en: "Starter", zh: "入门版" },
-    price: { en: "$9.9", zh: "¥9.9" },
-    period: { en: "/month", zh: "/月" },
+    price: { en: "$9.9", zh: "$9.9" },
+    period: { en: "", zh: "" },
     features: {
-      en: ["AI Fluency assessment", "Basic report summary", "Core recommendations", "7-day email support"],
-      zh: ["AI 实力测评", "基础报告解读", "核心建议", "7 天邮件支持"],
+      en: ["AI Fluency Score", "AI Level Classification", "Top 3 Weakness Identification", "Basic Recommendations"],
+      zh: ["AI 实力评分", "AI 等级评定", "Top 3 弱项识别", "基础改进建议"],
     },
   },
   pro: {
     name: { en: "Pro", zh: "专业版" },
-    price: { en: "$19.9", zh: "¥19.9" },
-    period: { en: "/month", zh: "/月" },
+    price: { en: "$19.9", zh: "$19.9" },
+    period: { en: "", zh: "" },
     features: {
-      en: ["Detailed report analysis", "Personalized improvement plan", "Peer benchmark comparison", "30-day email support"],
-      zh: ["详细报告解读", "个性化提升建议", "能力对标分析", "30 天邮件支持"],
+      en: ["Detailed 6-Dimension Report", "Personalized 90-Day Learning Plan", "Benchmark Against Similar Professionals", "Downloadable PDF Report", "30-day Email Support"],
+      zh: ["六维度详细分析报告", "个性化 90 天学习计划", "同行能力对标排名", "可下载 PDF 报告", "30 天邮件支持"],
     },
   },
   team: {
-    name: { en: "Enterprise", zh: "企业版" },
-    price: { en: "$199.9", zh: "¥199.9" },
-    period: { en: "/mo", zh: "/月" },
+    name: { en: "Team", zh: "团队版" },
+    price: { en: "Contact Us", zh: "联系我们" },
+    period: { en: "", zh: "" },
     features: {
-      en: ["Team capability assessment", "Team report & benchmarks", "Custom training recommendations", "Dedicated customer success manager"],
-      zh: ["团队能力测评", "团队报告与对标分析", "定制化培训建议", "专属客户成功经理"],
+      en: ["Team Capability Dashboard", "Bulk Assessment & Reports", "Custom Training Recommendations", "Dedicated Customer Success Manager"],
+      zh: ["团队能力看板", "批量测评与报告导出", "定制化培训建议", "专属客户成功经理"],
     },
   },
 } as const;
