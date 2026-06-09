@@ -50,6 +50,7 @@ import {
   User,
 } from "lucide-react";
 import { useSubscription } from "@/components/subscription-provider";
+import { useAuth } from "@/components/auth-provider";
 
 interface ResultsPageProps {
   answers: Record<number, string>;
@@ -108,9 +109,6 @@ function HexBadge({ level, size = 120 }: { level: number; size?: number }) {
   );
 }
 
-function AvatarEmoji() {
-  return <span className="text-6xl leading-none select-none">🧑‍💻</span>;
-}
 
 function QRCodePlaceholder() {
   return (
@@ -133,10 +131,12 @@ function QRCodePlaceholder() {
 export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: ResultsPageProps) {
   const { lang } = useLang();
   const { isPro, isTeam } = useSubscription();
+  const { user } = useAuth();
   const hasPro = isPro || isTeam;
   const [showPayment, setShowPayment] = useState(false);
   const [copied, setCopied] = useState(false);
   const zh = lang === "zh";
+  const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || (zh ? "用户" : "User");
 
   const dimensionScores = useMemo(() => {
     const scores: Record<string, { total: number; max: number }> = {};
@@ -347,9 +347,12 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                 <span className="text-[9px] font-bold text-slate-400">{zh ? "AI 素养" : "AI Fluency"}</span>
               </div>
 
-              <div className="mt-2 flex items-start justify-between">
+              {/* User name */}
+              <p className="mt-2 text-sm font-extrabold text-white">{userName}</p>
+
+              <div className="mt-1 flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-extrabold text-white">{currentLevel.name[lang]}</p>
+                  <p className="text-xs font-bold text-slate-300">{currentLevel.name[lang]}</p>
                   <span className="mt-1 inline-block rounded bg-gradient-to-r from-indigo-500 to-violet-500 px-1.5 py-0.5 text-[8px] font-bold text-white">
                     LEVEL {mainTier}
                   </span>
@@ -366,9 +369,6 @@ export function ResultsPage({ answers, practicalTexts, profileData, onRetake }: 
                     {zh ? "的用户" : "of people"}
                   </p>
                 </div>
-
-                {/* Avatar */}
-                <AvatarEmoji />
               </div>
 
               {/* QR Code area */}
