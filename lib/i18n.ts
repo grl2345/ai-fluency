@@ -67,12 +67,12 @@ export const UI = {
     },
   },
   hero: {
-    badge: { zh: '登录后开始测评', en: 'Sign in to start' },
+    badge: { zh: '¥9.9 起 · 登录后开始', en: 'From $9.9 · Sign in to start' },
     title1: { zh: '你到底有多懂', en: 'How good are you' },
     titleHighlight: { zh: 'AI 素养', en: 'with AI' },
     title2: { zh: '？', en: ', really?' },
     desc: { zh: '15 分钟，跨六大维度测出你真实的 AI 素养水平。拿到个性化报告，看清你的强项和盲区。', en: 'Take the 15-minute assessment and find out where you really stand across six dimensions of AI fluency. Get a personalized report that shows your strengths and blind spots.' },
-    cta: { zh: '免费开始测评', en: 'Start Free Assessment' },
+    cta: { zh: '开始测评', en: 'Start Assessment' },
     ctaSecondary: { zh: '查看示例报告', en: 'See a sample report' },
     minutes: { zh: '分钟', en: 'minutes' },
     questions: { zh: '道题', en: 'questions' },
@@ -100,25 +100,25 @@ export const UI = {
   cta: {
     title: { zh: '准备好发现你的 AI 潜力了吗？', en: 'Ready to discover your AI potential?' },
     subtitle: { zh: '发现你的 AI 优势和成长空间', en: 'Find your AI strengths and unlock your growth potential' },
-    btn: { zh: '免费开始测评', en: 'Start Your Free Assessment' },
+    btn: { zh: '开始测评', en: 'Start Your Assessment' },
   },
   footer: {
     tagline: { zh: '帮助专业人士驾驭 AI 时代', en: 'Helping professionals navigate the AI era' },
   },
   pricing: {
     title: { zh: '简单透明的定价', en: 'Simple, Transparent Pricing' },
-    subtitle: { zh: '免费测评，按需升级', en: 'Free assessment, upgrade when you need more' },
+    subtitle: { zh: '简单定价，按需升级', en: 'Simple pricing, upgrade when you need more' },
     popular: { zh: '最受欢迎', en: 'Most Popular' },
     free: {
-      name: { zh: '免费版', en: 'Free' },
-      price: { zh: '¥0', en: '$0' },
+      name: { zh: '入门版', en: 'Starter' },
+      price: { zh: '¥9.9', en: '$9.9' },
       period: { zh: '', en: '' },
-      desc: { zh: '免费了解你的 AI 实力水平', en: 'Discover your AI fluency level for free' },
+      desc: { zh: '了解你的 AI 实力水平', en: 'Discover your AI fluency level' },
       features: {
         zh: ['AI 实力评分', 'AI 等级评定', 'Top 3 弱项识别', '基础改进建议'],
         en: ['AI Fluency Score', 'AI Level Classification', 'Top 3 Weakness Identification', 'Basic Recommendations'],
       },
-      cta: { zh: '免费开始', en: 'Start Free' },
+      cta: { zh: '立即购买', en: 'Get Started' },
     },
     pro: {
       name: { zh: '专业版', en: 'Pro' },
