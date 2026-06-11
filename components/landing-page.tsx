@@ -594,13 +594,16 @@ export function LandingPage({
           <div className="grid items-stretch gap-5 md:grid-cols-3">
             {([
               {
-                key: "free",
+                key: "starter",
                 name: t(UI.pricing.free.name, lang),
                 desc: t(UI.pricing.free.desc, lang),
-                price: lang === "zh" ? "免费" : "Free",
+                price: "$9.9",
                 features: UI.pricing.free.features[lang] as readonly string[],
                 highlighted: false,
-                action: onStartTest,
+                action: () => {
+                  if (!user) redirectToSignIn("/#pricing");
+                  else setPaymentPlan("starter");
+                },
                 ctaLabel: t(UI.pricing.free.cta, lang),
               },
               {
@@ -632,7 +635,7 @@ export function LandingPage({
                 ctaLabel: t(UI.pricing.team.cta, lang),
               },
             ]).map((plan, i) => {
-              const isProPrice = plan.key === "pro";
+              const isProPrice = plan.key === "pro" || plan.key === "starter";
               return (
                 <motion.div
                   key={plan.key}
@@ -675,7 +678,7 @@ export function LandingPage({
                         <span className={`text-[2.5rem] font-semibold leading-none tracking-tight ${
                           plan.highlighted ? "bg-gradient-to-br from-white to-indigo-200 bg-clip-text text-transparent" : "text-white"
                         } ${isProPrice ? "tabular-nums" : ""}`}>
-                          {isProPrice ? "19.9" : plan.price}
+                          {isProPrice ? plan.price.replace("$", "") : plan.price}
                         </span>
                       </div>
                     </div>
